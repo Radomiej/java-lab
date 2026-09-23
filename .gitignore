@@ -1,0 +1,7 @@
+node_modules/
+dist/
+server/.runtime/
+*.log
+.env
+.env.*
+!.env.example
