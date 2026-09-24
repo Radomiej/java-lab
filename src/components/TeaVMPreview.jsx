@@ -5,8 +5,7 @@ function statusLabel(status) {
   return "Czeka na uruchomienie";
 }
 
-export default function TeaVMPreview({ runner, mainClass, runMode, onRun }) {
-  const isSwing = runMode === "swing";
+export default function TeaVMPreview({ runner, mainClass, onRun }) {
   const isReady = runner.status === "ready" && runner.output;
 
   return (
@@ -17,10 +16,10 @@ export default function TeaVMPreview({ runner, mainClass, runMode, onRun }) {
       </div>
       <p className="preview-copy">Klasa <code>{mainClass}</code> jest kompilowana i uruchamiana w przeglądarce przez TeaVM. Nie używamy lokalnej Javy ani JAR-a.</p>
       <div className="teavm-display" aria-live="polite">
-        {isReady ? <pre className="teavm-output">{runner.output}</pre> : <span>{runner.stage || (isSwing ? "TeaVM nie udostępnia bibliotek Swing w tym kursie." : "Wynik pojawi się po uruchomieniu programu.")}</span>}
+        {isReady ? <pre className="teavm-output">{runner.output}</pre> : <span>{runner.stage || "Wynik pojawi się po uruchomieniu programu."}</span>}
       </div>
       <button className="button button--teavm button--wide" type="button" onClick={onRun} disabled={runner.status === "compiling"}>
-        {isSwing ? "Sprawdź zgodność kodu z TeaVM" : "▶ Uruchom w TeaVM"}
+        ▶ Uruchom w TeaVM
       </button>
       <p className="preview-note">Oficjalne zasoby TeaVM są dołączone lokalnie, a kompilacja i uruchomienie działają w Web Workerze. Kurs używa Java 21.</p>
     </section>

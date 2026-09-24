@@ -1,4 +1,4 @@
-export const trackOrder = ["fundamentals", "objects", "inheritance", "swing"];
+export const trackOrder = ["fundamentals", "objects", "inheritance"];
 
 export const tracks = {
   fundamentals: {
@@ -24,13 +24,5 @@ export const tracks = {
     description: "Polimorfizm, overriding i bezpieczne wyjątki.",
     accent: "#dcb86b",
     icon: "03",
-  },
-  swing: {
-    id: "swing",
-    label: "Swing",
-    shortLabel: "GUI",
-    description: "Pierwsze okna, komponenty, zdarzenia i projekt.",
-    accent: "#e889a1",
-    icon: "04",
   },
 };

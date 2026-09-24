@@ -13,7 +13,7 @@ export default function LessonWorkspace({ lesson, activeTask, activeFile, files,
           <div><p className="eyebrow">Laboratorium kodu</p><h2 id="editor-title">Zbuduj rozwiązanie</h2></div>
           <span className="language-badge">Java 21 · WebAssembly</span>
         </div>
-        <CodeEditor files={files} activeFile={activeFile} onFileChange={onFileChange} onCodeChange={onCodeChange} onCheck={onCheck} onCompile={onCompile} onReset={onReset} onSolution={onSolution} runner={runner} />
+        <CodeEditor files={files} activeFile={activeFile} taskId={activeTask.id} onFileChange={onFileChange} onCodeChange={onCodeChange} onCheck={onCheck} onCompile={onCompile} onReset={onReset} onSolution={onSolution} runner={runner} />
       </section>
       <FeedbackPanel report={checkReport} />
     </div>

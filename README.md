@@ -9,6 +9,10 @@ TeaVM kompiluje go do WebAssembly, a wynik `main()` jest pokazywany w panelu
 konsoli. Kurs nie uruchamia lokalnego JDK, nie tworzy JAR-a i nie wymaga
 lokalnego serwera Java.
 
+Kod jest edytowany w Monaco. Przycisk `?` przy nazwie pliku otwiera tooltip z
+podpowiedziami IntelliSense i skrótami klawiszowymi znanymi z Eclipse oraz VS
+Code.
+
 ## Uruchomienie
 
 Wymagania:
@@ -44,10 +48,7 @@ Kurs używa składni i API Java 21, zgodnie z aktualnym kompilatorem TeaVM
 Playground. Podstawowe przykłady działają w całości w przeglądarce, a wersja
 bytecode'u jest sprawdzana podczas diagnostyki.
 
-Swing pozostaje osobną ścieżką wyjaśniającą API. TeaVM nie dostarcza w tym
-runtime biblioteki `javax.swing`, więc lekcje Swing mogą sprawdzać strukturę
-kodu, ale nie otwierają natywnego okna w przeglądarce. Interfejs webowy kursu
-jest zbudowany w React.
+Kurs skupia się na konsolowej Javie i podstawach obiektowości.
 
 JUnit 5 nie jest ładowany do runtime'u lekcji. Zadania mają szybki checker
 źródła, a pełne testy JUnit mogą zostać dodane jako osobny etap kompilowany
@@ -62,7 +63,6 @@ w zadaniu prowadzonym, żeby dwa kolejne ćwiczenia sprawdzały samodzielność.
 - Fundamenty: pierwszy program, zmienne, typy, warunki, pętle i metody.
 - Obiekty: klasy, konstruktory, enkapsulacja i kompozycja.
 - Dziedziczenie: klasy bazowe, overriding, polimorfizm i wyjątki.
-- Swing: teoria komponentów GUI i ograniczenia uruchamiania w TeaVM.
 
 ## Testy i build
 

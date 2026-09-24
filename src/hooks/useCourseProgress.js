@@ -18,11 +18,15 @@ function sanitizeState(value, lessons) {
   const fallback = initialState(lessons);
   if (!value || typeof value !== "object") return fallback;
   const lesson = getLessonById(value.selectedLessonId);
+  const validTrack = lessons.some((candidate) => candidate.track === value.selectedTrack);
+  const availableTaskIds = new Set(lessons.flatMap((candidate) => candidate.tasks.map((task) => task.id)));
   return {
-    selectedTrack: value.selectedTrack || lesson.track || fallback.selectedTrack,
+    selectedTrack: validTrack ? value.selectedTrack : lesson.track || fallback.selectedTrack,
     selectedLessonId: lesson.id,
     filesByTask: value.filesByTask && typeof value.filesByTask === "object" ? value.filesByTask : {},
-    completedTasks: Array.isArray(value.completedTasks) ? value.completedTasks : [],
+    completedTasks: Array.isArray(value.completedTasks)
+      ? value.completedTasks.filter((taskId) => availableTaskIds.has(taskId))
+      : [],
   };
 }
 

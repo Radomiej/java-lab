@@ -1,0 +1,173 @@
+.editor-help-control {
+  display: inline-flex;
+  align-items: center;
+}
+
+.editor-help-button {
+  display: inline-grid;
+  width: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  place-items: center;
+  border-radius: 50%;
+  font-weight: 800;
+}
+
+.editor-help-tooltip {
+  position: fixed;
+  z-index: 120;
+  width: min(440px, calc(100vw - 24px));
+  padding: 16px;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+  color: var(--ink-700);
+  background: var(--paper);
+  box-shadow: 0 10px 24px rgb(16 43 66 / 18%);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.editor-help-header {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-bottom: 11px;
+  border-bottom: 1px solid var(--line);
+}
+
+.editor-help-header strong {
+  color: var(--ink-900);
+  font-size: 14px;
+}
+
+.editor-help-header span,
+.editor-help-platform-note,
+.editor-help-or {
+  color: var(--ink-500);
+}
+
+.editor-help-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.editor-help-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.editor-help-group h3 {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: 11px;
+}
+
+.editor-help-shortcuts {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.editor-help-shortcut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 28px;
+}
+
+.editor-help-shortcut > span:last-child {
+  flex: 1 1 50%;
+}
+
+.editor-help-keymaps,
+.editor-help-keymap,
+.editor-help-key-part {
+  display: inline-flex;
+  align-items: center;
+}
+
+.editor-help-keymaps {
+  flex: 0 0 205px;
+  gap: 5px;
+}
+
+.editor-help-alternative {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.editor-help-keymap {
+  gap: 3px;
+}
+
+.editor-help-key-part {
+  gap: 3px;
+}
+
+.editor-help-key-plus {
+  color: var(--ink-500);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.editor-help-or {
+  padding: 0 2px;
+  font-size: 9px;
+}
+
+.editor-help-tooltip kbd {
+  display: inline-flex;
+  min-width: 25px;
+  min-height: 22px;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 5px;
+  border: 1px solid #b8c9d1;
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  color: var(--ink-900);
+  background: #f4f8fa;
+  box-shadow: 0 1px 1px rgb(16 43 66 / 8%);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.editor-help-platform-note {
+  margin-top: 13px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.editor-help-platform-note kbd {
+  min-width: 22px;
+  min-height: 20px;
+  padding: 2px 5px;
+  vertical-align: middle;
+}
+
+@media (max-width: 600px) {
+  .editor-help-tooltip {
+    padding: 14px;
+  }
+
+  .editor-help-shortcut {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .editor-help-keymaps {
+    flex-basis: auto;
+  }
+}

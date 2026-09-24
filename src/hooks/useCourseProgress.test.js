@@ -36,4 +36,19 @@ describe("useCourseProgress", () => {
     expect(result.current.completedTasks).not.toContain(taskId);
     expect(result.current.filesByTask[taskId]).toBeUndefined();
   });
+
+  it("migrates a saved selection from a removed track", () => {
+    window.localStorage.setItem("java-lab-progress-v1", JSON.stringify({
+      selectedTrack: "swing",
+      selectedLessonId: "swing-13",
+      filesByTask: {},
+      completedTasks: ["swing-13-independent-1"],
+    }));
+
+    const { result } = renderHook(() => useCourseProgress(allLessons));
+
+    expect(result.current.selectedTrack).toBe("fundamentals");
+    expect(result.current.selectedLessonId).toBe(allLessons[0].id);
+    expect(result.current.completedTasks).toEqual([]);
+  });
 });

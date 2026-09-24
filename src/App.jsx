@@ -145,7 +145,6 @@ export default function App() {
     <>
       <TeaVMPreview
         mainClass={activeTask.mainClass}
-        runMode={activeTask.runMode}
         runner={runner}
         onRun={handleCompile}
       />
