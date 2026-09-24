@@ -12,13 +12,13 @@ export default function AppShell({ sidebar, main, inspector }) {
         <header className="mobile-header">
           <button className="icon-button" type="button" onClick={() => setSidebarOpen(true)} aria-label="Otwórz lekcje">☰</button>
           <span className="mobile-brand"><span className="brand-mark">J</span> Java Lab</span>
-          <span className="mobile-status"><span className="status-dot" /> lokalnie</span>
+          <span className="mobile-status"><span className="status-dot" /> w przeglądarce</span>
         </header>
         <div className="workspace-toolbar">
           <button className="button button--ghost" type="button" onClick={() => setSidebarCollapsed((value) => !value)}>
             {sidebarCollapsed ? "Pokaż ścieżki" : "Schowaj ścieżki"}
           </button>
-          <span className="toolbar-note">JDK 17 · CheerpJ 4.3 · zapis lokalny</span>
+          <span className="toolbar-note">TeaVM · WebAssembly · Java 17 API · zasoby lokalne</span>
         </div>
         {main}
       </main>

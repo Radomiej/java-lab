@@ -4,7 +4,7 @@ function fileIcon(fileName) {
   return fileName.endsWith(".java") ? "J" : "·";
 }
 
-export default function CodeEditor({ files, activeFile, onFileChange, onCodeChange, onCheck, onCompile, onCompileCheerpJ, onReset, onSolution, runner }) {
+export default function CodeEditor({ files, activeFile, onFileChange, onCodeChange, onCheck, onCompile, onReset, onSolution, runner }) {
   const source = files[activeFile] || "";
   const lineCount = useMemo(() => Math.max(1, source.split("\n").length), [source]);
 
@@ -30,11 +30,10 @@ export default function CodeEditor({ files, activeFile, onFileChange, onCodeChan
         <div className="line-numbers" aria-hidden="true">{Array.from({ length: lineCount }, (_, index) => <span key={index}>{index + 1}</span>)}</div>
         <textarea className="code-editor" aria-label={`Kod pliku ${activeFile}`} spellCheck="false" value={source} onChange={(event) => onCodeChange(activeFile, event.target.value)} onKeyDown={handleKeyDown} />
       </div>
-      <p className="editor-help">Tab wstawia dwa spacje. Zapis szkicu działa automatycznie w tej przeglądarce.</p>
+      <p className="editor-help">Tab wstawia dwa spacje. Kod zostaje w tej przeglądarce i jest uruchamiany przez TeaVM.</p>
       <div className="editor-actions">
         <button className="button button--primary" type="button" onClick={onCheck}>✓ Sprawdź zadanie</button>
-        <button className="button button--secondary" type="button" onClick={onCompile} disabled={runner.status === "compiling"}>▶ Skompiluj i uruchom</button>
-        <button className="button button--cheerp" type="button" onClick={onCompileCheerpJ} disabled={runner.status === "compiling"}>▣ Uruchom w CheerpJ</button>
+        <button className="button button--teavm" type="button" onClick={onCompile} disabled={runner.status === "compiling"}>▶ Uruchom w przeglądarce</button>
         {onSolution && <button className="button button--ghost button--solution" type="button" onClick={onSolution}>Pokaż rozwiązanie</button>}
         <button className="button button--ghost" type="button" onClick={onReset}>Przywróć start</button>
       </div>

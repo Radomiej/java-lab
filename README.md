@@ -1,42 +1,69 @@
-# Java Lab — kurs Javy z CheerpJ
+# Java Lab — kurs Javy w przeglądarce
 
-Lokalne laboratorium do nauki podstaw Javy dla uczniów. Kurs prowadzi od pierwszego programu, przez zmienne, warunki i pętle, do obiektów, dziedziczenia, kompozycji oraz prostych aplikacji Swing uruchamianych w przeglądarce przez CheerpJ.
+Java Lab to kurs podstaw Javy dla uczniów: od `class` i `main`, przez zmienne,
+warunki, pętle i metody, po obiekty, kompozycję, dziedziczenie oraz
+polimorfizm.
+
+Główna aplikacja działa all-in-browser. Kod z edytora trafia do Web Workera,
+TeaVM kompiluje go do WebAssembly, a wynik `main()` jest pokazywany w panelu
+konsoli. Kurs nie uruchamia lokalnego JDK, nie tworzy JAR-a i nie wymaga
+lokalnego serwera Java.
 
 ## Uruchomienie
 
 Wymagania:
 
 - Node.js 18 lub nowszy,
-- JDK 17 z programami `java`, `javac` i `jar` dostępnymi w `PATH`,
-- połączenie z internetem przy pierwszym uruchomieniu panelu CheerpJ.
+- przeglądarka z obsługą WebAssembly GC,
+- brak JDK — nie jest potrzebne do pracy ucznia.
 
 ```powershell
 cd C:\Nauka\java-lab
 npm install
-npm run dev:all
+npm run dev
 ```
 
 Otwórz `http://127.0.0.1:5182`.
 
-Frontend działa na Vite, a lokalny runner Java na `http://127.0.0.1:3002`. Runner kompiluje kod poleceniem `javac --release 17`, uruchamia programy konsolowe lokalnie i przygotowuje JAR-y dla CheerpJ.
+Oficjalne pliki TeaVM Playground są przechowywane w
+`public/vendor/teavm/cdn/`, a worker ładuje je z tego samego originu. Dzięki
+temu aplikacja nie zależy od CORS na CDN i nadal wykonuje kompilację w
+przeglądarce.
+
+## Co jest uruchamiane
+
+1. Edytor przechowuje kod lekcji w pamięci przeglądarki i w lokalnym postępie.
+2. Worker ładuje kompilator TeaVM, SDK javac oraz TeaVM classlib.
+3. Java jest kompilowana w workerze, a następnie TeaVM generuje WebAssembly.
+4. Moduł WebAssembly uruchamia `main()` i przechwytuje `System.out` do
+   panelu wyniku.
+
+## Wersja Javy i ograniczenia
+
+Kurs uczy składni i API na poziomie Java 17. Aktualny oficjalny kompilator
+TeaVM Playground jest zbudowany na javac, który emituje bytecode Java 21; worker
+raportuje tę informację diagnostycznie, zamiast udawać, że jest to major 61.
+Podstawowe przykłady kursu działają w tym trybie w przeglądarce. W repozytorium
+jest też eksperymentalny wariant kompilatora target 17 w
+`tools/teavm-javac-java17/`, ale obecny backend TeaVM 0.15 nie generuje z niego
+poprawnego WASM nawet dla Hello World (`dereferencing a null pointer`), dlatego
+nie jest używany przez aplikację.
+
+Swing pozostaje osobną ścieżką wyjaśniającą API. TeaVM nie dostarcza w tym
+runtime biblioteki `javax.swing`, więc lekcje Swing mogą sprawdzać strukturę
+kodu, ale nie otwierają natywnego okna w przeglądarce. Interfejs webowy kursu
+jest zbudowany w React.
+
+JUnit 5 nie jest ładowany do runtime'u lekcji. Zadania mają szybki checker
+źródła, a pełne testy JUnit mogą zostać dodane jako osobny etap kompilowany
+przez TeaVM, gdy będzie potrzebny stabilny wariant test runnera.
 
 ## Zawartość kursu
 
-- Fundamenty: pierwszy program, zmienne, warunki, pętle.
-- Obiekty: klasy, konstruktory, enkapsulacja, kompozycja.
-- Dziedziczenie: klasy bazowe, polimorfizm, interfejsy.
-- Swing: pierwsze okno, przyciski i prosta aplikacja.
-
-Każda lekcja ma krótkie wyjaśnienie, przykład, zadania prowadzone i checkpoint automatycznie sprawdzający kod źródłowy.
-
-## Ważne ograniczenia MVP
-
-- Checkpointy są celowo prostym lokalnym checkerem tekstu i wyrażeń regularnych — nie zastępują pełnego kompilatora.
-- Kompilowanie i uruchamianie odbywa się przez lokalny JDK, więc aplikacja nie jest jeszcze usługą wieloużytkownikową ani sandboxem produkcyjnym.
-- CheerpJ uruchamia w przeglądarce gotowy JAR. Runtime jest ładowany z oficjalnego CDN: `https://cjrtnc.leaningtech.com/4.3/loader.js`.
-- JUnit 5 nie jest uruchamiany w przeglądarkowym panelu CheerpJ w tej wersji. Można go dodać jako osobny lokalny tor testów Maven/Gradle w kolejnym etapie.
-
-Przed użyciem w sieci publicznej runner powinien dostać izolację procesu, limity zasobów, autoryzację i czyszczenie artefaktów.
+- Fundamenty: pierwszy program, zmienne, typy, warunki, pętle i metody.
+- Obiekty: klasy, konstruktory, enkapsulacja i kompozycja.
+- Dziedziczenie: klasy bazowe, overriding, polimorfizm i wyjątki.
+- Swing: teoria komponentów GUI i ograniczenia uruchamiania w TeaVM.
 
 ## Testy i build
 
@@ -45,6 +72,5 @@ npm test -- --run
 npm run build
 ```
 
-## Git
-
-Repozytorium zostało zainicjalizowane lokalnie. Dokumentacja architektury i plan implementacji są w `docs/superpowers/`.
+W `tools/browser-poc/` pozostawiono wcześniejsze spike'i CheerpJ/TeaVM do
+porównań technicznych. Nie są używane przez główny kurs React.

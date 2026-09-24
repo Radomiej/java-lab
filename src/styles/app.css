@@ -116,8 +116,8 @@ pre { margin: 0; }
 .button--primary { color: white; background: var(--teal-600); box-shadow: 0 3px 8px rgb(21 153 142 / 20%); }
 .button--primary:hover, .button--primary:focus-visible { background: #117c74; }
 .button--secondary { border-color: #addfd7; color: var(--teal-600); background: var(--teal-soft); }
-.button--cheerp { border-color: #bdd6ef; color: #31699d; background: #eaf3ff; }
-.button--cheerp:hover, .button--cheerp:focus-visible { border-color: #7eadde; background: #dbeaff; }
+.button--teavm { border-color: #9bded5; color: #087d73; background: #e2f8f4; }
+.button--teavm:hover, .button--teavm:focus-visible { border-color: #42bcae; background: #d2f3ed; }
 .button--ghost { border-color: var(--line); color: var(--ink-700); background: var(--paper); }
 .button--ghost:hover, .button--ghost:focus-visible { border-color: var(--line-strong); background: #f6fafb; }
 .button--solution { margin-left: auto; }
@@ -143,8 +143,8 @@ pre { margin: 0; }
 .runtime-pill--error { color: var(--red); background: var(--red-soft); }
 .runtime-pill--ready, .runtime-pill--jar-ready { color: var(--green); background: #edf9f3; }
 .runtime-pill--small { padding: 5px 7px; }
-.cheerpj-display { display: grid; min-height: 260px; margin-top: 14px; place-items: center; overflow: hidden; border: 1px solid #c8d9e4; border-radius: 9px; color: #7c98aa; background: #102b42; font-size: 11px; text-align: center; }
-.cheerpj-display canvas, .cheerpj-display > div { max-width: 100%; }
+.teavm-display { display: grid; min-height: 260px; margin-top: 14px; place-items: center; overflow: auto; border: 1px solid #b7d9d5; border-radius: 9px; color: #668892; background: #102b42; font-size: 11px; text-align: center; }
+.teavm-output { width: 100%; min-height: 100%; margin: 0; padding: 16px; color: #d2eceb; background: transparent; font: 11px/1.65 var(--mono); text-align: left; white-space: pre-wrap; }
 .button--wide { width: 100%; margin-top: 12px; }
 .preview-note { margin: 9px 0 0; color: var(--ink-500); font-size: 9px; line-height: 1.45; }
 .runtime-console { background: var(--navy-900); }
@@ -188,7 +188,7 @@ pre { margin: 0; }
   .editor-actions { align-items: stretch; flex-direction: column; }
   .editor-actions .button { width: 100%; }
   .button--solution { margin-left: 0; }
-  .cheerpj-display { min-height: 220px; }
+  .teavm-display { min-height: 220px; }
   .section-heading-row { align-items: flex-start; }
   .language-badge { font-size: 9px; }
 }
