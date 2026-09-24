@@ -55,6 +55,10 @@ przez TeaVM, gdy będzie potrzebny stabilny wariant test runnera.
 
 ## Zawartość kursu
 
+Każda lekcja ma trzy zadania: jedno prowadzone z rozwiązaniem i dwa
+samodzielne. Podpowiedź oraz przycisk pokazania rozwiązania są dostępne tylko
+w zadaniu prowadzonym, żeby dwa kolejne ćwiczenia sprawdzały samodzielność.
+
 - Fundamenty: pierwszy program, zmienne, typy, warunki, pętle i metody.
 - Obiekty: klasy, konstruktory, enkapsulacja i kompozycja.
 - Dziedziczenie: klasy bazowe, overriding, polimorfizm i wyjątki.

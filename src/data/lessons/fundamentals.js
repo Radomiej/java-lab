@@ -112,7 +112,7 @@ export const fundamentalsLessons = [
         checks: [
           { kind: "contains", file: "Main.java", value: "String playerName", label: "Tekstowa nazwa gracza" },
           { kind: "contains", file: "Main.java", value: "int points", label: "Liczba punktów" },
-          { kind: "contains", file: "System.out.println(playerName)", label: "Wypisanie nazwy" },
+          { kind: "contains", file: "Main.java", value: "System.out.println(playerName)", label: "Wypisanie nazwy" },
           { kind: "contains", file: "Main.java", value: "System.out.println(points)", label: "Wypisanie punktów" },
         ],
         mainClass: "Main",
