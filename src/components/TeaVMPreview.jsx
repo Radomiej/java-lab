@@ -22,7 +22,7 @@ export default function TeaVMPreview({ runner, mainClass, runMode, onRun }) {
       <button className="button button--teavm button--wide" type="button" onClick={onRun} disabled={runner.status === "compiling"}>
         {isSwing ? "Sprawdź zgodność kodu z TeaVM" : "▶ Uruchom w TeaVM"}
       </button>
-      <p className="preview-note">Oficjalne zasoby TeaVM są dołączone lokalnie, a kompilacja i uruchomienie działają w Web Workerze. Przykłady używają API Java 17; aktualny javac TeaVM emituje bytecode Java 21.</p>
+      <p className="preview-note">Oficjalne zasoby TeaVM są dołączone lokalnie, a kompilacja i uruchomienie działają w Web Workerze. Kurs używa Java 21.</p>
     </section>
   );
 }

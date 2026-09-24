@@ -11,7 +11,7 @@ export default function LessonWorkspace({ lesson, activeTask, activeFile, files,
       <section className="editor-section" aria-labelledby="editor-title">
         <div className="section-heading-row">
           <div><p className="eyebrow">Laboratorium kodu</p><h2 id="editor-title">Zbuduj rozwiązanie</h2></div>
-          <span className="language-badge">Java 17 API · WebAssembly</span>
+          <span className="language-badge">Java 21 · WebAssembly</span>
         </div>
         <CodeEditor files={files} activeFile={activeFile} onFileChange={onFileChange} onCodeChange={onCodeChange} onCheck={onCheck} onCompile={onCompile} onReset={onReset} onSolution={onSolution} runner={runner} />
       </section>

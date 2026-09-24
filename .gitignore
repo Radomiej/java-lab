@@ -1,7 +1,6 @@
 node_modules/
 dist/
-/public/vendor/cheerpj/
-server/.runtime/
+tools/teavm-javac-java17/
 *.log
 .env
 .env.*

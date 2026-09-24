@@ -72,15 +72,6 @@ async function compileAndRun(message) {
     }
 
     const versions = classVersions(compiler);
-    const tooNewClass = versions.find((entry) => entry.majorVersion > 61);
-    if (tooNewClass) {
-      diagnostics.push({
-        severity: "warning",
-        code: "JAVA_TARGET_MISMATCH",
-        message: `Oficjalny kompilator TeaVM Playground wygenerował bytecode Java ${tooNewClass.majorVersion - 44}; przykłady kursu pozostają w zakresie API Java 17.`,
-      });
-    }
-
     phase = "TeaVM → WebAssembly";
     self.postMessage({ command: "phase", id: message.id, phase: "Generuję WebAssembly…" });
     if (!compiler.generateWebAssembly({ outputName: "app", mainClass: message.mainClass })) {

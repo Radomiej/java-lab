@@ -18,7 +18,7 @@ export default function AppShell({ sidebar, main, inspector }) {
           <button className="button button--ghost" type="button" onClick={() => setSidebarCollapsed((value) => !value)}>
             {sidebarCollapsed ? "Pokaż ścieżki" : "Schowaj ścieżki"}
           </button>
-          <span className="toolbar-note">TeaVM · WebAssembly · Java 17 API · zasoby lokalne</span>
+          <span className="toolbar-note">TeaVM · WebAssembly · Java 21 · zasoby lokalne</span>
         </div>
         {main}
       </main>

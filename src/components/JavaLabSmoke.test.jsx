@@ -10,6 +10,6 @@ describe("Java Lab workspace", () => {
     expect(screen.getByRole("heading", { name: "Pierwszy program Javy" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Sprawdź zadanie/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Uruchom w przeglądarce/i })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /CheerpJ/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /TeaVM/i })).toBeInTheDocument();
   });
 });

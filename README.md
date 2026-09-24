@@ -40,14 +40,9 @@ przeglądarce.
 
 ## Wersja Javy i ograniczenia
 
-Kurs uczy składni i API na poziomie Java 17. Aktualny oficjalny kompilator
-TeaVM Playground jest zbudowany na javac, który emituje bytecode Java 21; worker
-raportuje tę informację diagnostycznie, zamiast udawać, że jest to major 61.
-Podstawowe przykłady kursu działają w tym trybie w przeglądarce. W repozytorium
-jest też eksperymentalny wariant kompilatora target 17 w
-`tools/teavm-javac-java17/`, ale obecny backend TeaVM 0.15 nie generuje z niego
-poprawnego WASM nawet dla Hello World (`dereferencing a null pointer`), dlatego
-nie jest używany przez aplikację.
+Kurs używa składni i API Java 21, zgodnie z aktualnym kompilatorem TeaVM
+Playground. Podstawowe przykłady działają w całości w przeglądarce, a wersja
+bytecode'u jest sprawdzana podczas diagnostyki.
 
 Swing pozostaje osobną ścieżką wyjaśniającą API. TeaVM nie dostarcza w tym
 runtime biblioteki `javax.swing`, więc lekcje Swing mogą sprawdzać strukturę
@@ -71,6 +66,3 @@ przez TeaVM, gdy będzie potrzebny stabilny wariant test runnera.
 npm test -- --run
 npm run build
 ```
-
-W `tools/browser-poc/` pozostawiono wcześniejsze spike'i CheerpJ/TeaVM do
-porównań technicznych. Nie są używane przez główny kurs React.

@@ -1,17 +1,17 @@
 export const swingLessons = [
   {
     id: "swing-13", track: "swing", order: 13, title: "Pierwsze okno Swing", summary: "JFrame i EDT",
-    objective: "Uruchomisz pierwszą aplikację okienkową i zobaczysz ją w przeglądarce przez CheerpJ.",
+    objective: "Poznasz strukturę pierwszej aplikacji okienkowej i ograniczenia Swinga w TeaVM.",
     theory: [
       { title: "JFrame jest oknem", text: "Swing dostarcza komponenty GUI. JFrame jest głównym oknem aplikacji, do którego dodajemy kolejne elementy.", code: "JFrame frame = new JFrame(\"Java Lab\");\nframe.setSize(480, 280);" },
       { title: "EDT obsługuje UI", text: "Kod interfejsu uruchamiaj przez SwingUtilities.invokeLater. Dzięki temu zmiany komponentów trafiają na właściwy wątek Swinga.", code: "SwingUtilities.invokeLater(() -> {\n    frame.setVisible(true);\n});" },
     ],
-    tips: ["Pamiętaj o setDefaultCloseOperation.", "CheerpJ pokaże okno we własnym obszarze aplikacji."],
+    tips: ["Pamiętaj o setDefaultCloseOperation.", "TeaVM nie udostępnia biblioteki Swing w tym kursie; skupiamy się na strukturze kodu."],
     tasks: [{
       id: "swing-13-task", title: "Otwórz okno", mode: "guided", runMode: "swing",
       prompt: "Utwórz okno Swing o tytule Java Lab i rozmiarze 480×280.",
       steps: ["Dodaj importy JFrame i SwingUtilities.", "Utwórz JFrame, ustaw rozmiar i zamykanie.", "Pokaż okno przez setVisible(true)."],
-      hints: ["Aplikację uruchomisz przyciskiem Uruchom w CheerpJ po skonfigurowaniu JDK."],
+      hints: ["W tym kursie sprawdzamy zgodność kodu ze składnią Javy; natywne okno Swing nie jest uruchamiane w TeaVM."],
       starterFiles: { "Main.java": `import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
