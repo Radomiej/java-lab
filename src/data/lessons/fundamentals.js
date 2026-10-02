@@ -50,8 +50,9 @@ export const fundamentalsLessons = [
         },
         checks: [
           { kind: "contains", file: "Main.java", value: "public static void main", label: "Punkt startowy main" },
-          { kind: "contains", file: "Main.java", value: "System.out.println(\"Witaj, Java!\")", label: "Pierwszy komunikat" },
-          { kind: "contains", file: "Main.java", value: "System.out.println(\"Zaczynamy quest\")", label: "Drugi komunikat" },
+        ],
+        outputChecks: [
+          { kind: "outputLines", values: ["Witaj, Java!", "Zaczynamy quest"], label: "Wynik programu" },
         ],
         mainClass: "Main",
         runMode: "console",
@@ -112,9 +113,8 @@ export const fundamentalsLessons = [
         checks: [
           { kind: "contains", file: "Main.java", value: "String playerName", label: "Tekstowa nazwa gracza" },
           { kind: "contains", file: "Main.java", value: "int points", label: "Liczba punktów" },
-          { kind: "contains", file: "Main.java", value: "System.out.println(playerName)", label: "Wypisanie nazwy" },
-          { kind: "contains", file: "Main.java", value: "System.out.println(points)", label: "Wypisanie punktów" },
         ],
+        outputChecks: [{ kind: "outputLines", values: ["Ada", "100"], label: "Karta postaci w konsoli" }],
         mainClass: "Main",
         runMode: "console",
       },
@@ -178,11 +178,12 @@ export const fundamentalsLessons = [
 `,
         },
         checks: [
-          { kind: "regex", file: "Main.java", value: "for\\s*\\(", label: "Pętla for" },
+          { kind: "contains", file: "Main.java", value: "for (", label: "Pętla for" },
           { kind: "contains", file: "Main.java", value: "round <= 3", label: "Trzy rundy" },
-          { kind: "regex", file: "Main.java", value: "if\\s*\\(", label: "Instrukcja if" },
+          { kind: "contains", file: "Main.java", value: "if (", label: "Instrukcja if" },
           { kind: "contains", file: "Main.java", value: "points >= 50", label: "Reguła punktów" },
         ],
+        outputChecks: [{ kind: "outputLines", values: ["1", "2", "3", "Zaliczone"], label: "Trzy rundy i decyzja" }],
         mainClass: "Main",
         runMode: "console",
       },
@@ -244,9 +245,9 @@ export const fundamentalsLessons = [
         },
         checks: [
           { kind: "contains", file: "Main.java", value: "static int calculateReward(int base)", label: "Metoda z parametrem" },
-          { kind: "contains", file: "Main.java", value: "return base * 2", label: "Wynik metody" },
           { kind: "contains", file: "Main.java", value: "calculateReward(15)", label: "Wywołanie metody" },
         ],
+        outputChecks: [{ kind: "outputLines", values: ["30"], label: "Obliczona nagroda" }],
         mainClass: "Main",
         runMode: "console",
       },

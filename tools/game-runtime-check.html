@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pl">
+<meta charset="utf-8">
+<title>Weryfikacja runtime gry</title>
+<h1>Weryfikacja runtime gry</h1>
+<button id="run">Sprawdź rozwiązania w TeaVM</button>
+<button id="console-run">Sprawdź rozwiązania konsolowe</button>
+<pre id="result">Czeka na uruchomienie.</pre>
+<script type="module">
+import { gameDevLessons } from '/src/data/lessons/gameDev.js';
+import { gameEngineRuntimeFiles } from '/src/data/gameEngineRuntime.js';
+import { createTeaVMRunner } from '/src/services/teavmRunner.js';
+import { allLessons } from '/src/data/curriculum.js';
+import { checkSource } from '/src/services/lessonChecker.js';
+const runner = createTeaVMRunner();
+const button = document.querySelector('#run');
+const result = document.querySelector('#result');
+button.onclick = async () => {
+  button.disabled = true;
+  document.querySelector('#console-run').disabled = true;
+  result.textContent = '';
+  try {
+    for (const task of gameDevLessons.flatMap(lesson => lesson.tasks).filter(task => task.gameTests?.length)) {
+      result.textContent += `${task.title}: kompiluję…\n`;
+      const response = await runner.run({
+        files: { ...task.solutionFiles, ...gameEngineRuntimeFiles },
+        mainClass: task.mainClass, mode: 'game', gameTests: task.gameTests,
+      });
+      if (!response.ok) throw new Error(response.error || JSON.stringify(response.diagnostics));
+      if (response.behaviorResults?.length !== task.gameTests.length) throw new Error('Brak wyników testów');
+      for (const test of response.behaviorResults) {
+        result.textContent += `${test.passed ? 'PASS' : 'FAIL'}: ${test.label} — ${test.detail}\n`;
+      }
+      if (response.behaviorResults.some(test => !test.passed)) throw new Error(`Niepoprawne rozwiązanie: ${task.title}`);
+      runner.stopGame();
+    }
+    result.textContent += 'Wszystkie rozwiązania i scenariusze zaliczone.\n';
+  } catch (error) { result.textContent += `BŁĄD: ${error.message}\n`; }
+  finally { button.disabled = false; document.querySelector('#console-run').disabled = false; }
+};
+window.addEventListener('pagehide', () => runner.dispose());
+document.querySelector('#console-run').onclick = async (event) => {
+  const consoleButton = event.currentTarget;
+  consoleButton.disabled = true;
+  button.disabled = true;
+  result.textContent = '';
+  try {
+    for (const task of allLessons.flatMap(lesson => lesson.tasks).filter(task => task.runMode === 'console')) {
+      result.textContent += `${task.id}: kompiluję…\n`;
+      const response = await runner.run({ files: task.solutionFiles, mainClass: task.mainClass, mode: 'console' });
+      if (!response.ok) throw new Error(`${task.id}: ${response.error || JSON.stringify(response.diagnostics)}`);
+      const report = checkSource(task.solutionFiles, task.outputChecks, response.output || '');
+      if (!report.passed) throw new Error(`${task.id}: wynik niezgodny z zadaniem: ${JSON.stringify(response.output)}`);
+      result.textContent += `PASS ${task.id}: ${JSON.stringify(response.output)}\n`;
+    }
+    result.textContent += 'Wszystkie rozwiązania konsolowe skompilowane i uruchomione.\n';
+  } catch (error) { result.textContent += `BŁĄD: ${error.message}\n`; }
+  finally { consoleButton.disabled = false; button.disabled = false; }
+};
+</script>
+</html>

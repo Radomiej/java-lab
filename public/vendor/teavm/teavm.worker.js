@@ -1,3 +1,6 @@
+import { prepareJavaSources } from "./source-path.js";
+import { disposeGameRuntime, invokeGameExport } from "./game-lifecycle.js";
+
 const TEAVM_URLS = {
   // Official TeaVM Playground assets are vendored because the CDN does not expose
   // the binary files with CORS headers when the lab is served from localhost.
@@ -8,6 +11,9 @@ const TEAVM_URLS = {
 };
 
 let compilerState;
+const gameKeys = new Set();
+let gameRuntime;
+let gameSize = { width: 600, height: 400 };
 
 async function fetchBytes(url) {
   try {
@@ -58,13 +64,14 @@ function classVersions(compiler) {
 
 async function compileAndRun(message) {
   const { compiler, load } = compilerState;
+  stopGameRuntime();
   const diagnostics = [];
   let phase = "javac";
   const registration = compiler.onDiagnostic((diagnostic) => diagnostics.push(diagnosticToJson(diagnostic)));
   try {
     compiler.clearSourceFiles();
     compiler.clearOutputFiles();
-    for (const [fileName, source] of Object.entries(message.files || {})) compiler.addSourceFile(fileName, source);
+    for (const [fileName, source] of prepareJavaSources(message.files || {})) compiler.addSourceFile(fileName, source);
 
     self.postMessage({ command: "phase", id: message.id, phase: "Kompiluję kod Java w przeglądarce…" });
     if (!compiler.compile()) {
@@ -78,8 +85,8 @@ async function compileAndRun(message) {
       return { command: "result", id: message.id, ok: false, phase, diagnostics, classVersions: versions, output: "" };
     }
 
-    phase = "uruchamianie main()";
-    self.postMessage({ command: "phase", id: message.id, phase: "Uruchamiam main()…" });
+    phase = "uruchamianie runtime";
+    self.postMessage({ command: "phase", id: message.id, phase: message.mode === "game" ? "Uruchamiam pętlę gry…" : "Uruchamiam main()…" });
     const generatedWasm = compiler.getWebAssemblyOutputFile("app.wasm");
     if (!generatedWasm || generatedWasm.length === 0) throw new Error("TeaVM nie wygenerował app.wasm.");
     const output = [];
@@ -88,9 +95,32 @@ async function compileAndRun(message) {
     const previousError = console.error;
     console.log = (...parts) => output.push(parts.map(String).join(" "));
     console.error = (...parts) => errors.push(parts.map(String).join(" "));
+    const behaviorResults = [];
     try {
+      for (const test of message.gameTests || []) {
+        const probe = await load(generatedWasm);
+        await probe.exports.main([]);
+        probe.exports.resize?.(test.width || 600, test.height || 400);
+        probe.exports.tick(0);
+        for (const key of test.keys || []) probe.exports.setKey(key, true);
+        for (let step = 0; step < (test.steps || 1); step++) probe.exports.tick(test.delta ?? 0.1);
+        const frameText = String(probe.exports.frame());
+        const rectLines = frameText.split("\n").filter((line) => line.startsWith("rect|"));
+        const rectLine = test.texture
+          ? frameText.split("\n").find(line => line.startsWith(`sprite|${test.texture}|`))
+          : rectLines[test.rectIndex || 0];
+        const rect = rectLine?.split("|").slice(test.texture ? 2 : 1, test.texture ? 6 : 5).map(Number);
+        const passed = test.text !== undefined
+          ? frameText.split("\n").some((line) => line.startsWith(`text|${test.text}|`))
+          : Boolean(rect && rect.every(Number.isFinite) &&
+          (!test.color || rectLine.split("|")[5] === test.color) &&
+          Object.entries(test.expected || {}).every(([axis, value]) => Math.abs(rect[axis === "x" ? 0 : 1] - value) < 0.01));
+        behaviorResults.push({ passed, label: test.label, detail: passed ? "Zachowanie gry jest poprawne." : `Niepoprawna pozycja gracza: ${rect?.join(", ") || "brak prostokąta"}` });
+      }
       const app = await load(generatedWasm);
-      await app.exports.main([]);
+      const mainResult = app.exports.main([]);
+      if (message.mode !== "game") await mainResult;
+      else startGameRuntime(app, message.id);
     } finally {
       console.log = previousLog;
       console.error = previousError;
@@ -104,10 +134,81 @@ async function compileAndRun(message) {
       classVersions: versions,
       output: output.join("\n"),
       error: errors.join("\n"),
+      behaviorResults,
     };
   } finally {
     if (typeof registration === "function") registration();
     else registration?.destroy?.();
+  }
+}
+
+function startGameRuntime(app, gameId) {
+  const tick = app.exports.tick;
+  const frame = app.exports.frame;
+  if (typeof tick !== "function" || typeof frame !== "function") {
+    throw new Error("TeaVM nie wyeksportował tick() i frame() dla trybu gry.");
+  }
+  let previousTime = performance.now();
+  app.exports.resize?.(gameSize.width, gameSize.height);
+  const drawFrame = () => {
+    const now = performance.now();
+    const delta = Math.min(0.1, Math.max(0, (now - previousTime) / 1000));
+    previousTime = now;
+    tick(delta);
+    const commands = String(frame() || "");
+    const drawCommands = [];
+    for (const line of commands.split("\n")) {
+      if (!line) continue;
+      const parts = line.split("|");
+      if (parts[0] === "clear") drawCommands.push({ op: "clear", color: parts[1] });
+      if (parts[0] === "rect") drawCommands.push({ op: "rect", x: Number(parts[1]), y: Number(parts[2]), width: Number(parts[3]), height: Number(parts[4]), color: parts[5] });
+      if (parts[0] === "text") drawCommands.push({ op: "text", text: parts[1], x: Number(parts[2]), y: Number(parts[3]), color: parts[4], align: parts[5] || "left" });
+      if (parts[0] === "sprite") drawCommands.push({ op: "sprite", texture: parts[1], x: Number(parts[2]), y: Number(parts[3]), width: Number(parts[4]), height: Number(parts[5]), rotation: Number(parts[6] || 0), scaleX: Number(parts[7] ?? 1), scaleY: Number(parts[8] ?? 1) });
+    }
+    self.postMessage({ command: "game-draw", gameId, op: "frame", commands: drawCommands });
+  };
+  const emitFrame = () => {
+    const previousLog = console.log;
+    const previousError = console.error;
+    const forward = (level, parts) => self.postMessage({
+      command: "game-output", gameId, level, output: parts.map(String).join(" "),
+    });
+    console.log = (...parts) => forward("log", parts);
+    console.error = (...parts) => forward("error", parts);
+    try { drawFrame(); }
+    finally { console.log = previousLog; console.error = previousError; }
+  };
+  gameRuntime = { app, gameId, emitFrame, interval: null };
+  self.postMessage({ command: "game-draw", gameId, op: "clear", color: "#0b2033" });
+  try { emitFrame(); }
+  catch (error) { stopGameRuntime(); throw error; }
+  gameRuntime.interval = setInterval(() => {
+    try {
+      emitFrame();
+    } catch (error) {
+      stopGameRuntime();
+      self.postMessage({ command: "game-error", gameId, error: error instanceof Error ? error.message : String(error) });
+    }
+  }, 16);
+}
+
+function stopGameRuntime() {
+  const previousRuntime = gameRuntime;
+  gameRuntime = undefined;
+  gameKeys.clear();
+  if (!previousRuntime) return;
+  const previousLog = console.log, previousError = console.error;
+  const forward = (level, parts) => self.postMessage({ command: "game-output", gameId: previousRuntime.gameId, level, output: parts.map(String).join(" ") });
+  console.log = (...parts) => forward("log", parts);
+  console.error = (...parts) => forward("error", parts);
+  let ok = true;
+  try { disposeGameRuntime(previousRuntime); }
+  catch (error) {
+    ok = false;
+    self.postMessage({ command: "game-error", gameId: previousRuntime.gameId, error: error instanceof Error ? error.message : String(error) });
+  } finally {
+    console.log = previousLog; console.error = previousError;
+    self.postMessage({ command: "game-stopped", gameId: previousRuntime.gameId, ok });
   }
 }
 
@@ -116,6 +217,22 @@ initialize()
   .catch((error) => self.postMessage({ command: "init-error", error: error instanceof Error ? error.message : String(error) }));
 
 self.addEventListener("message", async ({ data }) => {
+  if (data?.command === "game-resize") {
+    gameSize = { width: data.width, height: data.height };
+    invokeGameExport(gameRuntime, "resize", [data.width, data.height], stopGameRuntime, event => self.postMessage(event));
+    return;
+  }
+  if (data?.command === "game-input") {
+    if (data.pressed) gameKeys.add(data.key);
+    else gameKeys.delete(data.key);
+    invokeGameExport(gameRuntime, "setKey", [data.key, data.pressed], stopGameRuntime, event => self.postMessage(event));
+    return;
+  }
+  if (data?.command === "game-stop") {
+    stopGameRuntime();
+    gameKeys.clear();
+    return;
+  }
   if (data?.command !== "compile-and-run") return;
   try {
     self.postMessage(await compileAndRun(data));
@@ -126,7 +243,7 @@ self.addEventListener("message", async ({ data }) => {
       ok: false,
       phase: error.phase || "TeaVM",
       code: error.code || "TEAVM_ERROR",
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? `${error.message}\n${error.stack || ""}` : String(error),
       stack: error instanceof Error ? error.stack : "",
       output: "",
     });

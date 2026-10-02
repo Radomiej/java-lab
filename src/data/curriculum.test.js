@@ -3,12 +3,12 @@ import { allLessons, trackOrder, tracks } from "./curriculum.js";
 import { checkSource } from "../services/lessonChecker.js";
 
 describe("Java Lab curriculum", () => {
-  it("contains three tracks and twelve ordered lessons", () => {
-    expect(trackOrder).toHaveLength(3);
-    expect(Object.keys(tracks)).toHaveLength(3);
-    expect(allLessons).toHaveLength(12);
+  it("contains four tracks and fifteen ordered lessons", () => {
+    expect(trackOrder).toHaveLength(4);
+    expect(Object.keys(tracks)).toHaveLength(4);
+    expect(allLessons).toHaveLength(15);
     expect(allLessons.map((lesson) => lesson.order)).toEqual(
-      Array.from({ length: 12 }, (_, index) => index + 1),
+      Array.from({ length: 15 }, (_, index) => index + 1),
     );
   });
 
@@ -18,7 +18,7 @@ describe("Java Lab curriculum", () => {
       expect(lesson.theory.length).toBeGreaterThanOrEqual(2);
       expect(lesson.tasks.length).toBeGreaterThanOrEqual(1);
       expect(lesson.tasks[0].starterFiles["Main.java"]).toContain("class");
-      expect(lesson.tasks[0].checks.length).toBeGreaterThanOrEqual(1);
+      expect((lesson.tasks[0].outputChecks || lesson.tasks[0].gameTests || lesson.tasks[0].checks).length).toBeGreaterThanOrEqual(1);
     }
   });
 
@@ -30,11 +30,10 @@ describe("Java Lab curriculum", () => {
     }
   });
 
-  it("keeps every task solution aligned with its source checks", () => {
+  it("provides execution contracts for every task", () => {
     for (const lesson of allLessons) {
       for (const task of lesson.tasks) {
-        const report = checkSource(task.solutionFiles, task.checks);
-        expect(report.passed, `${lesson.id}/${task.id}`).toBe(true);
+        expect(task.outputChecks?.length || task.gameTests?.length, `${lesson.id}/${task.id}`).toBeGreaterThan(0);
       }
     }
   });

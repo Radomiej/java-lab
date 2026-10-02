@@ -46,7 +46,7 @@ export default function Sidebar({ tracks, trackOrder, lessons, selectedTrack, se
         ))}
       </div>
 
-      <div className="sidebar-footer"><span>16 lekcji</span><span className="offline-badge"><span className="status-dot" /> lokalnie</span></div>
+      <div className="sidebar-footer"><span>{lessons.length} lekcji</span><span className="offline-badge"><span className="status-dot" /> lokalnie</span></div>
     </nav>
   );
 }

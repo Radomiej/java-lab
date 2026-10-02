@@ -1,0 +1,34 @@
+<!doctype html><html lang="pl"><meta charset="utf-8"><title>Izolacja kompilatora</title>
+<h1>Izolacja kompilatora API</h1><button id="run">Uruchom izolację</button><pre id="result">Czeka.</pre>
+<script type="module">
+import { gameCoreRuntimeFiles as gameEngineRuntimeFiles } from '/src/data/gameCoreRuntime.js';
+import { createTeaVMRunner } from '/src/services/teavmRunner.js';
+import { isolateJavaMethods } from './java-method-isolation.js';
+const result = document.querySelector('#result'), button = document.querySelector('#run');
+const minimalGame = 'package engine; public class Game { public boolean isDisposed() { return false; } void removed(Component component) {} }';
+button.onclick = async () => {
+  button.disabled = true; result.textContent = '';
+  const noTypeChecks = Object.fromEntries(Object.entries(gameEngineRuntimeFiles).map(([file, source]) => [file, source.replaceAll('type.isInstance(component)', 'true')]));
+  const variants = [
+    ['Same deklaracje API', isolateJavaMethods(gameEngineRuntimeFiles).variant()],
+    ['Bez adnotacji SuppressWarnings', Object.fromEntries(Object.entries(gameEngineRuntimeFiles).map(([file, source]) => [file, source.replace(/@SuppressWarnings\("unchecked"\)\s*/g, '')]))],
+    ['Jawne importy wewnatrz pakietu', Object.fromEntries(Object.entries(gameEngineRuntimeFiles).map(([file, source]) => [file, source.replace('package engine;', 'package engine;\n' + Object.keys(gameEngineRuntimeFiles).filter(other => other !== file).map(other => 'import engine.' + other.replace('.java', '') + ';').join('\n'))]))],
+    ['Samo Class<?>', { 'Main.java': 'public class Main { static boolean matches(Class<?> type, Object object) { return type.isInstance(object); } public static void main(String[] args) { System.out.println("OK"); } }' }],
+    ['Class<T> i metoda generyczna', { 'Main.java': 'public class Main { static <T> T find(Class<T> type) { return null; } public static void main(String[] args) { System.out.println("OK"); } }' }],
+    ['Surowe Class w API', Object.fromEntries(Object.entries(gameEngineRuntimeFiles).map(([file, source]) => [file, source.replace(/Class<(?:T|\?)>/g, 'Class')]))],
+    ['Bez wywolan Class.isInstance', noTypeChecks],
+    ['Minimalna klasa Game', { ...gameEngineRuntimeFiles, 'Game.java': minimalGame }],
+    ['Oba uproszczenia', { ...noTypeChecks, 'Game.java': minimalGame }],
+  ];
+  for (const [label, files] of variants) {
+    const runner = createTeaVMRunner();
+    result.textContent += label + ': kompiluje…\n';
+    try {
+      const response = await runner.run({ files: { 'Main.java': 'public class Main { public static void main(String[] args) { System.out.println("OK"); } }', ...files }, mainClass: 'Main', mode: 'console' });
+      result.textContent += label + ': ' + (response.ok ? 'PASS ' + response.output : response.error || JSON.stringify(response.diagnostics)) + '\n';
+    } catch (error) { result.textContent += label + ': ' + error.message + '\n'; }
+    finally { runner.dispose(); }
+  }
+  button.disabled = false;
+};
+</script></html>

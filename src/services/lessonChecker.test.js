@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { checkSource } from "./lessonChecker.js";
+import { checkSource, mergeCompilationResult } from "./lessonChecker.js";
 
 describe("lesson source checker", () => {
+  it("wymaga jawnego potwierdzenia kompilacji i uruchomienia", () => {
+    const report = checkSource({ "Main.java": "class Main {}" }, [{ kind: "contains", value: "class Main" }]);
+    expect(mergeCompilationResult(report, undefined).passed).toBe(false);
+    expect(mergeCompilationResult(report, {}).passed).toBe(false);
+    expect(mergeCompilationResult(report, { ok: true }).passed).toBe(true);
+  });
   it("passes required Java fragments and returns a score", () => {
     const result = checkSource(
       { "Main.java": "public class Main { int level = 3; }" },
@@ -33,5 +39,30 @@ describe("lesson source checker", () => {
     );
 
     expect(result.passed).toBe(true);
+  });
+
+  it("can validate the program result instead of exact source text", () => {
+    const result = checkSource(
+      { "Main.java": "class Main { /* implementation may vary */ }" },
+      [{ kind: "outputLines", values: ["Witaj", "Wynik: 42"], label: "Wynik programu" }],
+      "Witaj\nWynik: 42\n",
+    );
+
+    expect(result.passed).toBe(true);
+    expect(result.results[0].detail).toContain("linie");
+  });
+
+  it("rejects an incomplete if when TeaVM reports a compilation error", () => {
+    const sourceReport = checkSource(
+      { "Main.java": "public class Main { public static void main(String[] args) { if (); } }" },
+      [{ kind: "contains", file: "Main.java", value: "if (", label: "Instrukcja if" }],
+    );
+    const result = mergeCompilationResult(sourceReport, {
+      ok: false,
+      error: "Main.java: if wymaga wyrażenia boolean",
+    });
+
+    expect(result.passed).toBe(false);
+    expect(result.results[0]).toMatchObject({ passed: false, label: "Kompilacja programu" });
   });
 });

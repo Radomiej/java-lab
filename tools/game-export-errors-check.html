@@ -1,0 +1,41 @@
+<!doctype html><html lang="pl"><meta charset="utf-8">
+<title>Błędy eksportów Java</title><h1>Błędy eksportów Java</h1>
+<button id="run">Sprawdź wejście, resize i restart</button><pre id="result">Czeka.</pre>
+<script type="module">
+import {createTeaVMRunner} from '/src/services/teavmRunner.js';
+const runner=createTeaVMRunner(),result=document.querySelector('#result'),button=document.querySelector('#run');
+const source=`import org.teavm.jso.JSExport;
+public class Main {
+ public static void main(String[] args) {}
+ @JSExport public static void tick(double dt) {}
+ @JSExport public static String frame() {return "clear|black";}
+ @JSExport public static void setKey(String key, boolean down) {throw new IllegalStateException("INPUT FAILURE");}
+ @JSExport public static void resize(double w,double h) {if(w==123) throw new IllegalStateException("RESIZE FAILURE");}
+ @JSExport public static void dispose() {System.out.println("DISPOSED");}
+}`;
+button.onclick=async()=>{
+ button.disabled=true;result.textContent='Kompiluję…';
+ try{
+  for(const [command,detail,expected] of [['game-input',{key:'a',pressed:true},'INPUT FAILURE'],['game-resize',{width:123,height:200},'RESIZE FAILURE']]){
+   const response=await runner.run({files:{'Main.java':source},mainClass:'Main',mode:'game'});
+   if(!response.ok)throw new Error(response.error||JSON.stringify(response.diagnostics));
+   const worker=globalThis.__javaLabTeaVMWorker,events=[];
+   const listener=({data})=>events.push(data);
+   worker.addEventListener('message',listener);
+   try{
+    worker.postMessage({command,...detail});
+    await new Promise(resolve=>setTimeout(resolve,300));
+    const error=events.find(event=>event.command==='game-error');
+    if(!error?.error.includes(expected))throw new Error('Brak błędu '+expected);
+    if(events.filter(event=>event.command==='game-output'&&event.output==='DISPOSED').length!==1)throw new Error('Cleanup nie został wykonany raz');
+    const stopped=events.findIndex(event=>event.command==='game-stopped');
+    if(stopped<0||events.slice(stopped+1).some(event=>event.command==='game-draw'))throw new Error('Pętla nie zatrzymała się');
+    result.textContent+='\nPASS '+expected+': błąd, cleanup i zatrzymanie';
+   }finally{worker.removeEventListener('message',listener);}
+  }
+  result.textContent+='\nPASS ponowne uruchomienie po błędzie wejścia';
+ }catch(error){result.textContent+='\nBŁĄD: '+error.message;}
+ finally{button.disabled=false;}
+};
+window.addEventListener('pagehide',()=>runner.dispose());
+</script></html>

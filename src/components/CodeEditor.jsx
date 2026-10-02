@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { formatJavaSource, triggerEditorAction } from "./javaEditorCommands.js";
 import { createJavaCompletionProvider } from "./javaIntellisense.js";
 import EditorHelp from "./EditorHelp.jsx";
+import { gameEngineRuntimeFiles } from "../data/gameEngineRuntime.js";
 
 function fileIcon(fileName) {
   return fileName.endsWith(".java") ? "J" : "·";
@@ -31,7 +32,12 @@ export default function CodeEditor({
   onReset,
   onSolution,
   runner,
+  engine,
 }) {
+  const readOnly = Boolean(engine && Object.hasOwn(gameEngineRuntimeFiles, activeFile));
+  const [newClassName, setNewClassName] = useState("");
+  const [fileError, setFileError] = useState("");
+  const [addingFile, setAddingFile] = useState(false);
   const source = files[activeFile] || "";
   const editorHostRef = useRef(null);
   const editorRef = useRef(null);
@@ -47,6 +53,10 @@ export default function CodeEditor({
   const [loadError, setLoadError] = useState(null);
 
   const workspaceKey = taskId || "lesson";
+
+  useEffect(() => {
+    if (editorReady) editorRef.current?.updateOptions({ readOnly });
+  }, [editorReady, readOnly]);
 
   useEffect(() => {
     filesRef.current = files;
@@ -270,14 +280,38 @@ export default function CodeEditor({
             {fileName}
           </button>
         ))}
+      {engine && <button className="editor-tab editor-tab--add" type="button" onClick={() => { setAddingFile(!addingFile); setFileError(""); }}>+ Dodaj plik</button>}
       </div>
       <div className="editor-card-heading">
-        <strong>{activeFile}</strong>
+        <strong>{activeFile}{readOnly ? " · API silnika (tylko odczyt)" : ""}</strong>
         <span className="editor-card-heading-actions">
           <span className="editor-language">Java · UTF-8 · Monaco</span>
           <EditorHelp />
         </span>
       </div>
+      {engine && addingFile && <form className="editor-add-file" onSubmit={(event) => {
+        event.preventDefault();
+        const name = newClassName.trim().replace(/\.java$/, "");
+        if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(name)) {
+          setFileError("Podaj poprawną nazwę klasy Java.");
+          return;
+        }
+        const file = `${name}.java`;
+        if (Object.hasOwn(files, file)) {
+          setFileError("Taki plik już istnieje.");
+          return;
+        }
+        onCodeChange(file, `public class ${name} {\n}\n`);
+        onFileChange(file);
+        setNewClassName("");
+        setFileError("");
+        setAddingFile(false);
+      }}>
+        <input autoFocus aria-label="Nazwa nowej klasy" value={newClassName} onChange={(event) => setNewClassName(event.target.value)} onKeyDown={(event) => { if (event.key === "Escape") setAddingFile(false); }} placeholder="Enemy.java" />
+        <button type="submit" className="button button--ghost">Dodaj</button>
+        <button type="button" className="button button--ghost" onClick={() => setAddingFile(false)}>Anuluj</button>
+        {fileError && <span role="alert">{fileError}</span>}
+      </form>}
       {loadError ? (
         <div className="code-editor-wrap code-editor-fallback-wrap">
           <textarea
@@ -285,6 +319,7 @@ export default function CodeEditor({
             aria-label={`Kod pliku ${activeFile}`}
             spellCheck="false"
             value={source}
+            readOnly={readOnly}
             onChange={(event) => onCodeChange(activeFile, event.target.value)}
             onKeyDown={(event) => insertIndent(event, source, activeFile, onCodeChange)}
           />
@@ -302,7 +337,7 @@ export default function CodeEditor({
         </div>
       )}
       <div className="editor-actions">
-        <button className="button button--primary" type="button" onClick={onCheck}>✓ Sprawdź zadanie</button>
+        <button className="button button--primary" type="button" onClick={onCheck} disabled={runner.status === "compiling"}>✓ Sprawdź zadanie</button>
         <button className="button button--teavm" type="button" onClick={onCompile} disabled={runner.status === "compiling"}>▶ Uruchom w przeglądarce</button>
         {onSolution && <button className="button button--ghost button--solution" type="button" onClick={onSolution}>Pokaż rozwiązanie</button>}
         <button className="button button--ghost" type="button" onClick={onReset}>Przywróć start</button>

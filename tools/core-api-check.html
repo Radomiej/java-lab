@@ -1,0 +1,25 @@
+<!doctype html><html lang="pl"><meta charset="utf-8">
+<title>Kontrakt pełnego API</title><h1>Kontrakt pełnego API</h1>
+<button id="run">Sprawdź lifecycle i komponenty</button><pre id="result">Czeka.</pre>
+<script type="module">
+import { coreApiContract } from './core-api-contract.js';
+import { gameCoreRuntimeFiles as gameEngineRuntimeFiles } from '/src/data/gameCoreRuntime.js';
+import { createTeaVMRunner } from '/src/services/teavmRunner.js';
+const runner = createTeaVMRunner();
+const button = document.querySelector('#run'), result = document.querySelector('#result');
+button.onclick = async () => {
+  button.disabled = true; result.textContent = 'Kompiluję kontrakt…';
+  try {
+    const minimal = await runner.run({ files: { ...gameEngineRuntimeFiles, 'Main.java': 'public class Main { public static void main(String[] args) { System.out.println("API compiled"); } }' }, mainClass: 'Main', mode: 'console' }, { onStage: stage => { result.textContent += '\nAPI: ' + stage; } });
+    if (!minimal.ok) throw new Error('Same klasy API: ' + (minimal.error || JSON.stringify(minimal.diagnostics)));
+    result.textContent += '\nSame klasy API: PASS';
+    const response = await runner.run({ files: { ...gameEngineRuntimeFiles, 'Main.java': coreApiContract }, mainClass: 'Main', mode: 'console' }, { onStage: stage => { result.textContent += '\n' + stage; } });
+    if (!response.ok) throw new Error(response.error || JSON.stringify(response.diagnostics));
+    result.textContent = response.output;
+    if (response.output.split('\n').filter(line => line.startsWith('PASS ')).length !== 24) throw new Error('Niepełny wynik kontraktu');
+    result.textContent += '\nCały kontrakt zaliczony.';
+  } catch (error) { result.textContent += '\nBŁĄD: ' + error.message; }
+  finally { button.disabled = false; }
+};
+window.addEventListener('pagehide', () => runner.dispose());
+</script></html>

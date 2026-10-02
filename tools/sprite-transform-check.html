@@ -1,0 +1,62 @@
+<!doctype html><html lang="pl"><meta charset="utf-8">
+<title>Transformacje Java na canvasie</title><h1>Transformacje Java na canvasie</h1>
+<button id="run">Sprawdź obrót, odbicie i izolację obiektów</button>
+<canvas id="canvas" style="width:400px;height:240px" aria-label="Scena transformacji"></canvas>
+<pre id="result">Czeka.</pre>
+<script type="module">
+import {gameEngineRuntimeFiles} from '/src/data/gameEngineRuntime.js';
+import {createTeaVMRunner} from '/src/services/teavmRunner.js';
+import {createGameInterop} from '/src/services/gameInterop.js';
+const canvas=document.querySelector('#canvas'),runner=createTeaVMRunner(),bridge=createGameInterop(canvas);
+bridge.resize();
+const source=`import engine.*;
+import org.teavm.jso.JSExport;
+class StudentGame extends Game {
+ public void onCreate() {
+  background = "black";
+  GameObject transformed = createObject("transformed").setPosition(80,80);
+  transformed.addComponent(new Sprite("player",32,20));
+  transformed.transform.rotation.z = Math.PI / 2;
+  transformed.transform.scale.x = -2;
+  transformed.transform.scale.y = 3;
+  createObject("normal").setPosition(200,80).addComponent(new Sprite("player",32,32));
+ }
+}
+public class Main {
+ static StudentGame game;
+ public static void main(String[] args) { game = new StudentGame(); game.start(); }
+ @JSExport public static void tick(double dt) { game.step(dt); }
+ @JSExport public static String frame() { return GameCanvas.frame(); }
+ @JSExport public static void resize(double w,double h) { GameCanvas.setSize(w,h); }
+ @JSExport public static void setKey(String key,boolean down) { Input.setKey(key,down); }
+ @JSExport public static void dispose() { game.dispose(); }
+}`;
+const result=document.querySelector('#result'),button=document.querySelector('#run');
+button.onclick=async()=>{
+ button.disabled=true;result.textContent='Kompiluję Java…';
+ try{
+  const atlas=new Image();atlas.src='/game-assets/atlas.svg';await atlas.decode();
+  const golden=document.createElement('canvas');golden.width=canvas.width;golden.height=canvas.height;
+  const expected=golden.getContext('2d');const ratio=window.devicePixelRatio||1;
+  expected.setTransform(ratio,0,0,ratio,0,0);expected.imageSmoothingEnabled=false;
+  expected.fillStyle='black';expected.fillRect(0,0,400,240);
+  expected.save();expected.translate(80,80);expected.rotate(Math.PI/2);expected.scale(-2,3);
+  expected.drawImage(atlas,0,0,32,32,-16,-10,32,20);expected.restore();
+  expected.drawImage(atlas,0,0,32,32,184,64,32,32);
+  const target=expected.getImageData(0,0,golden.width,golden.height).data;
+  const response=await runner.run({files:{...gameEngineRuntimeFiles,'Main.java':source},mainClass:'Main',mode:'game'});
+  if(!response.ok)throw new Error(response.error||JSON.stringify(response.diagnostics));
+  const deadline=performance.now()+10000;
+  let matched=false;
+  while(!matched && performance.now()<deadline){
+   const pixels=bridge.context.getImageData(0,0,canvas.width,canvas.height).data;
+   matched=pixels.length===target.length && pixels.every((value,index)=>value===target[index]);
+   if(!matched)await new Promise(resolve=>setTimeout(resolve,30));
+  }
+  if(!matched)throw new Error('Obraz Java nie zgadza się z niezależnym rysowaniem referencyjnym');
+  result.textContent+='\nPASS obrót i odbicie Java zgadzają się z pikselami referencyjnymi\nPASS kolejny sprite zachował własną transformację';
+ }catch(error){result.textContent+='\nBŁĄD: '+error.message;}
+ finally{runner.stopGame();button.disabled=false;}
+};
+window.addEventListener('pagehide',()=>{runner.dispose();bridge.dispose();});
+</script></html>

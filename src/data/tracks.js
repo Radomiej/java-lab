@@ -1,4 +1,4 @@
-export const trackOrder = ["fundamentals", "objects", "inheritance"];
+export const trackOrder = ["fundamentals", "objects", "inheritance", "game-dev"];
 
 export const tracks = {
   fundamentals: {
@@ -24,5 +24,13 @@ export const tracks = {
     description: "Polimorfizm, overriding i bezpieczne wyjątki.",
     accent: "#dcb86b",
     icon: "03",
+  },
+  "game-dev": {
+    id: "game-dev",
+    label: "Game Dev w Javie",
+    shortLabel: "GAME",
+    description: "GameObjecty, komponenty i pierwsza gra w przeglądarce.",
+    accent: "#e58a69",
+    icon: "04",
   },
 };

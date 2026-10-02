@@ -1,0 +1,84 @@
+<!doctype html><html lang="pl"><meta charset="utf-8">
+<title>Sprite Java na canvasie</title><h1>Sprite Java na canvasie</h1>
+<button id="run">Sprawdź obraz, input i restart</button>
+<canvas id="canvas" style="width:500px;height:300px" aria-label="Plansza gry"></canvas>
+<pre id="result">Czeka.</pre>
+<script type="module">
+import { gameEngineRuntimeFiles } from '/src/data/gameEngineRuntime.js';
+import { createTeaVMRunner } from '/src/services/teavmRunner.js';
+import { createGameInterop } from '/src/services/gameInterop.js';
+const runner = createTeaVMRunner();
+const canvas = document.querySelector('#canvas');
+const bridge = createGameInterop(canvas); bridge.resize();
+const result = document.querySelector('#result'), button = document.querySelector('#run');
+const source = `import engine.*;
+import org.teavm.jso.JSExport;
+class Player extends Component {
+ public void onUpdate(double dt) {
+  requireComponent(CharacterController2D.class).move(Input.isKeyDown("ArrowRight") ? 1 : 0, 0, 100);
+ }
+}
+class StudentGame extends Game {
+ public void onCreate() {
+  background = "#000000";
+  GameObject hero = createObject("Gracz").setPosition(80, 80);
+  hero.addComponent(new Sprite());
+  hero.addComponent(new CharacterController2D());
+  hero.addComponent(new Player());
+ }
+}
+public class Main {
+ static StudentGame game;
+ public static void main(String[] args) { game = new StudentGame(); game.start(); }
+ @JSExport public static void tick(double dt) { game.step(dt); }
+ @JSExport public static String frame() { return GameCanvas.frame(); }
+ @JSExport public static void resize(double w, double h) { GameCanvas.setSize(w, h); }
+ @JSExport public static void setKey(String key, boolean down) { Input.setKey(key, down); }
+ @JSExport public static void dispose() { game.dispose(); }
+}`;
+let latest;
+const request = {files:{...gameEngineRuntimeFiles,'Main.java':source},mainClass:'Main',mode:'game'};
+const start = async () => {
+ latest = undefined;
+ const response = await runner.run(request,{onGameCommand: frame => {
+  const sprite = frame.commands?.find(command => command.op === 'sprite');
+  if (sprite) latest = sprite;
+ }});
+ if (!response.ok) throw new Error(response.error || JSON.stringify(response.diagnostics));
+};
+const until = async (predicate, label) => {
+ const deadline = performance.now() + 10000;
+ while (!predicate()) {
+  if (performance.now() > deadline) throw new Error(label);
+  await new Promise(resolve => setTimeout(resolve, 30));
+ }
+};
+const hasSpritePixels = () => {
+ const ratio = window.devicePixelRatio || 1;
+ const pixels = bridge.context.getImageData(64*ratio,64*ratio,32*ratio,32*ratio).data;
+ for(let i=0;i<pixels.length;i+=4) if(pixels[i] || pixels[i+1] || pixels[i+2]) return true;
+ return false;
+};
+button.onclick = async () => {
+ button.disabled = true; result.textContent = 'Kompiluję…';
+ try {
+  await start();
+  if(latest?.x !== 80 || latest?.y !== 80) throw new Error('Niepoprawna pozycja startowa');
+  await until(hasSpritePixels,'Atlas nie narysował sprite na canvasie');
+  result.textContent += '\nPASS rzeczywiste piksele sprite z atlasu';
+  canvas.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight'}));
+  await until(()=>latest?.x > 90,'Input nie przesuwa komponentu Java');
+  canvas.dispatchEvent(new KeyboardEvent('keyup',{key:'ArrowRight'}));
+  result.textContent += '\nPASS klawiatura → Java controller → nowa klatka';
+  runner.stopGame();
+  await start();
+  if(latest?.x !== 80 || latest?.y !== 80) throw new Error('Restart zachował stary stan');
+  result.textContent += '\nPASS restart tworzy nową scenę';
+ } catch(error) { result.textContent += '\nBŁĄD: ' + error.message; }
+ finally {
+  canvas.dispatchEvent(new KeyboardEvent('keyup',{key:'ArrowRight'}));
+  runner.stopGame(); button.disabled = false;
+ }
+};
+window.addEventListener('pagehide',()=>{bridge.dispose();runner.dispose();});
+</script></html>

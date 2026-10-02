@@ -1,0 +1,27 @@
+<!doctype html><html lang="pl"><meta charset="utf-8">
+<title>Testy obiektów Java</title><h1>Testy obiektów Java bez canvasu</h1>
+<button id="run">Sprawdź test kontrolera i wykrycie błędu</button><pre id="result">Czeka.</pre>
+<script type="module">
+import {gameDevLessons} from '/src/data/lessons/gameDev.js';
+import {gameEngineRuntimeFiles} from '/src/data/gameEngineRuntime.js';
+import {buildTaskCheckRequest,evaluateTaskCheck} from '/src/services/taskExecution.js';
+import {createTeaVMRunner} from '/src/services/teavmRunner.js';
+const runner=createTeaVMRunner(),task=gameDevLessons[1].tasks[0];
+const button=document.querySelector('#run'),result=document.querySelector('#result');
+button.onclick=async()=>{
+ button.disabled=true;result.textContent='Uruchamiam test Java…';
+ try {
+  const files={...task.solutionFiles,...gameEngineRuntimeFiles};
+  const response=await runner.run(buildTaskCheckRequest(task,files));
+  if(!evaluateTaskCheck(task,files,response).passed)throw new Error(response.error||JSON.stringify(response.diagnostics));
+  result.textContent+='\n'+response.output;
+  const broken={...files,'PlayerController.java':'import engine.*; public class PlayerController extends Component { public void onUpdate(double delta) {} }'};
+  const rejected=await runner.run(buildTaskCheckRequest(task,broken));
+  if(evaluateTaskCheck(task,broken,rejected).passed)throw new Error('Test zaakceptował nieruchomy kontroler');
+  if(!rejected.error?.includes('Ruch w prawo'))throw new Error('Nieoczekiwany błąd: '+rejected.error);
+  result.textContent+='\nPASS test Java odrzucił wadliwe zachowanie kontrolera';
+ }catch(error){result.textContent+='\nBŁĄD: '+error.message;}
+ finally{button.disabled=false;}
+};
+window.addEventListener('pagehide',()=>runner.dispose());
+</script></html>

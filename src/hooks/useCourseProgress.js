@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from "react";
-import { getLessonById } from "../data/curriculum.js";
 import { useLocalStorage } from "./useLocalStorage.js";
 
 const STORAGE_KEY = "java-lab-progress-v1";
@@ -17,7 +16,9 @@ function initialState(lessons) {
 function sanitizeState(value, lessons) {
   const fallback = initialState(lessons);
   if (!value || typeof value !== "object") return fallback;
-  const lesson = getLessonById(value.selectedLessonId);
+  const lesson = lessons.find((candidate) => candidate.id === value.selectedLessonId)
+    || lessons.find((candidate) => candidate.id === fallback.selectedLessonId)
+    || lessons[0];
   const validTrack = lessons.some((candidate) => candidate.track === value.selectedTrack);
   const availableTaskIds = new Set(lessons.flatMap((candidate) => candidate.tasks.map((task) => task.id)));
   return {
@@ -43,7 +44,7 @@ export function useCourseProgress(lessons) {
   }, [updateState]);
 
   const selectLesson = useCallback((lessonId) => {
-    const lesson = getLessonById(lessonId);
+    const lesson = lessons.find((candidate) => candidate.id === lessonId) || lessons[0];
     updateState((current) => ({
       ...current,
       selectedTrack: lesson.track,

@@ -1,0 +1,66 @@
+<!doctype html><html lang="pl"><meta charset="utf-8">
+<title>Interop Game i cleanup</title><h1>Interop Game i cleanup</h1>
+<button id="run">Sprawdź Game → TeaVM → canvas → dispose</button>
+<canvas id="canvas" style="width:500px;height:300px" aria-label="Plansza testowa"></canvas>
+<pre id="result">Czeka.</pre>
+<script type="module">
+import { gameEngineRuntimeFiles } from '/src/data/gameEngineRuntime.js';
+import { createTeaVMRunner } from '/src/services/teavmRunner.js';
+import { createGameInterop } from '/src/services/gameInterop.js';
+const runner = createTeaVMRunner();
+const bridge = createGameInterop(document.querySelector('#canvas'));
+bridge.resize();
+const button = document.querySelector('#run'), result = document.querySelector('#result');
+const source = `import engine.*;
+import org.teavm.jso.JSExport;
+class Mover extends Component {
+    public void onUpdate(double dt) {
+        if (Input.isKeyDown("ArrowRight")) gameObject.transform.x += 100 * dt;
+        GameCanvas.drawRect(gameObject.transform.x, gameObject.transform.y, 28, 28, "blue");
+    }
+    public void onDestroy() { System.out.println("COMP DISPOSED"); }
+}
+class StudentGame extends Game {
+    public void onCreate() { createObject("Gracz").setPosition(30, 40).addComponent(new Mover()); }
+    public void onUpdate(double dt) { GameCanvas.clear("black"); }
+    public void onDestroy() { System.out.println("GAME DISPOSED"); }
+}
+public class Main {
+    private static StudentGame game;
+    public static void main(String[] args) { game = new StudentGame(); game.start(); }
+    @JSExport public static void tick(double dt) { game.step(dt); }
+    @JSExport public static String frame() { return GameCanvas.frame(); }
+    @JSExport public static void resize(double width, double height) { GameCanvas.setSize(width, height); }
+    @JSExport public static void setKey(String key, boolean pressed) { Input.setKey(key, pressed); }
+    @JSExport public static void dispose() { game.dispose(); }
+}`;
+button.onclick = async () => {
+  button.disabled = true; result.textContent = 'Kompiluję grę ucznia…';
+  const frames = [];
+  try {
+    const response = await runner.run({ files: { ...gameEngineRuntimeFiles, 'Main.java': source }, mainClass: 'Main', mode: 'game' }, { onGameCommand: frame => frames.push(frame), onStage: stage => { result.textContent += '\n' + stage; } });
+    if (!response.ok) throw new Error(response.error || JSON.stringify(response.diagnostics));
+    const first = frames.flatMap(frame => frame.commands || []).find(command => command.op === 'rect');
+    if (!first || first.x !== 30 || first.y !== 40) throw new Error('Brak poprawnej klatki ze sceny Game');
+    result.textContent += '\nPASS komponent Java rysuje przez canvas';
+    const worker = globalThis.__javaLabTeaVMWorker;
+    const output = [];
+    const stopped = new Promise((resolve, reject) => {
+      const timer = setTimeout(() => { worker.removeEventListener('message', listener); reject(new Error('Brak potwierdzenia cleanup')); }, 5000);
+      const listener = ({ data }) => {
+        if (data.command === 'game-output') output.push(data.output);
+        if (data.command === 'game-stopped') {
+          clearTimeout(timer); worker.removeEventListener('message', listener);
+          data.ok ? resolve() : reject(new Error('Błąd cleanup w Javie'));
+        }
+      };
+      worker.addEventListener('message', listener);
+    });
+    runner.stopGame(); await stopped;
+    if (output.join('|') !== 'COMP DISPOSED|GAME DISPOSED') throw new Error('Niepoprawna kolejność lub liczba hooków: ' + output.join('|'));
+    result.textContent += '\nPASS Component.onDestroy i Game.onDestroy wykonane raz\nPASS worker potwierdził zatrzymanie';
+  } catch (error) { result.textContent += '\nBŁĄD: ' + error.message; }
+  finally { button.disabled = false; }
+};
+window.addEventListener('pagehide', () => { bridge.dispose(); runner.dispose(); });
+</script></html>

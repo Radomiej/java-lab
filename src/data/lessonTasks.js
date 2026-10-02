@@ -955,7 +955,7 @@ public class Main {
         try {
             requireName("");
         } catch (IllegalArgumentException error) {
-            System.out.println(error.getMessage());
+            System.out.println("Nazwa jest wymagana");
         }
     }
 }
@@ -967,10 +967,224 @@ public class Main {
       ],
     }),
   ],
+  "game-dev-13": [
+    independentTask("game-dev-13", "independent-1", {
+      title: "Potwór z komponentem",
+      prompt: "Utwórz obiekt Potwór z komponentem Atak i narysuj go w scenie.",
+      steps: ["Użyj klas GameObject i Component.", "Ustaw pozycję 360, 140.", "Wywołaj draw()."],
+      starter: `class Component { String name; Component(String name) { this.name = name; } }
+class GameObject {
+    String name; int x; int y; Component component;
+    GameObject(String name, int x, int y, Component component) { this.name = name; this.x = x; this.y = y; this.component = component; }
+    void draw() { System.out.println("GAME|" + name + "|" + x + "|" + y + "|" + component.name); }
+}
+public class Main {
+    public static void main(String[] args) {
+        // TODO: utwórz Potwór z komponentem Atak
+    }
+}
+`,
+      solution: `class Component { String name; Component(String name) { this.name = name; } }
+class GameObject {
+    String name; int x; int y; Component component;
+    GameObject(String name, int x, int y, Component component) { this.name = name; this.x = x; this.y = y; this.component = component; }
+    void draw() { System.out.println("GAME|" + name + "|" + x + "|" + y + "|" + component.name); }
+}
+public class Main {
+    public static void main(String[] args) {
+        GameObject enemy = new GameObject("Potwór", 360, 140, new Component("Atak"));
+        enemy.draw();
+    }
+}
+`,
+      checks: [
+        { kind: "contains", file: "Main.java", value: "new GameObject(\"Potwór\", 360, 140", label: "Utworzenie potwora" },
+        { kind: "contains", file: "Main.java", value: "new Component(\"Atak\")", label: "Komponent ataku" },
+        { kind: "contains", file: "Main.java", value: "enemy.draw()", label: "Rysowanie potwora" },
+      ],
+      runMode: "game",
+    }),
+    independentTask("game-dev-13", "independent-2", {
+      title: "Trzy obiekty sceny",
+      prompt: "Zbuduj scenę z graczem, potworem i skarbem.",
+      steps: ["Utwórz trzy GameObjecty.", "Nadaj im różne pozycje.", "Wywołaj draw dla każdego obiektu."],
+      starter: `class GameObject {
+    String name; int x; int y;
+    GameObject(String name, int x, int y) { this.name = name; this.x = x; this.y = y; }
+    void draw() { System.out.println("GAME|" + name + "|" + x + "|" + y + "|Scena"); }
+}
+public class Main {
+    public static void main(String[] args) {
+        // TODO: trzy obiekty
+    }
+}
+`,
+      solution: `class GameObject {
+    String name; int x; int y;
+    GameObject(String name, int x, int y) { this.name = name; this.x = x; this.y = y; }
+    void draw() { System.out.println("GAME|" + name + "|" + x + "|" + y + "|Scena"); }
+}
+public class Main {
+    public static void main(String[] args) {
+        GameObject player = new GameObject("Gracz", 100, 100);
+        GameObject enemy = new GameObject("Potwór", 300, 120);
+        GameObject treasure = new GameObject("Skarb", 500, 220);
+        player.draw(); enemy.draw(); treasure.draw();
+    }
+}
+`,
+      checks: [
+        { kind: "contains", file: "Main.java", value: "new GameObject(\"Gracz\"", label: "Gracz" },
+        { kind: "contains", file: "Main.java", value: "new GameObject(\"Potwór\"", label: "Potwór" },
+        { kind: "contains", file: "Main.java", value: "new GameObject(\"Skarb\"", label: "Skarb" },
+      ],
+      runMode: "game",
+    }),
+  ],
+  "game-dev-14": [
+    independentTask("game-dev-14", "independent-1", {
+      title: "Scena w pętli",
+      prompt: "Przechowaj obiekty w tablicy i narysuj je pętlą for-each.",
+      steps: ["Utwórz GameObject[] scene.", "Dodaj dwa obiekty.", "Przejdź po scenie pętlą."],
+      starter: `class GameObject {
+    String name;
+    GameObject(String name) { this.name = name; }
+    void draw() { System.out.println("GAME|" + name + "|120|120|Scena"); }
+}
+public class Main {
+    public static void main(String[] args) {
+        // TODO: tablica i pętla
+    }
+}
+`,
+      solution: `class GameObject {
+    String name;
+    GameObject(String name) { this.name = name; }
+    void draw() { System.out.println("GAME|" + name + "|120|120|Scena"); }
+}
+public class Main {
+    public static void main(String[] args) {
+        GameObject[] scene = { new GameObject("Gracz"), new GameObject("Moneta") };
+        for (GameObject object : scene) { object.draw(); }
+    }
+}
+`,
+      checks: [
+        { kind: "contains", file: "Main.java", value: "GameObject[] scene", label: "Tablica sceny" },
+        { kind: "contains", file: "Main.java", value: "for (GameObject object : scene)", label: "Pętla sceny" },
+      ],
+      runMode: "game",
+    }),
+    independentTask("game-dev-14", "independent-2", {
+      title: "Komponent zdrowia",
+      prompt: "Dodaj komponent Health z wartością życia i przypisz go do gracza.",
+      steps: ["Utwórz klasę Health.", "Dodaj pole hearts.", "Wypisz obiekt Gracz z komponentem Health."],
+      starter: `class Health {
+    // TODO: hearts i konstruktor
+}
+class GameObject {
+    // TODO: obiekt z komponentem
+}
+public class Main {
+    public static void main(String[] args) {
+        // TODO: gracz z życiem
+    }
+}
+`,
+      solution: `class Health {
+    int hearts;
+    Health(int hearts) { this.hearts = hearts; }
+}
+class GameObject {
+    String name; Health health;
+    GameObject(String name, Health health) { this.name = name; this.health = health; }
+    void draw() { System.out.println("GAME|" + name + "|160|180|HP " + health.hearts); }
+}
+public class Main {
+    public static void main(String[] args) {
+        GameObject player = new GameObject("Gracz", new Health(3));
+        player.draw();
+    }
+}
+`,
+      checks: [
+        { kind: "contains", file: "Main.java", value: "class Health", label: "Komponent zdrowia" },
+        { kind: "contains", file: "Main.java", value: "new Health(3)", label: "Trzy życia" },
+        { kind: "contains", file: "Main.java", value: "health.hearts", label: "Stan komponentu" },
+      ],
+      runMode: "game",
+    }),
+  ],
+  "game-dev-15": [
+    independentTask("game-dev-15", "independent-1", {
+      title: "Dwie monety",
+      prompt: "Zwiększ wynik dwa razy i pokaż dwie monety w scenie.",
+      steps: ["Dodaj metodę collect.", "Wywołaj ją dwa razy.", "Wypisz SCORE|2."],
+      starter: `class Score {
+    int points;
+    // TODO: collect
+}
+public class Main {
+    public static void main(String[] args) {
+        Score score = new Score();
+        // TODO: dwie monety
+    }
+}
+`,
+      solution: `class Score {
+    int points;
+    void collect() { points++; }
+}
+public class Main {
+    public static void main(String[] args) {
+        Score score = new Score();
+        score.collect(); score.collect();
+        System.out.println("GAME|Moneta 1|220|180|Punkt");
+        System.out.println("GAME|Moneta 2|380|180|Punkt");
+        System.out.println("SCORE|" + score.points);
+    }
+}
+`,
+      checks: [
+        { kind: "contains", file: "Main.java", value: "void collect()", label: "Zbieranie punktu" },
+        { kind: "contains", file: "Main.java", value: "score.collect(); score.collect()", label: "Dwie monety" },
+        { kind: "contains", file: "Main.java", value: "SCORE|", label: "Wynik gry" },
+      ],
+      runMode: "game",
+    }),
+    independentTask("game-dev-15", "independent-2", {
+      title: "Warunek zwycięstwa",
+      prompt: "Dodaj warunek, który wyświetli WYGRANA po zebraniu trzech monet.",
+      steps: ["Utwórz score z trzema punktami.", "Sprawdź points >= 3.", "Wypisz komunikat WYGRANA."],
+      starter: `public class Main {
+    public static void main(String[] args) {
+        int points = 0;
+        // TODO: warunek zwycięstwa
+    }
+}
+`,
+      solution: `public class Main {
+    public static void main(String[] args) {
+        int points = 3;
+        System.out.println("SCORE|" + points);
+        if (points >= 3) {
+            System.out.println("WYGRANA");
+        }
+    }
+}
+`,
+      checks: [
+        { kind: "contains", file: "Main.java", value: "points >= 3", label: "Próg zwycięstwa" },
+        { kind: "contains", file: "Main.java", value: "WYGRANA", label: "Komunikat zwycięstwa" },
+      ],
+      runMode: "game",
+    }),
+  ],
 };
 
 export function addIndependentTasks(lesson) {
   const [firstTask] = lesson.tasks;
+  if (lesson.track === "game-dev") return lesson;
   return {
     ...lesson,
     tasks: [

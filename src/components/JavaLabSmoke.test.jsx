@@ -23,4 +23,22 @@ describe("Java Lab workspace", () => {
     expect(screen.getByText(/Komunikat misji/i)).toBeInTheDocument();
     expect(screen.queryByText(/Podpowiedź:/i)).not.toBeInTheDocument();
   });
+
+  it("pokazuje ścieżkę 04 Game Dev i pozwala schować lewy panel", () => {
+    render(<App />);
+
+    expect(screen.getByRole("tab", { name: /Game Dev w Javie/i })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Schowaj panel ścieżek/i }));
+
+    expect(screen.getByRole("button", { name: /Pokaż panel ścieżek/i })).toBeInTheDocument();
+    expect(document.querySelector(".app-shell--sidebar-collapsed")).toBeInTheDocument();
+  });
+
+  it("ukrywa ścieżkę Game Dev, gdy flaga runtime jest wyłączona", () => {
+    globalThis.__JAVA_LAB_FEATURE_FLAGS__ = { "game-dev.enabled": false };
+    render(<App />);
+
+    expect(screen.queryByRole("tab", { name: /Game Dev w Javie/i })).not.toBeInTheDocument();
+    delete globalThis.__JAVA_LAB_FEATURE_FLAGS__;
+  });
 });

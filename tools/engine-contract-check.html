@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pl">
+<meta charset="utf-8">
+<title>Kontrakt silnika TeaVM</title>
+<h1>Kontrakt silnika TeaVM</h1>
+<button id="run">Sprawdź API silnika i błędny kod</button>
+<pre id="result">Czeka na uruchomienie.</pre>
+<script type="module">
+import { gameEngineRuntimeFiles } from '/src/data/gameEngineRuntime.js';
+import { createTeaVMRunner } from '/src/services/teavmRunner.js';
+const runner = createTeaVMRunner();
+const button = document.querySelector('#run');
+const result = document.querySelector('#result');
+const source = `import engine.*;
+class Counter extends Component {
+    int starts;
+    int updates;
+    public void start() { starts++; }
+    public void update(double delta) { updates++; gameObject.transform.x += delta; }
+}
+public class Main {
+    static void check(boolean condition, String label) {
+        if (!condition) throw new IllegalArgumentException(label);
+        System.out.println("PASS " + label);
+    }
+    public static void main(String[] args) {
+        GameObject object = new GameObject("Gracz", 180, 120);
+        Counter counter = object.addComponent(new Counter());
+        check(counter.gameObject == object && counter.starts == 1, "owner i start komponentu");
+        object.update(0.25);
+        check(counter.updates == 1 && object.transform.x == 180.25, "update i pozycja ulamkowa");
+        counter.enabled = false;
+        object.update(1);
+        check(counter.updates == 1, "wylaczony komponent");
+        counter.enabled = true;
+        object.active = false;
+        object.update(1);
+        check(counter.updates == 1, "nieaktywny obiekt");
+        boolean rejected = false;
+        try { new GameObject("Drugi", 0, 0).addComponent(counter); }
+        catch (IllegalArgumentException error) { rejected = true; }
+        check(rejected, "komponent nie moze miec dwoch wlascicieli");
+        rejected = false;
+        try { object.addComponent(null); }
+        catch (IllegalArgumentException error) { rejected = true; }
+        check(rejected, "odrzucenie null");
+        Input.setKey("Space", true);
+        check(Input.isKeyDown("Space") && Input.isKeyPressed("Space"), "nowe nacisniecie");
+        Input.endFrame();
+        Input.setKey("Space", true);
+        check(Input.isKeyDown("Space") && !Input.isKeyPressed("Space"), "autorepeat nie powtarza nacisniecia");
+        Input.setKey("Space", false);
+        Input.setKey("Space", true);
+        Input.setKey("Space", false);
+        check(!Input.isKeyDown("Space") && Input.isKeyPressed("Space"), "krotkie nacisniecie miedzy klatkami");
+        Input.endFrame();
+        check(!Input.isKeyPressed("Space"), "czyszczenie zbocza po klatce");
+        GameLoop.start(); check(GameLoop.isRunning(), "start petli");
+        GameLoop.stop(); check(!GameLoop.isRunning(), "stop petli");
+        GameCanvas.setSize(350, 250);
+        check(GameCanvas.getWidth() == 350 && GameCanvas.getHeight() == 250, "rozmiar planszy");
+        GameCanvas.clear("black");
+        object.draw("blue");
+        check(GameCanvas.frame().indexOf("rect|") < 0, "nieaktywny obiekt nie rysuje");
+        object.active = true;
+        object.draw("blue");
+        check(GameCanvas.frame().indexOf("|center") >= 0, "etykieta wycentrowana");
+        GameCanvas.clear("white");
+        check(GameCanvas.frame().indexOf("rect|") < 0, "clear rozpoczyna nowa klatke");
+    }
+}`;
+button.onclick = async () => {
+  button.disabled = true;
+  result.textContent = 'Kompiluję kontrakt API…\n';
+  try {
+    const response = await runner.run({ files: { ...gameEngineRuntimeFiles, 'Main.java': source }, mainClass: 'Main', mode: 'console' });
+    if (!response.ok) throw new Error(response.error || JSON.stringify(response.diagnostics));
+    if (response.output.split('\n').filter(line => line.startsWith('PASS ')).length !== 16) throw new Error('Nie wykonano wszystkich asercji API');
+    result.textContent += response.output + '\n';
+    const broken = await runner.run({ files: { 'Main.java': 'public class Main { public static void main(String[] args) { if()' }, mainClass: 'Main', mode: 'console' });
+    if (broken.ok !== false || !broken.diagnostics?.length) throw new Error('Niepoprawny if() nie został odrzucony');
+    result.textContent += 'PASS niezamkniety if() odrzucony przez javac\n';
+    const retry = await runner.run({ files: { 'Main.java': 'public class Main { public static void main(String[] args) { System.out.println("OK"); } }' }, mainClass: 'Main', mode: 'console' });
+    if (!retry.ok || retry.output.trim() !== 'OK') throw new Error('Runner nie działa po błędzie kompilacji');
+    result.textContent += 'PASS ponowne uruchomienie po bledzie kompilacji\nWszystkie testy kontraktu zaliczone.\n';
+  } catch (error) { result.textContent += `BŁĄD: ${error.message}\n`; }
+  finally { button.disabled = false; }
+};
+window.addEventListener('pagehide', () => runner.dispose());
+</script>
+</html>

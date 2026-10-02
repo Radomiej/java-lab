@@ -1,0 +1,52 @@
+<!doctype html><html lang="pl"><meta charset="utf-8">
+<title>Odzyskiwanie renderera</title><h1>Odzyskiwanie renderera</h1>
+<button id="run">Sprawdź przerwane pobranie, retry i brak tekstury</button>
+<canvas id="canvas" style="width:300px;height:200px" aria-label="Canvas testowy"></canvas>
+<pre id="result">Czeka.</pre>
+<script type="module">
+import {createGameInterop} from '/src/services/gameInterop.js';
+const canvas=document.querySelector('#canvas'),button=document.querySelector('#run'),result=document.querySelector('#result');
+const until=async predicate=>{
+ const deadline=performance.now()+10000;
+ while(!predicate()){
+  if(performance.now()>deadline)throw new Error('Przekroczony czas oczekiwania');
+  await new Promise(resolve=>setTimeout(resolve,30));
+ }
+};
+button.onclick=async()=>{
+ button.disabled=true;result.textContent='Sprawdzam renderer…';
+ const nativeFetch=window.fetch;
+ let interrupted=false,error;
+ window.fetch=(url,options)=>{
+  if(!interrupted && url==='/game-assets/atlas.json'){
+   interrupted=true;const controller=new AbortController();controller.abort();
+   return nativeFetch(url,{...options,signal:controller.signal});
+  }
+  return nativeFetch(url,options);
+ };
+ const bridge=createGameInterop(canvas);bridge.resize();
+ const onError=event=>{error=event.detail;};
+ window.addEventListener('java-lab-game-render-error',onError);
+ const draw=texture=>window.dispatchEvent(new CustomEvent('java-lab-game-draw',{detail:{op:'frame',commands:[
+  {op:'clear',color:'black'}, {op:'sprite',texture,x:80,y:80,width:32,height:32},
+ ]}}));
+ try{
+  draw('player');await until(()=>error!==undefined);
+  if(!interrupted)throw new Error('Nie wykonano przerwanego pobrania');
+  result.textContent+='\nPASS przerwane pobranie daje błąd renderera';
+  error=undefined;draw('player');
+  await until(()=>{
+   const ratio=window.devicePixelRatio||1;
+   const pixels=bridge.context.getImageData(64*ratio,64*ratio,32*ratio,32*ratio).data;
+   for(let i=0;i<pixels.length;i+=4)if(pixels[i]||pixels[i+1]||pixels[i+2])return true;
+   return false;
+  });
+  if(error!==undefined)throw new Error(error);
+  result.textContent+='\nPASS retry pobrał atlas i narysował rzeczywiste piksele';
+  draw('nieistniejaca-tekstura');
+  if(error!=='Brak tekstury: nieistniejaca-tekstura')throw new Error('Brak czytelnego błędu tekstury');
+  result.textContent+='\nPASS nieznana tekstura ma czytelny błąd';
+ }catch(failure){result.textContent+='\nBŁĄD: '+failure.message;}
+ finally{bridge.dispose();window.fetch=nativeFetch;window.removeEventListener('java-lab-game-render-error',onError);button.disabled=false;}
+};
+</script></html>

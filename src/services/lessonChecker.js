@@ -13,10 +13,33 @@ function fail(label, detail) {
   return { passed: false, label, detail };
 }
 
-function evaluateCheck(files, check) {
+function evaluateCheck(files, check, executionOutput = "") {
   const label = check.label || "Warunek zadania";
   const source = getFileText(files, check.file);
   const location = check.file ? ` w pliku ${check.file}` : "";
+
+  if (check.kind === "outputContains") {
+    const passed = executionOutput.includes(check.value);
+    return passed
+      ? pass(label, `Wynik programu zawiera: ${check.value}`)
+      : fail(label, `Wynik programu nie zawiera: ${check.value}`);
+  }
+
+  if (check.kind === "outputEquals") {
+    const passed = executionOutput.trim() === String(check.value).trim();
+    return passed
+      ? pass(label, "Wynik programu jest poprawny.")
+      : fail(label, `Oczekiwano wyniku: ${check.value}`);
+  }
+
+  if (check.kind === "outputLines") {
+    const actual = executionOutput.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    const expected = check.values.map((line) => String(line).trim());
+    const passed = actual.length === expected.length && actual.every((line, index) => line === expected[index]);
+    return passed
+      ? pass(label, "Wszystkie linie wyniku są poprawne.")
+      : fail(label, `Oczekiwano linii: ${expected.join(" | ")}`);
+  }
 
   if (!source) {
     return fail(label, `Nie znaleziono kodu${location}.`);
@@ -58,8 +81,8 @@ function evaluateCheck(files, check) {
   return fail(label, `Nieznany typ sprawdzenia: ${check.kind}`);
 }
 
-export function checkSource(files, checks = []) {
-  const results = checks.map((check) => evaluateCheck(files || {}, check));
+export function checkSource(files, checks = [], executionOutput = "") {
+  const results = checks.map((check) => evaluateCheck(files || {}, check, executionOutput));
   const score = results.filter((result) => result.passed).length;
   const passed = results.length > 0 && score === results.length;
   return {
@@ -70,5 +93,24 @@ export function checkSource(files, checks = []) {
     summary: passed
       ? "Wszystkie testy zadania są zaliczone."
       : `Zaliczone testy: ${score}/${results.length}.`,
+  };
+}
+
+export function mergeCompilationResult(report, compilation) {
+  if (compilation?.ok === true) return report;
+  return {
+    ...report,
+    passed: false,
+    results: [
+      {
+        passed: false,
+        label: "Kompilacja programu",
+        detail: compilation?.error || compilation?.diagnostics?.map((item) => item.message).filter(Boolean).join("\n") || "Brak potwierdzenia poprawnej kompilacji i uruchomienia.",
+      },
+      ...report.results,
+    ],
+    score: report.score,
+    total: report.total + 1,
+    summary: "Zadanie niezaliczone: kod nie kompiluje się.",
   };
 }

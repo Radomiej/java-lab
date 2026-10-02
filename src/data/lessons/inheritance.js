@@ -209,14 +209,14 @@ public class Main {
         try {
             addPoints(-5);
         } catch (IllegalArgumentException error) {
-            System.out.println(error.getMessage());
+            System.out.println("Punkty nie mogą być ujemne");
         }
     }
 }
 ` },
       checks: [
         { kind: "contains", file: "Main.java", value: "throw new IllegalArgumentException", label: "Rzucenie wyjątku" },
-        { kind: "regex", file: "Main.java", value: "try\\s*\\{", label: "Blok try" },
+        { kind: "contains", file: "Main.java", value: "try {", label: "Blok try" },
         { kind: "contains", file: "Main.java", value: "catch (IllegalArgumentException", label: "Obsługa błędu" },
       ], mainClass: "Main", runMode: "console",
     }],
