@@ -1,18 +1,54 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import App from "../App.jsx";
 
-afterEach(cleanup);
+afterEach(() => {cleanup(); vi.restoreAllMocks(); localStorage.clear();});
 
 describe("Java Lab workspace", () => {
+  it('shows only the simple game entry, not engine sources or TeaVM bindings', () => {
+    vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockReturnValue({setTransform(){},fillRect(){},fillText(){}});
+    render(<App />);
+    fireEvent.click(screen.getByRole('tab',{name:/Game Dev w Javie/i}));
+    expect(screen.getByRole('tab',{name:/GameMain.java/})).toBeInTheDocument();
+    expect(screen.queryByRole('tab',{name:/^J Main\.java$/})).not.toBeInTheDocument();
+    expect(screen.queryByRole('tab',{name:/Sprite.java/})).not.toBeInTheDocument();
+    expect(screen.queryByRole('tab',{name:/GameLauncher.java/})).not.toBeInTheDocument();
+    expect(screen.getByRole('textbox',{name:'Kod pliku GameMain.java'})).toBeInTheDocument();
+  });
+  it('keeps one RUN and the console in the main area for ordinary Java', () => {
+    render(<App />);
+    expect(screen.getAllByRole('button',{name:/^▶?\s*RUN$/})).toHaveLength(1);
+    expect(document.querySelector('main .runtime-console')).toBeInTheDocument();
+    expect(document.querySelector('.inspector-region')).not.toBeInTheDocument();
+  });
+  it('places actions above the code and attaches the console directly below it', () => {
+    render(<App />);
+    const toolbar = screen.getByRole('toolbar',{name:'Akcje edytora'});
+    const editor = screen.getByRole('textbox',{name:'Kod pliku Main.java'});
+    const consolePanel = screen.getByRole('region',{name:'Konsola'});
+    expect(toolbar).toContainElement(screen.getByRole('button',{name:/RUN/}));
+    expect(toolbar.compareDocumentPosition(editor) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(editor.closest('.code-editor-wrap').nextElementSibling).toBe(consolePanel);
+    expect(consolePanel.closest('.editor-shell')).toBe(editor.closest('.editor-shell'));
+  });
+  it('enlarges the existing game canvas as a modal and closes it with Escape', () => {
+    vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockReturnValue({setTransform(){},fillRect(){},fillText(){}});
+    render(<App />);
+    fireEvent.click(screen.getByRole('tab',{name:/Game Dev w Javie/i}));
+    const canvas=document.querySelector('.game-canvas');
+    fireEvent.click(screen.getByRole('button',{name:'Pełny ekran gry'}));
+    expect(screen.getByRole('dialog',{name:'Podgląd gry'})).toContainElement(canvas);
+    fireEvent.keyDown(document,{key:'Escape'});
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(document.querySelector('.game-canvas')).toBe(canvas);
+  });
   it("renders the first lesson and its primary actions", () => {
     render(<App />);
 
     expect(screen.getAllByText("Java Lab").length).toBeGreaterThan(0);
     expect(screen.getByRole("heading", { name: "Pierwszy program Javy" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Sprawdź zadanie/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Uruchom w przeglądarce/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /TeaVM/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /RUN/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading',{name:'Konsola'})).toBeInTheDocument();
   });
 
   it("hides hints after switching to an independent task", () => {

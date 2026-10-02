@@ -17,7 +17,8 @@ describe("Java Lab curriculum", () => {
       expect(lesson.objective).toBeTruthy();
       expect(lesson.theory.length).toBeGreaterThanOrEqual(2);
       expect(lesson.tasks.length).toBeGreaterThanOrEqual(1);
-      expect(lesson.tasks[0].starterFiles["Main.java"]).toContain("class");
+      const entry = lesson.track === 'game-dev' ? 'GameMain' : 'Main';
+      expect(lesson.tasks[0].starterFiles[`${entry}.java`]).toContain(`class ${entry}`);
       expect((lesson.tasks[0].outputChecks || lesson.tasks[0].gameTests || lesson.tasks[0].checks).length).toBeGreaterThanOrEqual(1);
     }
   });

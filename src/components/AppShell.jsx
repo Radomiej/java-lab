@@ -29,7 +29,7 @@ export default function AppShell({ sidebar, main, inspector }) {
   };
 
   return (
-    <div className={`app-shell${sidebarOpen ? " app-shell--sidebar-open" : ""}${sidebarCollapsed ? " app-shell--sidebar-collapsed" : ""}`} style={{ "--sidebar-size": `${panelSizes.sidebar}px`, "--inspector-size": `${panelSizes.inspector}px` }}>
+    <div className={`app-shell${!inspector ? ' app-shell--no-inspector' : ''}${sidebarOpen ? " app-shell--sidebar-open" : ""}${sidebarCollapsed ? " app-shell--sidebar-collapsed" : ""}`} style={{ "--sidebar-size": `${panelSizes.sidebar}px`, "--inspector-size": `${panelSizes.inspector}px` }}>
       <button className="sidebar-backdrop" type="button" aria-label="Zamknij menu" onClick={() => setSidebarOpen(false)} />
       <aside className="sidebar-region" id="course-sidebar">{sidebar}</aside>
       <button className="panel-resizer panel-resizer--sidebar" type="button" aria-label="Zmień szerokość panelu ścieżek" onPointerDown={(event) => startResize("sidebar", event)} />
@@ -47,8 +47,10 @@ export default function AppShell({ sidebar, main, inspector }) {
         </div>
         {main}
       </main>
-      <button className="panel-resizer panel-resizer--inspector" type="button" aria-label="Zmień szerokość panelu gry" onPointerDown={(event) => startResize("inspector", event)} />
-      <aside className="inspector-region" aria-label="Wynik programu i diagnostyka">{inspector}</aside>
+      {inspector && <>
+        <button className="panel-resizer panel-resizer--inspector" type="button" aria-label="Zmień szerokość panelu gry" onPointerDown={(event) => startResize("inspector", event)} />
+        <aside className="inspector-region" aria-label="Podgląd gry">{inspector}</aside>
+      </>}
     </div>
   );
 }

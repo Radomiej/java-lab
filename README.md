@@ -67,7 +67,19 @@ normalizuje kierunek i przyjmuje prędkość w pikselach na sekundę.
 Granice świata kontrolera można wyłączyć przez `collideWorldBounds = false`.
 API udostępnia `GameCanvas.getWidth()` i `getHeight()`.
 Starsze `GameObject.update/draw` i `GameLoop` pozostają kompatybilne.
-Pliki silnika są tylko do odczytu.
+Edytor pokazuje tylko `GameMain.java` oraz własne komponenty ucznia.
+`GameMain extends Game` jest punktem startowym sceny. Launcher z `main()`
+i eksportami TeaVM jest generowany poza edytorem. Wszystkie pliki gry
+otrzymują automatycznie pakiet `lab` i importy API; biblioteka zachowuje
+osobny pakiet `engine`.
+
+Ctrl+klik na nazwie klasy silnika (lub F12) otwiera jej źródło tylko do
+odczytu. Te pliki nie zajmują zakładek, dopóki ich nie otworzysz.
+
+Jeden przycisk `RUN` uruchamia program i sprawdza zadanie. Konsola znajduje
+się pod edytorem. W Game Dev po testach Java uruchamia się podgląd sceny;
+prawy panel zawiera tylko canvas. Przycisk pełnego ekranu powiększa ten sam
+canvas do modala bez ponownego uruchomienia gry; Escape zamyka modal.
 Panel ścieżek można schować przyciskiem nad edytorem.
 
 ## Flagi funkcji

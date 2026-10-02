@@ -1,4 +1,6 @@
-const defaultWorkerFactory = () => new Worker("/vendor/teavm/teavm.worker.js?v=game-wrapper-8", { type: "module" });
+import {prepareGameRequest} from './gameWorkspace.js';
+
+const defaultWorkerFactory = () => new Worker("/vendor/teavm/teavm.worker.js?v=game-wrapper-9", { type: "module" });
 
 function createRunnerError(code, message) {
   const error = new Error(message);
@@ -126,6 +128,7 @@ export function createTeaVMRunner({ workerFactory = defaultWorkerFactory, timeou
 
   return {
     async run(payload, { onStage, onGameCommand, signal, timeout = timeoutMs } = {}) {
+      payload = prepareGameRequest(payload);
       const runGeneration = generation;
       stopWatchdog();
       let initializationTimeout;

@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { formatJavaSource, triggerEditorAction } from "./javaEditorCommands.js";
 import { createJavaCompletionProvider } from "./javaIntellisense.js";
 import EditorHelp from "./EditorHelp.jsx";
+import RuntimeConsole from './RuntimeConsole.jsx';
 import { gameEngineRuntimeFiles } from "../data/gameEngineRuntime.js";
+import {createEngineDefinitionProvider, createEngineHoverProvider, resolveEngineSymbol} from './javaEngineNavigation.js';
 
 function fileIcon(fileName) {
   return fileName.endsWith(".java") ? "J" : "·";
@@ -28,7 +30,6 @@ export default function CodeEditor({
   onFileChange,
   onCodeChange,
   onCheck,
-  onCompile,
   onReset,
   onSolution,
   runner,
@@ -38,7 +39,11 @@ export default function CodeEditor({
   const [newClassName, setNewClassName] = useState("");
   const [fileError, setFileError] = useState("");
   const [addingFile, setAddingFile] = useState(false);
-  const source = files[activeFile] || "";
+  const source = files[activeFile] ?? (engine ? gameEngineRuntimeFiles[activeFile] : '') ?? '';
+  const [openedApi, setOpenedApi] = useState([]);
+  const onFileChangeRef = useRef(onFileChange);
+  const definitionProviderRef = useRef(null);
+  const hoverProviderRef = useRef(null);
   const editorHostRef = useRef(null);
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
@@ -62,10 +67,12 @@ export default function CodeEditor({
     filesRef.current = files;
     activeFileRef.current = activeFile;
     onCodeChangeRef.current = onCodeChange;
-  }, [activeFile, files, onCodeChange]);
+    onFileChangeRef.current = onFileChange;
+  }, [activeFile, files, onCodeChange, onFileChange]);
 
   useEffect(() => {
     setEditorReady(false);
+    setOpenedApi([]);
     setLoadError(null);
     let cancelled = false;
 
@@ -190,7 +197,7 @@ export default function CodeEditor({
           const uri = monaco.Uri.parse(
             `inmemory://java-lab/${encodeURIComponent(workspaceKey)}/${encodeURIComponent(fileName)}`,
           );
-          const model = monaco.editor.createModel(filesRef.current[fileName] || "", "java", uri);
+          const model = monaco.editor.createModel(filesRef.current[fileName] ?? (engine ? gameEngineRuntimeFiles[fileName] : '') ?? '', "java", uri);
           const listener = model.onDidChangeContent(() => {
             onCodeChangeRef.current(fileName, model.getValue());
           });
@@ -204,6 +211,30 @@ export default function CodeEditor({
           "java",
           createJavaCompletionProvider(monaco),
         );
+        if (engine) {
+          const openApi = position => {
+            const symbol = position && resolveEngineSymbol(gameEngineRuntimeFiles, editor.getModel(), position);
+            if (!symbol) return;
+            const file = symbol.file;
+            editor.setModel(getOrCreateModel(file));
+            editor.updateOptions({readOnly:true});
+            editor.setPosition({lineNumber:symbol.line,column:symbol.column});
+            editor.revealLineInCenter(symbol.line);
+            setOpenedApi(current => current.includes(file) ? current : [...current, file]);
+            onFileChangeRef.current(file);
+          };
+          definitionProviderRef.current = monaco.languages.registerDefinitionProvider('java',
+            createEngineDefinitionProvider(gameEngineRuntimeFiles, getOrCreateModel,
+              model => [...modelsRef.current.values()].includes(model)));
+          hoverProviderRef.current = monaco.languages.registerHoverProvider('java',
+            createEngineHoverProvider(gameEngineRuntimeFiles,
+              model => [...modelsRef.current.values()].includes(model)));
+          editorActionsRef.current.push(editor.onMouseDown(event => {
+            if ((event.event.ctrlKey || event.event.metaKey) && event.target.position) openApi(event.target.position);
+          }));
+          editorActionsRef.current.push(editor.addAction({id:'java-lab.open-engine-source',label:'Otwórz źródło klasy silnika',
+            keybindings:[monaco.KeyCode.F12],run:()=>openApi(editor.getPosition())}));
+        }
 
         editorRef.current = editor;
         monacoRef.current = monaco;
@@ -222,6 +253,10 @@ export default function CodeEditor({
       cancelled = true;
       completionProviderRef.current?.dispose();
       completionProviderRef.current = null;
+      definitionProviderRef.current?.dispose();
+      definitionProviderRef.current = null;
+      hoverProviderRef.current?.dispose();
+      hoverProviderRef.current = null;
       editorActionsRef.current.forEach((action) => action.dispose());
       editorActionsRef.current = [];
       editorRef.current?.dispose();
@@ -266,8 +301,20 @@ export default function CodeEditor({
 
   return (
     <div className="editor-shell">
+      <div className="editor-action-bar" role="toolbar" aria-label="Akcje edytora">
+        <button className="button button--primary" type="button" onClick={onCheck} disabled={runner.status === "compiling"}>▶ RUN</button>
+        <div className="editor-action-bar-secondary">
+          {readOnly && <button className="button button--ghost" type="button" onClick={() => {
+            setOpenedApi(current => current.filter(file => file !== activeFile));
+            onFileChange(Object.keys(files)[0]);
+          }}>Zamknij źródło API</button>}
+          {onSolution && <button className="button button--ghost" type="button" onClick={onSolution}>Pokaż rozwiązanie</button>}
+          <button className="button button--ghost" type="button" onClick={onReset}>Przywróć start</button>
+          <EditorHelp />
+        </div>
+      </div>
       <div className="editor-tabs" role="tablist" aria-label="Pliki lekcji">
-        {Object.keys(files).map((fileName) => (
+        {[...Object.keys(files), ...openedApi].map((fileName) => (
           <button
             className={`editor-tab${activeFile === fileName ? " is-active" : ""}`}
             type="button"
@@ -282,13 +329,7 @@ export default function CodeEditor({
         ))}
       {engine && <button className="editor-tab editor-tab--add" type="button" onClick={() => { setAddingFile(!addingFile); setFileError(""); }}>+ Dodaj plik</button>}
       </div>
-      <div className="editor-card-heading">
-        <strong>{activeFile}{readOnly ? " · API silnika (tylko odczyt)" : ""}</strong>
-        <span className="editor-card-heading-actions">
-          <span className="editor-language">Java · UTF-8 · Monaco</span>
-          <EditorHelp />
-        </span>
-      </div>
+      {readOnly && <div className="editor-api-notice">{activeFile} · API silnika (tylko odczyt)</div>}
       {engine && addingFile && <form className="editor-add-file" onSubmit={(event) => {
         event.preventDefault();
         const name = newClassName.trim().replace(/\.java$/, "");
@@ -297,7 +338,7 @@ export default function CodeEditor({
           return;
         }
         const file = `${name}.java`;
-        if (Object.hasOwn(files, file)) {
+        if (Object.hasOwn(files, file) || Object.hasOwn(gameEngineRuntimeFiles,file) || ['Main.java','GameLauncher.java'].includes(file)) {
           setFileError("Taki plik już istnieje.");
           return;
         }
@@ -336,12 +377,7 @@ export default function CodeEditor({
           {!editorReady && <div className="monaco-loading" aria-live="polite">Ładowanie edytora…</div>}
         </div>
       )}
-      <div className="editor-actions">
-        <button className="button button--primary" type="button" onClick={onCheck} disabled={runner.status === "compiling"}>✓ Sprawdź zadanie</button>
-        <button className="button button--teavm" type="button" onClick={onCompile} disabled={runner.status === "compiling"}>▶ Uruchom w przeglądarce</button>
-        {onSolution && <button className="button button--ghost button--solution" type="button" onClick={onSolution}>Pokaż rozwiązanie</button>}
-        <button className="button button--ghost" type="button" onClick={onReset}>Przywróć start</button>
-      </div>
+      <RuntimeConsole runner={runner} />
     </div>
   );
 }

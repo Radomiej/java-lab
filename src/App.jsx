@@ -6,11 +6,10 @@ import { createTeaVMRunner } from "./services/teavmRunner.js";
 import AppShell from "./components/AppShell.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import LessonWorkspace from "./components/LessonWorkspace.jsx";
-import RuntimeConsole from "./components/RuntimeConsole.jsx";
-import TeaVMPreview from "./components/TeaVMPreview.jsx";
 import GamePreview from "./components/GamePreview.jsx";
 import { getFeatureFlags, isFeatureEnabled } from "./config/featureFlags.js";
 import { gameEngineRuntimeFiles } from "./data/gameEngineRuntime.js";
+import {gameEditorFiles} from './services/gameWorkspace.js';
 
 const emptyReport = { passed: false, score: 0, total: 0, results: [], summary: "Uruchom sprawdzanie, aby zobaczyć wyniki." };
 const emptyRunner = { status: "idle", output: "", error: null, stage: "", diagnostics: [], classVersions: [] };
@@ -83,7 +82,7 @@ export default function App() {
   useEffect(() => {
     if (!selectedLesson.tasks.some((task) => task.id === activeTaskId)) {
       setActiveTaskId(selectedLesson.tasks[0]?.id);
-      setActiveFile("Main.java");
+      setActiveFile(selectedLesson.track === 'game-dev' ? 'GameMain.java' : 'Main.java');
       setCheckReport(emptyReport);
       setRunner(emptyRunner);
     }
@@ -91,7 +90,9 @@ export default function App() {
 
   const activeTask = selectedLesson.tasks.find((task) => task.id === activeTaskId) || selectedLesson.tasks[0];
   const files = useMemo(
-    () => ({ ...activeTask.starterFiles, ...(progress.filesByTask[activeTask.id] || {}), ...(activeTask.engine ? gameEngineRuntimeFiles : {}) }),
+    () => activeTask.engine
+      ? {...activeTask.starterFiles, ...gameEditorFiles(progress.filesByTask[activeTask.id] || {})}
+      : ({ ...activeTask.starterFiles, ...(progress.filesByTask[activeTask.id] || {}) }),
     [activeTask, progress.filesByTask],
   );
   const completedCount = progress.completedTasks.length;
@@ -116,7 +117,7 @@ export default function App() {
     executionVersion.current++;
     teavmRunner.stopGame();
     setActiveTaskId(taskId);
-    setActiveFile("Main.java");
+    setActiveFile(selectedLesson.track === 'game-dev' ? 'GameMain.java' : 'Main.java');
     setCheckReport(emptyReport);
     setRunner(emptyRunner);
   };
@@ -125,15 +126,24 @@ export default function App() {
     const version = ++executionVersion.current;
     setRunner({ ...emptyRunner, status: "compiling", stage: "Uruchamiam kod, aby sprawdzić wynik…" });
     try {
-      const result = await teavmRunner.run(
+      let result = await teavmRunner.run(
         buildTaskCheckRequest(activeTask, files),
         { onStage: (stage) => { if (version === executionVersion.current) setRunner((current) => ({ ...current, stage })); } },
       );
       if (version !== executionVersion.current) return;
-      const report = evaluateTaskCheck(activeTask, files, {
+      let report = evaluateTaskCheck(activeTask, files, {
         ...result,
         error: result.error || diagnosticsText(result.diagnostics),
       });
+      if (activeTask.engine && report.passed) {
+        const checkOutput = result.output;
+        result = await teavmRunner.run({files,mainClass:activeTask.mainClass,mode:'game'}, {
+          onStage:stage => {if (version === executionVersion.current) setRunner(current => ({...current,stage}));},
+        });
+        if (version !== executionVersion.current) return;
+        result.output = [checkOutput,result.output].filter(Boolean).join('\n');
+        if (!result.ok) report = evaluateTaskCheck(activeTask,files,{...result,error:result.error || diagnosticsText(result.diagnostics)});
+      }
       setCheckReport(report);
       progress.markTaskComplete(activeTask.id, report.passed);
       setRunner({
@@ -151,29 +161,6 @@ export default function App() {
     }
   };
 
-  const handleCompile = async () => {
-    const version = ++executionVersion.current;
-    setRunner({ ...emptyRunner, status: "compiling", stage: "Łączę z kompilatorem TeaVM w przeglądarce…" });
-    try {
-      const result = await teavmRunner.run(
-        { files, mainClass: activeTask.mainClass, mode: activeTask.runMode || "console" },
-        { onStage: (stage) => { if (version === executionVersion.current) setRunner((current) => ({ ...current, stage })); } },
-      );
-      if (version !== executionVersion.current) return;
-      setRunner({
-        status: result.ok === false ? "error" : "ready",
-        output: result.output || "",
-        error: result.ok === false ? result.error || diagnosticsText(result.diagnostics) : result.error || null,
-        stage: result.phase || "",
-        diagnostics: result.diagnostics || [],
-        classVersions: result.classVersions || [],
-      });
-    } catch (error) {
-      if (version !== executionVersion.current) return;
-      setRunner({ ...emptyRunner, status: "error", error: error.message });
-    }
-  };
-
   const handleSolution = () => {
     executionVersion.current++;
     teavmRunner.stopGame();
@@ -187,7 +174,7 @@ export default function App() {
     executionVersion.current++;
     teavmRunner.stopGame();
     progress.resetTask(activeTask.id);
-    setActiveFile("Main.java");
+    setActiveFile(activeTask.engine ? 'GameMain.java' : 'Main.java');
     setCheckReport(emptyReport);
     setRunner(emptyRunner);
   };
@@ -211,7 +198,7 @@ export default function App() {
     <LessonWorkspace
       lesson={selectedLesson}
       activeTask={activeTask}
-      activeFile={activeFile}
+      activeFile={Object.hasOwn(files, activeFile) || (activeTask.engine && Object.hasOwn(gameEngineRuntimeFiles, activeFile)) ? activeFile : Object.keys(files)[0]}
       files={files}
       completedTasks={progress.completedTasks}
       checkReport={checkReport}
@@ -228,22 +215,12 @@ export default function App() {
         setRunner((current) => current.status === "compiling" ? emptyRunner : current);
       }}
       onCheck={handleCheck}
-      onCompile={handleCompile}
       onReset={handleReset}
       onSolution={activeTask.mode === "guided" ? handleSolution : undefined}
     />
   );
 
-  const inspector = (
-    <>
-      {activeTask.runMode === "game" ? (
-        <GamePreview mainClass={activeTask.mainClass} runner={runner} onRun={handleCompile} />
-      ) : (
-        <TeaVMPreview mainClass={activeTask.mainClass} runner={runner} onRun={handleCompile} />
-      )}
-      <RuntimeConsole runner={runner} />
-    </>
-  );
+  const inspector = activeTask.engine ? <GamePreview runner={runner} /> : null;
 
   return <AppShell sidebar={sidebar} main={main} inspector={inspector} />;
 }

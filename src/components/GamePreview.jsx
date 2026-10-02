@@ -1,11 +1,31 @@
 import { useEffect, useRef, useState } from "react";
 import { createGameInterop } from "../services/gameInterop.js";
 
-export default function GamePreview({ runner, mainClass, onRun }) {
+export default function GamePreview({ runner }) {
   const isReady = runner.status === "ready";
   const [keys, setKeys] = useState([]);
   const stageRef = useRef(null);
   const canvasRef = useRef(null);
+  const [fullscreen,setFullscreen] = useState(false);
+  const panelRef = useRef(null);
+  const fullscreenButtonRef = useRef(null);
+  useEffect(() => {
+    if (!fullscreen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    canvasRef.current?.focus();
+    const onKey = event => {
+      if (event.key === 'Escape') {event.preventDefault(); setFullscreen(false);}
+      if (event.key === 'Tab') {
+        const targets = [...panelRef.current.querySelectorAll('button, canvas[tabindex]')];
+        const index = targets.indexOf(document.activeElement);
+        event.preventDefault();
+        targets[(index + (event.shiftKey ? -1 : 1) + targets.length) % targets.length]?.focus();
+      }
+    };
+    document.addEventListener('keydown',onKey);
+    return () => {document.body.style.overflow=previousOverflow; document.removeEventListener('keydown',onKey); fullscreenButtonRef.current?.focus();};
+  },[fullscreen]);
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return undefined;
@@ -34,19 +54,19 @@ export default function GamePreview({ runner, mainClass, onRun }) {
     return () => interop.dispose();
   }, []);
   return (
-    <section className="preview-card game-preview" aria-labelledby="game-preview-title">
+    <section ref={panelRef} className={`preview-card game-preview${fullscreen ? ' game-preview--fullscreen' : ''}`} role={fullscreen ? 'dialog' : undefined} aria-modal={fullscreen ? true : undefined} aria-labelledby="game-preview-title">
       <div className="preview-heading">
         <div><p className="eyebrow">TeaVM · Game Dev</p><h2 id="game-preview-title">Podgląd gry</h2></div>
-        <span className={`runtime-pill runtime-pill--${runner.status}`}>{runner.status === "compiling" ? "Budowanie" : isReady ? "Gra gotowa" : "Czeka"}</span>
+        <div className="game-preview-actions">
+          <span className={`runtime-pill runtime-pill--${runner.status}`}>{runner.status === "compiling" ? "Budowanie" : isReady ? "Gra gotowa" : "Czeka"}</span>
+          <button ref={fullscreenButtonRef} className="button button--ghost" type="button" onClick={() => setFullscreen(value => !value)} aria-label={fullscreen ? 'Zamknij pełny ekran gry' : 'Pełny ekran gry'}>{fullscreen ? '✕ Zamknij' : '⛶'}</button>
+        </div>
       </div>
       <div className="game-stage" ref={stageRef} role="application" aria-label="Plansza gry. Kliknij, aby przechwycić klawisze.">
         <canvas ref={canvasRef} className="game-canvas" aria-label="Canvas gry" />
         {!isReady && <span>{runner.stage || "Uruchom program, aby zobaczyć scenę."}</span>}
         {keys.length > 0 && <span className="game-input-status">{keys.join(" + ")}</span>}
       </div>
-      <button className="button button--teavm button--wide" type="button" onClick={onRun} disabled={runner.status === "compiling"}>
-        ▶ Uruchom grę w przeglądarce
-      </button>
     </section>
   );
 }

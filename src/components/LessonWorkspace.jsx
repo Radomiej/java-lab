@@ -3,7 +3,7 @@ import TaskPanel from "./TaskPanel.jsx";
 import CodeEditor from "./CodeEditor.jsx";
 import FeedbackPanel from "./FeedbackPanel.jsx";
 
-export default function LessonWorkspace({ lesson, activeTask, activeFile, files, completedTasks, checkReport, runner, onTaskChange, onFileChange, onCodeChange, onCheck, onCompile, onReset, onSolution }) {
+export default function LessonWorkspace({ lesson, activeTask, activeFile, files, completedTasks, checkReport, runner, onTaskChange, onFileChange, onCodeChange, onCheck, onReset, onSolution }) {
   return (
     <div className="lesson-workspace">
       <LessonOverview lesson={lesson} />
@@ -13,9 +13,9 @@ export default function LessonWorkspace({ lesson, activeTask, activeFile, files,
           <div><p className="eyebrow">Laboratorium kodu</p><h2 id="editor-title">Zbuduj rozwiązanie</h2></div>
           <span className="language-badge">Java 21 · WebAssembly</span>
         </div>
-        <CodeEditor files={files} activeFile={activeFile} taskId={activeTask.id} onFileChange={onFileChange} onCodeChange={onCodeChange} onCheck={onCheck} onCompile={onCompile} onReset={onReset} onSolution={onSolution} runner={runner} engine={activeTask.engine} />
+        <CodeEditor files={files} activeFile={activeFile} taskId={activeTask.id} onFileChange={onFileChange} onCodeChange={onCodeChange} onCheck={onCheck} onReset={onReset} onSolution={onSolution} runner={runner} engine={activeTask.engine} />
       </section>
-      <FeedbackPanel report={checkReport} />
+      {checkReport.total > 0 && <FeedbackPanel report={checkReport} />}
     </div>
   );
 }

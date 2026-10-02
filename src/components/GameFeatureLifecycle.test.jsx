@@ -31,11 +31,11 @@ it("stops forwarding runtime frames when Game Dev is disabled dynamically", asyn
   vi.stubGlobal("Worker", TestWorker);
   render(<App />);
   fireEvent.click(screen.getByRole("tab", { name: /Game Dev w Javie/i }));
-  fireEvent.click(screen.getByRole("button", { name: /Uruchom grę w przeglądarce/i }));
+  fireEvent.click(screen.getByRole("button", { name: /RUN/ }));
   await waitFor(() => expect(screen.getByText("Gra gotowa")).toBeInTheDocument());
   act(() => window.dispatchEvent(new CustomEvent("java-lab-game-render-error", { detail: "Brak tekstury: unknown" })));
   expect(screen.getByText(/Brak tekstury: unknown/)).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: /Uruchom grę w przeglądarce/i }));
+  fireEvent.click(screen.getByRole("button", { name: /RUN/ }));
   await waitFor(() => expect(screen.getByText("Gra gotowa")).toBeInTheDocument());
   const received = vi.fn();
   window.addEventListener("java-lab-game-draw", received);

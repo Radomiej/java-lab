@@ -1,3 +1,5 @@
+import {gameEditorFiles} from '../../services/gameWorkspace.js';
+
 const engineFiles = {
   "Main.java": `import engine.GameCanvas;
 import engine.GameObject;
@@ -441,3 +443,14 @@ gameDevLessons[2].theory = [
   {title:"Własne komponenty",text:"Score, Health i Collector należą do Twojej gry. Dodajesz je do obiektów sceny; silnik wywołuje onCreate, onUpdate i onDestroy.",code:'player.addComponent(new HealthComponent());'},
   {title:"Kontakty",text:"Collider2D blokuje ruch. Trigger2D przekazuje kontakt do onTrigger bez blokowania. Regułę zbierania piszesz sam.",code:'public void onTrigger(GameObject other) { /* reguła gry */ }'},
 ];
+
+// The editor contains student code only. TeaVM bindings are generated at run time.
+for (const lesson of gameDevLessons) {
+  lesson.tips = ['Ctrl+klik na nazwie klasy silnika otwiera jej źródło tylko do odczytu.'];
+  for (const exercise of lesson.tasks) {
+    exercise.starterFiles = gameEditorFiles(exercise.starterFiles);
+    exercise.solutionFiles = gameEditorFiles(exercise.solutionFiles);
+    exercise.prompt = exercise.prompt.replace(/StudentGame/g, 'GameMain');
+    exercise.steps = exercise.steps.map(step => step.replace(/StudentGame/g, 'GameMain'));
+  }
+}

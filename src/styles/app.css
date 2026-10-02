@@ -13,6 +13,11 @@ pre { margin: 0; }
 .app-shell { display: grid; grid-template-columns: var(--sidebar-size, 260px) 5px minmax(0, 1fr) 5px var(--inspector-size, 380px); min-height: 100vh; }
 .app-shell--sidebar-collapsed { grid-template-columns: 0 0 minmax(0, 1fr) 5px var(--inspector-size, 380px); }
 .app-shell--sidebar-collapsed .sidebar-region { display: none; }
+.app-shell.app-shell--no-inspector { grid-template-columns: var(--sidebar-size, 260px) 5px minmax(0, 1fr); }
+.app-shell.app-shell--no-inspector.app-shell--sidebar-collapsed { grid-template-columns: 0 0 minmax(0, 1fr); }
+.game-preview-actions { display: flex; align-items: center; gap: 8px; }
+.game-preview.game-preview--fullscreen { position: fixed; z-index: 100; inset: 12px; display: flex; flex-direction: column; margin: 0; box-shadow: 0 0 0 100vmax rgb(8 24 37 / 75%); }
+.game-preview--fullscreen .game-stage { flex: 1; min-height: 0; }
 .panel-resizer { z-index: 5; width: 5px; padding: 0; border: 0; background: transparent; cursor: col-resize; }
 .panel-resizer:hover, .panel-resizer:focus-visible { background: var(--teal-500); }
 body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !important; user-select: none !important; }
@@ -123,7 +128,10 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
 .code-editor { display: block; min-width: 0; width: 100%; min-height: 300px; padding: 16px 15px; resize: vertical; border: 0; outline: 0; color: #d7e8f2; background: #102b42; font: 12px/1.65 var(--mono); tab-size: 2; white-space: pre; overflow: auto; }
 .code-editor:focus { box-shadow: inset 0 0 0 2px rgb(37 184 167 / 45%); }
 .editor-help { margin: 0; padding: 8px 14px; color: var(--ink-700); font-size: 11px; line-height: 1.5; }
-.editor-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 14px; background: var(--paper); }
+.editor-action-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--line); background: #f7fafc; }
+.editor-action-bar .button { min-height: 34px; padding: 8px 12px; }
+.editor-action-bar-secondary { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; }
+.editor-api-notice { padding: 8px 14px; color: var(--ink-700); font: 11px var(--mono); }
 .button { min-height: 36px; padding: 0 11px; border: 1px solid transparent; border-radius: 7px; font-size: 11px; font-weight: 800; }
 .button:disabled { opacity: .55; cursor: wait; }
 .button--primary { color: white; background: var(--teal-600); box-shadow: 0 3px 8px rgb(21 153 142 / 20%); }
@@ -171,10 +179,12 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
 .game-input-status { position: absolute !important; inset: auto 12px 10px !important; display: block !important; color: #9bb8c8; font-size: 9px; text-align: center; opacity: .9; }
 .button--wide { width: 100%; margin-top: 12px; }
 .preview-note { margin: 9px 0 0; color: var(--ink-500); font-size: 9px; line-height: 1.45; }
-.runtime-console { background: var(--navy-900); }
-.runtime-console .eyebrow, .runtime-console h2 { color: white; }
-.runtime-console .eyebrow { color: #7ce2d6; }
-.console-output { min-height: 105px; max-height: 240px; margin-top: 13px; padding: 11px; overflow: auto; border: 1px solid rgb(255 255 255 / 9%); border-radius: 7px; color: #bed5df; background: #0d2235; font: 10px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.editor-shell .runtime-console { padding: 0; border: 0; border-top: 1px solid #344453; border-radius: 0; background: #101c28; box-shadow: none; }
+.console-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 16px; background: #152330; }
+.runtime-console .console-heading h2 { color: #d6e6ee; font-size: 12px; font-weight: 600; letter-spacing: 0; }
+.console-heading .runtime-pill { padding: 3px 8px; font-size: 10px; }
+.console-output { min-height: 95px; max-height: 260px; margin: 0; padding: 12px 16px 16px; overflow: auto; border: 0; border-radius: 0; color: #bed5df; background: transparent; font: 12px/1.65 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.console-output:focus-visible { outline: 2px solid var(--teal-500, #13a89e); outline-offset: -2px; }
 .sidebar-backdrop { display: none; }
 
 @media (max-width: 1240px) {
@@ -210,8 +220,9 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
   .tips-row span { padding-left: 0; border-left: 0; }
   .task-list { grid-template-columns: 1fr; }
   .task-button { min-height: 58px; }
-  .editor-actions { align-items: stretch; flex-direction: column; }
-  .editor-actions .button { width: 100%; }
+  .editor-action-bar { align-items: flex-start; }
+  .editor-action-bar-secondary { flex: 1; }
+  .editor-action-bar .button { padding: 8px; font-size: 10px; }
   .button--solution { margin-left: 0; }
   .teavm-display { min-height: 220px; }
   .section-heading-row { align-items: flex-start; }
