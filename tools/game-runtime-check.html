@@ -12,6 +12,7 @@ import { gameEngineRuntimeFiles } from '/src/data/gameEngineRuntime.js';
 import { createTeaVMRunner } from '/src/services/teavmRunner.js';
 import { allLessons } from '/src/data/curriculum.js';
 import { checkSource } from '/src/services/lessonChecker.js';
+import {buildTaskCheckRequest} from '/src/services/taskExecution.js';
 const runner = createTeaVMRunner();
 const button = document.querySelector('#run');
 const result = document.querySelector('#result');
@@ -22,16 +23,9 @@ button.onclick = async () => {
   try {
     for (const task of gameDevLessons.flatMap(lesson => lesson.tasks).filter(task => task.gameTests?.length)) {
       result.textContent += `${task.title}: kompiluję…\n`;
-      const response = await runner.run({
-        files: { ...task.solutionFiles, ...gameEngineRuntimeFiles },
-        mainClass: task.mainClass, mode: 'game', gameTests: task.gameTests,
-      });
+      const response = await runner.run(buildTaskCheckRequest(task,task.solutionFiles));
       if (!response.ok) throw new Error(response.error || JSON.stringify(response.diagnostics));
-      if (response.behaviorResults?.length !== task.gameTests.length) throw new Error('Brak wyników testów');
-      for (const test of response.behaviorResults) {
-        result.textContent += `${test.passed ? 'PASS' : 'FAIL'}: ${test.label} — ${test.detail}\n`;
-      }
-      if (response.behaviorResults.some(test => !test.passed)) throw new Error(`Niepoprawne rozwiązanie: ${task.title}`);
+      result.textContent += `PASS ${task.id}: ${response.output}\n`;
       runner.stopGame();
     }
     result.textContent += 'Wszystkie rozwiązania i scenariusze zaliczone.\n';

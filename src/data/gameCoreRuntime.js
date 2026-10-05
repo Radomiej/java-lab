@@ -26,6 +26,7 @@ public class Sprite extends Component {
   "Collider2D.java": `package engine;
 public class Collider2D extends Component {
     public boolean isStatic;
+    public boolean isTrigger;
     public Collider2D() { this(true); }
     public Collider2D(boolean isStatic) { this.isStatic = isStatic; }
 }
@@ -63,6 +64,8 @@ public abstract class Component {
     public void onCollision(GameObject other) {}
     public void onTrigger(GameObject other) {}
     public void onComponentChange(ComponentChange change) {}
+    public void onDrawBackground() {}
+    public void onDrawUI() {}
     public void start() { onCreate(); }
     public void update(double delta) { onUpdate(delta); }
     public final Game getGame() { return gameObject == null ? null : gameObject.game; }
@@ -139,6 +142,8 @@ public class Game {
         for (GameObject object : snapshot) components.add(object.getComponents());
         try {
             GameCanvas.clear(background);
+            for (GameObject object : snapshot) for (Component component : object.getComponents())
+                if (object.active && !object.destroyed && component.created && component.enabled && !component.removed) component.onDrawBackground();
             for (GameObject object : snapshot) {
                 CharacterController2D controller = object.getComponent(CharacterController2D.class);
                 if (controller != null) { controller.velocity.x = 0; controller.velocity.y = 0; }
@@ -146,12 +151,19 @@ public class Game {
             onUpdate(delta);
             for (int i = 0; i < snapshot.size() && !disposed; i++) snapshot.get(i).updateComponents(delta, components.get(i));
             if (!disposed) Physics2D.step(this, snapshot, delta);
+            double cameraX=0,cameraY=0;
+            for(GameObject object:getObjects()) {
+                Camera2D camera=object.getComponent(Camera2D.class);
+                if(object.active&&!object.destroyed&&camera!=null&&camera.enabled){cameraX=camera.offsetX;cameraY=camera.offsetY;break;}
+            }
             if (!disposed) for (GameObject object : getObjects()) {
                 Sprite sprite = object.getComponent(Sprite.class);
                 if (object.active && !object.destroyed && sprite != null && sprite.enabled && sprite.created)
-                    GameCanvas.drawSprite(sprite.texture, object.transform.x, object.transform.y, sprite.width, sprite.height,
+                    GameCanvas.drawSprite(sprite.texture, object.transform.x + object.transform.visualOffset.x - cameraX, object.transform.y + object.transform.visualOffset.y - cameraY, sprite.width, sprite.height,
                         object.transform.rotation.z, object.transform.scale.x, object.transform.scale.y);
             }
+            if (!disposed) for (GameObject object : getObjects()) for (Component component : object.getComponents())
+                if(object.active&&!object.destroyed&&component.created&&component.enabled&&!component.removed)component.onDrawUI();
         } finally { flush(); Input.endFrame(); }
     }
     void removed(Component component) { removed.add(component); }
@@ -169,88 +181,6 @@ public class Game {
         disposed = true;
         for (GameObject object : getObjects()) object.destroy();
         flush(); onDestroy();
-    }
-}
-`,
-  "Physics2D.java": `package engine;
-public final class Physics2D {
-    private Physics2D() {}
-    private static boolean live(GameObject object) { return object.active && !object.destroyed; }
-    private static double size(GameObject object, boolean x) {
-        Sprite sprite = object.getComponent(Sprite.class);
-        return sprite == null ? 32 : x ? sprite.width : sprite.height;
-    }
-    private static boolean overlaps(GameObject a, GameObject b) {
-        return Math.abs(a.transform.x - b.transform.x) < (size(a, true) + size(b, true)) / 2
-            && Math.abs(a.transform.y - b.transform.y) < (size(a, false) + size(b, false)) / 2;
-    }
-    private static boolean reachable(GameObject a, GameObject b, double startX, double startY) {
-        double ex = (size(a, true) + size(b, true)) / 2;
-        double ey = (size(a, false) + size(b, false)) / 2;
-        boolean horizontal = Math.abs(startY - b.transform.y) < ey
-            && Math.max(startX, a.transform.x) >= b.transform.x - ex
-            && Math.min(startX, a.transform.x) <= b.transform.x + ex;
-        boolean vertical = Math.abs(a.transform.x - b.transform.x) < ex
-            && Math.max(startY, a.transform.y) >= b.transform.y - ey
-            && Math.min(startY, a.transform.y) <= b.transform.y + ey;
-        return horizontal || vertical;
-    }
-    static void step(Game game, java.util.ArrayList<GameObject> objects, double delta) {
-        java.util.ArrayList<GameObject> firstContacts = new java.util.ArrayList<>();
-        java.util.ArrayList<GameObject> secondContacts = new java.util.ArrayList<>();
-        for (GameObject object : objects) {
-            CharacterController2D controller = object.getComponent(CharacterController2D.class);
-            Collider2D own = object.getComponent(Collider2D.class);
-            if (!live(object) || controller == null || !controller.enabled || !controller.created || (own != null && !own.enabled)) continue;
-            java.util.ArrayList<GameObject> contacts = new java.util.ArrayList<>();
-            double startX = object.transform.x, startY = object.transform.y;
-            for (int axis = 0; axis < 2; axis++) {
-                double movement = (axis == 0 ? controller.velocity.x : controller.velocity.y) * delta;
-                double origin = axis == 0 ? object.transform.x : object.transform.y;
-                if (axis == 0) object.transform.x += movement; else object.transform.y += movement;
-                for (GameObject other : objects) {
-                    Collider2D collider = other.getComponent(Collider2D.class);
-                    CharacterController2D otherController = other.getComponent(CharacterController2D.class);
-                    boolean body = collider != null ? collider.enabled && collider.created : otherController != null && otherController.created;
-                    if (other == object || !live(other) || !body) continue;
-                    double extent = (size(object, axis == 0) + size(other, axis == 0)) / 2;
-                    double otherPosition = axis == 0 ? other.transform.x : other.transform.y;
-                    double target = axis == 0 ? object.transform.x : object.transform.y;
-                    double perpendicular = axis == 0 ? object.transform.y - other.transform.y : object.transform.x - other.transform.x;
-                    boolean aligned = Math.abs(perpendicular) < (size(object, axis != 0) + size(other, axis != 0)) / 2;
-                    boolean crossed = aligned && (movement > 0
-                        ? origin <= otherPosition - extent && target >= otherPosition - extent
-                        : movement < 0 && origin >= otherPosition + extent && target <= otherPosition + extent);
-                    if (!crossed && !overlaps(object, other)) continue;
-                    boolean trigger = own instanceof Trigger2D || collider instanceof Trigger2D;
-                    if (!contacts.contains(other)) contacts.add(other);
-                    if (!trigger && movement != 0) {
-                        double position = otherPosition + (movement > 0 ? -extent : extent);
-                        if (axis == 0) object.transform.x = position; else object.transform.y = position;
-                    }
-                }
-            }
-            for (GameObject other : contacts) {
-                if (!reachable(object, other, startX, startY)) continue;
-                Collider2D collider = other.getComponent(Collider2D.class);
-                boolean alreadySent = false;
-                for (int i = 0; i < firstContacts.size(); i++) {
-                    if ((firstContacts.get(i) == object && secondContacts.get(i) == other)
-                        || (firstContacts.get(i) == other && secondContacts.get(i) == object)) alreadySent = true;
-                }
-                if (!alreadySent && live(object) && live(other) && (collider == null || collider.enabled)) {
-                    firstContacts.add(object); secondContacts.add(other);
-                    game.dispatchContact(object, other, own instanceof Trigger2D || collider instanceof Trigger2D);
-                }
-                if (game.isDisposed()) return;
-            }
-            if (live(object) && controller.collideWorldBounds) {
-                double halfWidth = Math.min(size(object, true) / 2, GameCanvas.getWidth() / 2);
-                double halfHeight = Math.min(size(object, false) / 2, GameCanvas.getHeight() / 2);
-                object.transform.x = Math.max(halfWidth, Math.min(GameCanvas.getWidth() - halfWidth, object.transform.x));
-                object.transform.y = Math.max(halfHeight, Math.min(GameCanvas.getHeight() - halfHeight, object.transform.y));
-            }
-        }
     }
 }
 `,
@@ -316,6 +246,7 @@ public final class Transform {
     public double y;
     public final Vector3 rotation = new Vector3(0, 0, 0);
     public final Vector3 scale = new Vector3(1, 1, 1);
+    public final Vector2 visualOffset = new Vector2();
 
     public Transform(double x, double y) {
         this.x = x;

@@ -73,7 +73,7 @@ i eksportami TeaVM jest generowany poza edytorem. Wszystkie pliki gry
 otrzymują automatycznie pakiet `lab` i importy API; biblioteka zachowuje
 osobny pakiet `engine`.
 
-Ctrl+klik na nazwie klasy silnika (lub F12) otwiera jej źródło tylko do
+Ctrl+klik na nazwie klasy lub rozpoznanej metody silnika (lub F12) otwiera jej źródło tylko do
 odczytu. Te pliki nie zajmują zakładek, dopóki ich nie otworzysz.
 
 Jeden przycisk `RUN` uruchamia program i sprawdza zadanie. Konsola znajduje
@@ -81,6 +81,21 @@ się pod edytorem. W Game Dev po testach Java uruchamia się podgląd sceny;
 prawy panel zawiera tylko canvas. Przycisk pełnego ekranu powiększa ten sam
 canvas do modala bez ponownego uruchomienia gry; Escape zamyka modal.
 Panel ścieżek można schować przyciskiem nad edytorem.
+
+## Dokumentacja silnika
+
+Lista klas i pól, cykl klatki, ograniczenia kolizji oraz diagramy Mermaid:
+[Silnik Java Lab](docs/game-engine.md).
+
+Ścieżki mają osobne zakresy 101–199, 201–299, 301–399, 401–499.
+Game Dev obejmuje ruch/obrót, trawę, monety/HUD, AI, pociski i tweeny.
+CircleCollider2D obsługuje koła i kontakty z prostokątami, Projectile2D
+sprawdza odcinek lotu i pomija właściciela. AI ma gotowe zachowania
+podążania, ucieczki, flankowania i lokalnego omijania przeszkód (nie A*).
+Tweeny animują pozycję, skalę, obrót lub wizualny shake; kamera nie rusza stanu fizyki.
+Własne pliki ucznia można usuwać z potwierdzeniem; pliki startowe i engine są chronione.
+
+Plan prac: [docs/todo.md](docs/todo.md).
 
 ## Flagi funkcji
 
@@ -121,8 +136,11 @@ w zadaniu prowadzonym, żeby dwa kolejne ćwiczenia sprawdzały samodzielność.
 Wewnętrzne scenariusze regresyjne Game Dev używają rzeczywistego runtime TeaVM:
 uruchamia nowy moduł dla każdego scenariusza, podaje klawisze i czas, a potem
 porównują komendy renderera. Nie są używane do zaliczania kodu ucznia.
-Testy wszystkich dziewięciu rozwiązań można uruchomić
+Testy wszystkich osiemnastu rozwiązań Game Dev można uruchomić
 na `/tools/game-runtime-check.html` przy działającym serwerze developerskim.
+Rozszerzone API sprawdza `/tools/expanded-engine-check.html`.
+Deweleloperskie testy źródeł Java wymagają istniejącego JDK 21+ (JAVA_HOME,
+PATH lub katalog .jdks); nie jest ono potrzebne uczniowi ani aplikacji w przeglądarce.
 Kontrakty core i fizyki są w `/tools/core-api-check.html` i
 `/tools/components-2d-check.html`; test kontrolera wyłącznie po stronie Javy
 w `/tools/java-object-tests-check.html`. Rendering, transformacje i retry

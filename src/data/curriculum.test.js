@@ -1,14 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { allLessons, trackOrder, tracks } from "./curriculum.js";
+import { allLessons, numberLessons, trackOrder, tracks } from "./curriculum.js";
 import { checkSource } from "../services/lessonChecker.js";
 
 describe("Java Lab curriculum", () => {
-  it("contains four tracks and fifteen ordered lessons", () => {
+  it('keeps other track numbers stable when adding a lesson and enforces 99 slots',()=>{
+    const numbered=numberLessons([{id:'a',track:'fundamentals'},{id:'b',track:'fundamentals'},{id:'c',track:'objects'}]);
+    expect(numbered.map(l=>l.order)).toEqual([101,102,201]);
+    const full=Array.from({length:99},(_,index)=>({id:`f${index}`,track:'fundamentals'}));
+    expect(numberLessons(full).at(-1).order).toBe(199);
+    expect(()=>numberLessons([...full,{id:'overflow',track:'fundamentals'}])).toThrow();
+  });
+  it("allocates an independent hundred-number block to each track", () => {
     expect(trackOrder).toHaveLength(4);
     expect(Object.keys(tracks)).toHaveLength(4);
-    expect(allLessons).toHaveLength(15);
+    expect(allLessons).toHaveLength(18);
     expect(allLessons.map((lesson) => lesson.order)).toEqual(
-      Array.from({ length: 15 }, (_, index) => index + 1),
+      [101,102,103,104,201,202,203,204,301,302,303,304,401,402,403,404,405,406],
     );
   });
 

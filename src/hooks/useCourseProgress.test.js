@@ -37,6 +37,25 @@ describe("useCourseProgress", () => {
     expect(result.current.filesByTask[taskId]).toBeUndefined();
   });
 
+  it('deletes a student file persistently without losing other files',()=>{
+    const {result}=renderHook(()=>useCourseProgress(allLessons));
+    const id=allLessons[12].tasks[0].id;
+    act(()=>result.current.updateFiles(id,{'Enemy.java':'class Enemy {}','Other.java':'class Other {}'}));
+    act(()=>result.current.deleteFile(id,'Enemy.java'));
+    expect(result.current.filesByTask[id]['Enemy.java']).toBeUndefined();
+    expect(result.current.filesByTask[id]['Other.java']).toBe('class Other {}');
+    const again=renderHook(()=>useCourseProgress(allLessons));
+    expect(again.result.current.filesByTask[id]['Enemy.java']).toBeUndefined();
+  });
+
+  it('maps old game selection but does not transfer old game completion',()=>{
+    localStorage.setItem('java-lab-progress-v1',JSON.stringify({selectedTrack:'game-dev',selectedLessonId:'game-dev-14',filesByTask:{old:{'Main.java':'saved'}},completedTasks:['game-dev-14-task']}));
+    const {result}=renderHook(()=>useCourseProgress(allLessons));
+    expect(result.current.selectedLessonId).toBe('game-dev-401');
+    expect(result.current.completedTasks).toEqual([]);
+    expect(result.current.filesByTask.old['Main.java']).toBe('saved');
+  });
+
   it("migrates a saved selection from a removed track", () => {
     window.localStorage.setItem("java-lab-progress-v1", JSON.stringify({
       selectedTrack: "swing",

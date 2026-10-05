@@ -2,7 +2,7 @@
 <title>Komponenty 2D</title><h1>Kontrakt komponentów 2D</h1>
 <button id="run">Sprawdź komponenty w TeaVM</button><pre id="result">Czeka.</pre>
 <script type="module">
-import { gameCoreRuntimeFiles } from '/src/data/gameCoreRuntime.js';
+import { gameEngineRuntimeFiles as gameCoreRuntimeFiles } from '/src/data/gameEngineRuntime.js';
 import { createTeaVMRunner } from '/src/services/teavmRunner.js';
 const runner = createTeaVMRunner();
 const source = `import engine.*;

@@ -16,7 +16,8 @@ function initialState(lessons) {
 function sanitizeState(value, lessons) {
   const fallback = initialState(lessons);
   if (!value || typeof value !== "object") return fallback;
-  const lesson = lessons.find((candidate) => candidate.id === value.selectedLessonId)
+  const migratedId = ({'game-dev-13':'game-dev-401','game-dev-14':'game-dev-401','game-dev-15':'game-dev-403'})[value.selectedLessonId] || value.selectedLessonId;
+  const lesson = lessons.find((candidate) => candidate.id === migratedId)
     || lessons.find((candidate) => candidate.id === fallback.selectedLessonId)
     || lessons[0];
   const validTrack = lessons.some((candidate) => candidate.track === value.selectedTrack);
@@ -77,6 +78,15 @@ export function useCourseProgress(lessons) {
     });
   }, [updateState]);
 
+  const deleteFile = useCallback((taskId,fileName) => {
+    const task=lessons.flatMap(lesson=>lesson.tasks).find(candidate=>candidate.id===taskId);
+    if(!task || Object.hasOwn(task.starterFiles,fileName))return;
+    updateState(current=>{
+      const files={...(current.filesByTask[taskId] || {})};delete files[fileName];
+      return {...current,filesByTask:{...current.filesByTask,[taskId]:files},completedTasks:current.completedTasks.filter(id=>id!==taskId)};
+    });
+  },[lessons,updateState]);
+
   const markTaskComplete = useCallback((taskId, passed = true) => {
     updateState((current) => ({
       ...current,
@@ -96,6 +106,7 @@ export function useCourseProgress(lessons) {
     selectLesson,
     updateFiles,
     resetTask,
+    deleteFile,
     markTaskComplete,
     hardReset,
     storageWarning: null,

@@ -1,12 +1,13 @@
 import {expect, it} from 'vitest';
 import {prepareGameRequest} from './gameWorkspace.js';
 import {gameDevLessons} from '../data/lessons/gameDev.js';
+import {gameEngineRuntimeFiles} from '../data/gameEngineRuntime.js';
 
 it('exposes only student files and starts each game with GameMain', () => {
   for (const task of gameDevLessons.flatMap(lesson => lesson.tasks)) {
     expect(task.starterFiles['GameMain.java']).toContain('class GameMain extends Game');
     expect(task.starterFiles['Main.java']).toBeUndefined();
-    expect(Object.keys(task.starterFiles).length).toBeLessThanOrEqual(2);
+    expect(Object.keys(task.starterFiles).some(file=>Object.hasOwn(gameEngineRuntimeFiles,file))).toBe(false);
   }
 });
 

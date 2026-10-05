@@ -214,6 +214,12 @@ export default function App() {
         setCheckReport(emptyReport);
         setRunner((current) => current.status === "compiling" ? emptyRunner : current);
       }}
+      onDeleteFile={fileName=>{
+        if(Object.hasOwn(activeTask.starterFiles,fileName)||Object.hasOwn(gameEngineRuntimeFiles,fileName))return;
+        executionVersion.current++;teavmRunner.stopGame();
+        progress.deleteFile(activeTask.id,fileName);
+        setActiveFile(Object.keys(activeTask.starterFiles)[0]);setCheckReport(emptyReport);setRunner(emptyRunner);
+      }}
       onCheck={handleCheck}
       onReset={handleReset}
       onSolution={activeTask.mode === "guided" ? handleSolution : undefined}

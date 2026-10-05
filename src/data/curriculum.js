@@ -8,12 +8,23 @@ import { trackOrder, tracks } from "./tracks.js";
 
 export { trackOrder, tracks };
 
-export const allLessons = [
+export function numberLessons(lessons) {
+  const counts=new Map();
+  return lessons.map(lesson=>{
+    const trackIndex=trackOrder.indexOf(lesson.track);
+    if(trackIndex<0)throw new Error('Nieznana ścieżka lekcji.');
+    const position=(counts.get(lesson.track)||0)+1;counts.set(lesson.track,position);
+    if(position>99)throw new Error('Ścieżka może zawierać najwyżej 99 lekcji.');
+    return {...lesson,order:(trackIndex+1)*100+position};
+  });
+}
+
+export const allLessons = numberLessons([
   ...fundamentalsLessons,
   ...objectLessons,
   ...inheritanceLessons,
   ...gameDevLessons,
-].map(addIndependentTasks).map(withConsoleExpectations).sort((left, right) => left.order - right.order);
+].map(addIndependentTasks).map(withConsoleExpectations)).sort((left, right) => left.order - right.order);
 
 export function getLessonById(lessonId) {
   return allLessons.find((lesson) => lesson.id === lessonId) || allLessons[0];

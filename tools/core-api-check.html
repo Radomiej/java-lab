@@ -3,7 +3,7 @@
 <button id="run">Sprawdź lifecycle i komponenty</button><pre id="result">Czeka.</pre>
 <script type="module">
 import { coreApiContract } from './core-api-contract.js';
-import { gameCoreRuntimeFiles as gameEngineRuntimeFiles } from '/src/data/gameCoreRuntime.js';
+import { gameEngineRuntimeFiles } from '/src/data/gameEngineRuntime.js';
 import { createTeaVMRunner } from '/src/services/teavmRunner.js';
 const runner = createTeaVMRunner();
 const button = document.querySelector('#run'), result = document.querySelector('#result');

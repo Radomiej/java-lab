@@ -25,10 +25,12 @@ function insertIndent(event, source, activeFile, onCodeChange) {
 
 export default function CodeEditor({
   files,
+  protectedFiles = {},
   activeFile,
   taskId,
   onFileChange,
   onCodeChange,
+  onDeleteFile,
   onCheck,
   onReset,
   onSolution,
@@ -58,6 +60,15 @@ export default function CodeEditor({
   const [loadError, setLoadError] = useState(null);
 
   const workspaceKey = taskId || "lesson";
+
+  useEffect(()=>{
+    for(const [file,model] of modelsRef.current) {
+      if(Object.hasOwn(files,file)||Object.hasOwn(gameEngineRuntimeFiles,file))continue;
+      if(editorRef.current?.getModel()===model)editorRef.current.setModel(null);
+      modelListenersRef.current.get(file)?.dispose();modelListenersRef.current.delete(file);
+      model.dispose();modelsRef.current.delete(file);
+    }
+  },[files]);
 
   useEffect(() => {
     if (editorReady) editorRef.current?.updateOptions({ readOnly });
@@ -304,6 +315,9 @@ export default function CodeEditor({
       <div className="editor-action-bar" role="toolbar" aria-label="Akcje edytora">
         <button className="button button--primary" type="button" onClick={onCheck} disabled={runner.status === "compiling"}>▶ RUN</button>
         <div className="editor-action-bar-secondary">
+          {engine && !readOnly && onDeleteFile && !Object.hasOwn(protectedFiles,activeFile) && <button className="button button--ghost" type="button" onClick={()=>{
+            if(window.confirm(`Usunąć plik ${activeFile}? Jego kod zostanie usunięty z zapisanego zadania.`))onDeleteFile(activeFile);
+          }}>Usuń plik</button>}
           {readOnly && <button className="button button--ghost" type="button" onClick={() => {
             setOpenedApi(current => current.filter(file => file !== activeFile));
             onFileChange(Object.keys(files)[0]);

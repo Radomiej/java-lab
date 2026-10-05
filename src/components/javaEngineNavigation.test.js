@@ -40,6 +40,13 @@ it('does not send a user-owned move method to the engine', () => {
   expect(createEngineHoverProvider(gameEngineRuntimeFiles).provideHover(model,{lineNumber:2,column:16})).toBeNull();
 });
 
+it('explains tween parameters and completion in a hover',()=>{
+  const model=modelAt('scale','Tweens.scale(gameObject, 2, 2, 0.5);');
+  const hover=createEngineHoverProvider(gameEngineRuntimeFiles).provideHover(model,{lineNumber:2,column:9});
+  expect(hover.contents.map(item=>item.value).join('\n')).toContain('sekundach');
+  expect(hover.contents.map(item=>item.value).join('\n')).toContain('cancel');
+});
+
 it('resolves the engine definition without opening tabs during a Ctrl hover', () => {
   const opened=[];
   const provider=createEngineDefinitionProvider({'Sprite.java':'package engine;\npublic class Sprite {}'},

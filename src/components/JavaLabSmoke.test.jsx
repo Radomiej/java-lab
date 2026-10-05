@@ -5,6 +5,22 @@ import App from "../App.jsx";
 afterEach(() => {cleanup(); vi.restoreAllMocks(); localStorage.clear();});
 
 describe("Java Lab workspace", () => {
+  it('lets the student delete a newly created file after confirmation, not a starter file',()=>{
+    vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockReturnValue({setTransform(){},fillRect(){},fillText(){}});
+    const confirm=vi.spyOn(window,'confirm').mockReturnValue(false);
+    render(<App />);
+    fireEvent.click(screen.getByRole('tab',{name:/Game Dev w Javie/i}));
+    expect(screen.queryByRole('button',{name:'Usuń plik'})).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button',{name:'+ Dodaj plik'}));
+    fireEvent.change(screen.getByRole('textbox',{name:'Nazwa nowej klasy'}),{target:{value:'Enemy'}});
+    fireEvent.click(screen.getByRole('button',{name:'Dodaj',exact:true}));
+    fireEvent.click(screen.getByRole('button',{name:'Usuń plik'}));
+    expect(screen.getByRole('tab',{name:/Enemy.java/})).toBeInTheDocument();
+    confirm.mockReturnValue(true);
+    fireEvent.click(screen.getByRole('button',{name:'Usuń plik'}));
+    expect(screen.queryByRole('tab',{name:/Enemy.java/})).not.toBeInTheDocument();
+    expect(screen.getByRole('tab',{name:/GameMain.java/})).toBeInTheDocument();
+  });
   it('shows only the simple game entry, not engine sources or TeaVM bindings', () => {
     vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockReturnValue({setTransform(){},fillRect(){},fillText(){}});
     render(<App />);

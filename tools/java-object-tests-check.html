@@ -6,7 +6,7 @@ import {gameDevLessons} from '/src/data/lessons/gameDev.js';
 import {gameEngineRuntimeFiles} from '/src/data/gameEngineRuntime.js';
 import {buildTaskCheckRequest,evaluateTaskCheck} from '/src/services/taskExecution.js';
 import {createTeaVMRunner} from '/src/services/teavmRunner.js';
-const runner=createTeaVMRunner(),task=gameDevLessons[1].tasks[0];
+const runner=createTeaVMRunner(),task=gameDevLessons[0].tasks[0];
 const button=document.querySelector('#run'),result=document.querySelector('#result');
 button.onclick=async()=>{
  button.disabled=true;result.textContent='Uruchamiam test Java…';

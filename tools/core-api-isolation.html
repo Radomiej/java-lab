@@ -1,7 +1,7 @@
 <!doctype html><html lang="pl"><meta charset="utf-8"><title>Izolacja kompilatora</title>
 <h1>Izolacja kompilatora API</h1><button id="run">Uruchom izolację</button><pre id="result">Czeka.</pre>
 <script type="module">
-import { gameCoreRuntimeFiles as gameEngineRuntimeFiles } from '/src/data/gameCoreRuntime.js';
+import { gameEngineRuntimeFiles } from '/src/data/gameEngineRuntime.js';
 import { createTeaVMRunner } from '/src/services/teavmRunner.js';
 import { isolateJavaMethods } from './java-method-isolation.js';
 const result = document.querySelector('#result'), button = document.querySelector('#run');
