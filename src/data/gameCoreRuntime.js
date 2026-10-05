@@ -43,6 +43,8 @@ public class Trigger2D extends Collider2D {
 public class CharacterController2D extends Component {
     public final Vector2 velocity = new Vector2();
     public boolean collideWorldBounds = true;
+    /** Hook silnika wykonywany po ruchu i kolizjach. */
+    public void onAfterMove(double delta) {}
     public void move(double x, double y) { move(x, y, 200); }
     public void move(double x, double y, double speed) {
         double length = Math.sqrt(x * x + y * y);
@@ -105,6 +107,7 @@ public class Game {
     private boolean started;
     private boolean disposed;
     public String background = "#0b2033";
+    public boolean debug;
     public void onCreate() {}
     public void onUpdate(double delta) {}
     public void onDestroy() {}
@@ -164,6 +167,15 @@ public class Game {
                     GameCanvas.drawSprite(sprite.texture, object.transform.x + object.transform.visualOffset.x - cameraX, object.transform.y + object.transform.visualOffset.y - cameraY, sprite.width, sprite.height,
                         object.transform.rotation.z, object.transform.scale.x * (sprite.flipX ? -1 : 1), object.transform.scale.y * (sprite.flipY ? -1 : 1));
             }
+            if (!disposed) GameCanvas.drawDebugState(debug);
+            if (!disposed) for (GameObject object : getObjects()) {
+                Collider2D collider=object.getComponent(Collider2D.class);
+                CharacterController2D controller=object.getComponent(CharacterController2D.class);
+                if(object.active && !object.destroyed && (collider!=null && collider.enabled && collider.created || collider==null && controller!=null && controller.enabled && controller.created))
+                    GameCanvas.drawCollider(collider instanceof CircleCollider2D ? "circle" : "rect",
+                        object.transform.x-cameraX,object.transform.y-cameraY,Physics2D.extent(object,true)*2,Physics2D.extent(object,false)*2,
+                        collider!=null && (collider.isTrigger || collider instanceof Trigger2D));
+            }
             if (!disposed) for (GameObject object : getObjects()) for (Component component : object.getComponents())
                 if(object.active&&!object.destroyed&&component.created&&component.enabled&&!component.removed)component.onDrawUI();
         } finally { flush(); Input.endFrame(); }
@@ -212,6 +224,11 @@ public final class GameCanvas {
     public static void drawText(String text, double x, double y, String color) { frame.append("text|").append(text.replace("|", "/").replace((char) 10, ' ')).append('|').append(x).append('|').append(y).append('|').append(color).append((char) 10); }
     public static void drawCenteredText(String text, double x, double y, String color) { frame.append("text|").append(text.replace("|", "/").replace((char) 10, ' ')).append('|').append(x).append('|').append(y).append('|').append(color).append("|center").append((char) 10); }
     public static String frame() { return frame.toString(); }
+    public static void drawDebugState(boolean enabled) { frame.append("debug|").append(enabled).append((char)10); }
+    /** Metadane debugowania: renderer wyświetla je po włączeniu Collidery. */
+    public static void drawCollider(String shape,double x,double y,double width,double height,boolean trigger) {
+        frame.append("collider|").append(shape).append('|').append(x).append('|').append(y).append('|').append(width).append('|').append(height).append('|').append(trigger).append((char)10);
+    }
     public static void drawSprite(String texture, double x, double y, double width, double height) {
         drawSprite(texture, x, y, width, height, 0, 1, 1);
     }
@@ -228,10 +245,16 @@ public final class Input {
     private static String keys = "";
     private static String pressedKeys = "";
 
-    public static boolean isKeyDown(String key) { return keys.indexOf("|" + key + "|") >= 0; }
-    public static boolean isKeyPressed(String key) { return pressedKeys.indexOf("|" + key + "|") >= 0; }
+    private static String normalize(String key) {
+        if(key==null || key.isEmpty() || key.indexOf('|')>=0)throw new IllegalArgumentException("Niepoprawny klawisz");
+        if(key.equals(" "))return "Space";
+        return key.length()==1?key.toLowerCase():key;
+    }
+    public static boolean isKeyDown(String key) { return keys.indexOf("|" + normalize(key) + "|") >= 0; }
+    public static boolean isKeyPressed(String key) { return pressedKeys.indexOf("|" + normalize(key) + "|") >= 0; }
     public static void endFrame() { pressedKeys = ""; }
     public static void setKey(String key, boolean pressed) {
+        key=normalize(key);
         String token = "|" + key + "|";
         if (pressed && !isKeyDown(key)) {
             keys += token;

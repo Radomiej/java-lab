@@ -63,6 +63,13 @@ jest czasem klatki w sekundach (silnik ogranicza krok do 0.1 s).
 `transform.rotation.z` podaje obrót w radianach, `transform.scale.x/y`
 skalę, w tym odbicie przez wartości ujemne. `CharacterController2D.move`
 normalizuje kierunek i przyjmuje prędkość w pikselach na sekundę.
+
+Ikona książki w górnym pasku otwiera dokumentację z koncepcją silnika,
+architekturą i przeszukiwanym wykazem wbudowanych klas oraz przykładów.
+Kontrolery `TopDownCharacterController2D` i `PlatformerCharacterController2D`
+udostępniają stany chodzenia/biegu; bindingi `KeyPressed`, `KeyDoublePressed`
+i `NoneOfKeysPressed` przyjmują callbacki Java. `Game.debug` lub przycisk
+„Collidery” włącza podgląd rzeczywistej geometrii kolizji.
 `Collider2D` blokuje ruch, a `Trigger2D` wywołuje `onTrigger` bez blokowania.
 Granice świata kontrolera można wyłączyć przez `collideWorldBounds = false`.
 API udostępnia `GameCanvas.getWidth()` i `getHeight()`.

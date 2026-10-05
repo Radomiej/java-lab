@@ -7,6 +7,8 @@ export default function GamePreview({ runner }) {
   const stageRef = useRef(null);
   const canvasRef = useRef(null);
   const [fullscreen,setFullscreen] = useState(false);
+  const [debugColliders,setDebugColliders] = useState(false);
+  const interopRef = useRef(null);
   const panelRef = useRef(null);
   const fullscreenButtonRef = useRef(null);
   useEffect(() => {
@@ -50,14 +52,21 @@ export default function GamePreview({ runner }) {
   useEffect(() => {
     if (!canvasRef.current) return undefined;
     const interop = createGameInterop(canvasRef.current);
+    interopRef.current=interop;
     interop.resize();
-    return () => interop.dispose();
+    return () => {interopRef.current=null;interop.dispose();};
   }, []);
+  useEffect(()=>{
+    const update=event=>setDebugColliders(event.detail.enabled);
+    window.addEventListener('java-lab-game-debug-state',update);
+    return ()=>window.removeEventListener('java-lab-game-debug-state',update);
+  },[]);
   return (
     <section ref={panelRef} className={`preview-card game-preview${fullscreen ? ' game-preview--fullscreen' : ''}`} role={fullscreen ? 'dialog' : undefined} aria-modal={fullscreen ? true : undefined} aria-labelledby="game-preview-title">
       <div className="preview-heading">
         <div><p className="eyebrow">TeaVM · Game Dev</p><h2 id="game-preview-title">Podgląd gry</h2></div>
         <div className="game-preview-actions">
+          <button className="button button--ghost" type="button" aria-pressed={debugColliders} title="Debug: żółty kontur to collider, niebieski przerywany to trigger" onClick={()=>{const value=!debugColliders;setDebugColliders(value);interopRef.current?.setDebugColliders(value);}}>Collidery</button>
           <span className={`runtime-pill runtime-pill--${runner.status}`}>{runner.status === "compiling" ? "Budowanie" : isReady ? "Gra gotowa" : "Czeka"}</span>
           <button ref={fullscreenButtonRef} className="button button--ghost" type="button" onClick={() => setFullscreen(value => !value)} aria-label={fullscreen ? 'Zamknij pełny ekran gry' : 'Pełny ekran gry'}>{fullscreen ? '✕ Zamknij' : '⛶'}</button>
         </div>

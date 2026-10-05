@@ -17,7 +17,7 @@ const scene = (setup='', fields='', extra='') => `public class GameMain extends 
     @Override public void onCreate() {
         player = createObject("Gracz").setPosition(180, 120);
         player.addComponent(new Sprite("player"));
-        player.addComponent(new CharacterController2D());
+        player.addComponent(new TopDownCharacterController2D());
         player.addComponent(new CircleCollider2D(12));
         player.addComponent(new PlayerController());
         ${setup}
@@ -68,7 +68,7 @@ const coinTest='Input.setKey("d",true); for(int i=0;i<5;i++)game.step(0.1); Inpu
 function aiFiles(type,setup='') {
   return {...grassFiles,'GameMain.java':scene(`createObject("Trawa").addComponent(new TileMap("grass",32));
         enemy=createObject("Wróg").setPosition(80,120);
-        enemy.addComponent(new Sprite("slime")); enemy.addComponent(new CharacterController2D());
+        enemy.addComponent(new Sprite("${type === 'FollowTarget2D' ? 'slime-blue' : 'slime-red'}")); enemy.addComponent(new CharacterController2D());
         enemy.addComponent(new CircleCollider2D(12));
         enemy.addComponent(new ${type}(player)); ${setup}`,'public GameObject enemy;')};
 }

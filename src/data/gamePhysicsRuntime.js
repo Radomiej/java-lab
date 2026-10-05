@@ -99,6 +99,7 @@ public final class Physics2D {
                 }
             }
             if(live(o)&&v.collideWorldBounds){double w=Math.min(extent(o,true),GameCanvas.getWidth()/2),h=Math.min(extent(o,false),GameCanvas.getHeight()/2);o.transform.x=clamp(o.transform.x,w,GameCanvas.getWidth()-w);o.transform.y=clamp(o.transform.y,h,GameCanvas.getHeight()-h);}
+            if(live(o)&&v.enabled)v.onAfterMove(delta);
         }
     }
 }

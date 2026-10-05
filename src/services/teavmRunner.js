@@ -1,6 +1,6 @@
 import {prepareGameRequest} from './gameWorkspace.js';
 
-const defaultWorkerFactory = () => new Worker("/vendor/teavm/teavm.worker.js?v=game-wrapper-9", { type: "module" });
+const defaultWorkerFactory = () => new Worker("/vendor/teavm/teavm.worker.js?v=game-wrapper-10", { type: "module" });
 
 function createRunnerError(code, message) {
   const error = new Error(message);
@@ -34,6 +34,7 @@ export function createTeaVMRunner({ workerFactory = defaultWorkerFactory, timeou
     if (globalThis.__javaLabTeaVMWorker === worker) delete globalThis.__javaLabTeaVMWorker;
     window.removeEventListener("java-lab-game-input", gameInputHandler);
     window.removeEventListener("java-lab-game-resize", gameResizeHandler);
+    window.removeEventListener("java-lab-game-debug", gameDebugHandler);
     document.removeEventListener("visibilitychange", onVisibilityChange);
     worker = undefined;
     readyPromise = undefined;
@@ -121,6 +122,7 @@ export function createTeaVMRunner({ workerFactory = defaultWorkerFactory, timeou
     });
     window.addEventListener("java-lab-game-input", gameInputHandler);
     window.addEventListener("java-lab-game-resize", gameResizeHandler);
+    window.addEventListener("java-lab-game-debug", gameDebugHandler);
     document.addEventListener("visibilitychange", onVisibilityChange);
     worker.postMessage({ command: "initialize" });
     return readyPromise;
@@ -169,6 +171,7 @@ export function createTeaVMRunner({ workerFactory = defaultWorkerFactory, timeou
       worker?.postMessage({ command: "game-stop" });
       window.removeEventListener("java-lab-game-input", gameInputHandler);
       window.removeEventListener("java-lab-game-resize", gameResizeHandler);
+      window.removeEventListener("java-lab-game-debug", gameDebugHandler);
       document.removeEventListener("visibilitychange", onVisibilityChange);
       activeGameRequest = undefined;
       rejectPending(createRunnerError("DISPOSED", "TeaVM runner został zamknięty."));
@@ -197,4 +200,8 @@ function gameInputHandler(event) {
 
 function gameResizeHandler(event) {
   globalThis.__javaLabTeaVMWorker?.postMessage({ command: "game-resize", ...event.detail });
+}
+
+function gameDebugHandler(event) {
+  globalThis.__javaLabTeaVMWorker?.postMessage({command:'game-debug',enabled:event.detail.enabled});
 }

@@ -8,6 +8,11 @@ Rozszerzenie silnika i osiem lekcji są zaimplementowane. Szczegóły klas, pól
 - [x] Lekcje 401–408: chodzenie i odbicie, trawa, monety i HUD, AI, pociski, tweeny i shake, skrzynki oraz wybór ulepszeń.
 - [x] Sprite.flipX i flipY, kierunek strzału niezależny od odbicia, chodzący wróg w 405.
 - [x] Bezszwowa trawa, warianty odbić kafelków i tekstura skrzynki.
+- [x] Dokumentacja pod ikoną książki: koncepcja, architektura, 33 klasy z przykładami i wyszukiwaniem.
+- [x] Kontrolery top-down i platformer: stany chodzenia/biegu, grawitacja, skok i podłoże.
+- [x] KeyPressed, KeyDoublePressed i NoneOfKeysPressed; callbacki i dynamiczne dodawanie bindingów.
+- [x] Game.debug i przycisk Collidery pokazujące geometrię fizyki oraz triggery.
+- [x] Bohater RPG i niebieski/czerwony przeciwnik czytelne na trawie.
 - [x] Po trzy zadania na lekcję, w tym dwa samodzielne bez podpowiedzi.
 - [x] CircleCollider2D oraz kontakty koło–koło i koło–AABB; swept collision dla szybkich pocisków.
 - [x] FollowTarget2D, FleeTarget2D, FlankTarget2D i lokalne ObstacleAvoidance2D.

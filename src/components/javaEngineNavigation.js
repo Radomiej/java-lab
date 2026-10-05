@@ -1,4 +1,11 @@
 const docs = {
+  'TopDownCharacterController2D.setRunning': 'Wybiera tryb chodzenia/biegu i przelicza aktualną prędkość. Następne move(x,y) używa walkSpeed albo runSpeed. Jawne move(x,y,speed), walk i run wybierają prędkość niezależnie. isRunning() jest false bez kierunku ruchu.',
+  'TopDownCharacterController2D.isWalk': 'Zwraca true dla aktywnego, zadanego ruchu z prędkością chodzenia. Przy biegu zwraca false; sprawdź wtedy isRunning(). Blokująca ściana nie zeruje zadanej prędkości.',
+  'TopDownCharacterController2D.isRunning': 'Zwraca true dla aktywnego, zadanego ruchu w trybie biegu; bez ruchu false. Prędkość określa runSpeed, domyślnie 240 px/s.',
+  'PlatformerCharacterController2D.jump': 'Skok jest dozwolony tylko przy isGrounded() i aktywnym kontrolerze. Zwraca true, gdy rozpoczął skok, false w powietrzu. jumpSpeed określa początkową szybkość w górę w px/s.',
+  'PlatformerCharacterController2D.isGrounded': 'Zwraca true po wykryciu podłoża pod postacią lub dolnej granicy świata. Stan jest aktualizowany po fizyce. Nie ma podwójnego skoku.',
+  'PlatformerCharacterController2D.isWalk': 'Zwraca true dla aktywnego, zadanego ruchu poziomego w trybie chodzenia. Samo spadanie/skok nie jest chodzeniem.',
+  'PlatformerCharacterController2D.isRunning': 'Zwraca true dla aktywnego, zadanego ruchu poziomego w trybie biegu. Samo spadanie/skok nie jest biegiem.',
   'Sprite.flipX': 'Odbija obraz lewo/prawo względem osi Y. true włącza odbicie. Nie zmienia pozycji, kierunku strzału ani collidera; mnoży renderowaną scale.x przez -1.',
   'Sprite.flipY': 'Odbija obraz góra/dół względem osi X. true włącza odbicie. Nie zmienia pozycji ani collidera; mnoży renderowaną scale.y przez -1. Oba flipy można łączyć.',
   'CharacterController2D.move': 'Ustawia kierunek ruchu (`x`, `y`), nie pozycję. Silnik normalizuje kierunek, więc przekątna nie przyspiesza ruchu. `double speed` określa prędkość w pikselach na sekundę. Wariant bez speed używa 200. Kierunek (0, 0) zatrzymuje ruch. Silnik uwzględnia delta — nie mnoż kierunku przez czas. Zwraca void.\n\n```java\nrequireComponent(CharacterController2D.class).move(x, y, 120);\n```',
@@ -22,6 +29,11 @@ const docs = {
 };
 
 const classDocs={
+  KeyPressed:'Callback Runnable raz na początek naciśnięcia. new KeyPressed("W", () -> getGame().debug = true). W/w są równoważne. enabled=false wyłącza binding.',
+  KeyDoublePressed:'Callback Runnable po dwóch naciśnięciach z puszczeniem klawisza pomiędzy. maxDelaySeconds=0.3 s czasu gry. Udana para resetuje licznik.',
+  NoneOfKeysPressed:'Callback w każdej klatce, gdy żaden z klawiszy String[] nie jest trzymany. Użyj do setRunning(false) po puszczeniu WASD.',
+  TopDownCharacterController2D:'Ruch X/Y bez grawitacji, automatyczny flipX. walk(x,y), run(x,y), stop(). walkSpeed=120, runSpeed=240 px/s. isWalk()/isRunning() sprawdzają aktualny ruch; klawisze obsługuje komponent ucznia.',
+  PlatformerCharacterController2D:'Ruch poziomy, grawitacja i skok. walk(x), run(x), jump() zwraca false bez podłoża. isGrounded(), isWalk(), isRunning(). Najlepiej używać prostokątnych colliderów; move ignoruje Y.',
   Sprite:'Grafika obiektu: texture to nazwa tekstury, width/height to rozmiar w pikselach. flipX odbija lewo/prawo, flipY góra/dół. Obrót i skala należą do Transform; collider pozostaje niezależny.',
   CircleCollider2D:'Kołowy collider. radius: dodatni, skończony promień w pikselach świata. Środek to transform.x/y. isTrigger=true daje kontakt bez blokowania. Skala sprite’a nie zmienia promienia.',
   TileMap:'Komponent tła: texture to klucz atlasu (np. grass); tileSize to rozmiar kafelka w pikselach, minimum 8. Nie tworzy colliderów.',

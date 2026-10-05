@@ -27,6 +27,7 @@ export function createGameInterop(canvas) {
   let lastTime = 0;
   let lastFrame;
   let disposed = false;
+  let debugColliders = false;
   let atlas;
   let atlasLoading;
   const loadAtlas = () => atlasLoading ||= Promise.all([
@@ -88,6 +89,23 @@ export function createGameInterop(canvas) {
       return;
     }
     if (command.op === "clear") api.clear(command.color);
+    if (command.op === 'debug') {
+      if(debugColliders!==Boolean(command.enabled)) {
+        debugColliders=Boolean(command.enabled);
+        window.dispatchEvent(new CustomEvent('java-lab-game-debug-state',{detail:{enabled:debugColliders}}));
+      }
+    }
+    if (command.op === 'collider' && debugColliders) {
+      context.save();
+      try {
+        context.strokeStyle=command.trigger?'#64e9ff':'#ffe38a';
+        context.lineWidth=1.5;
+        context.setLineDash(command.trigger?[4,3]:[]);
+        if(command.shape==='circle') {
+          context.beginPath();context.arc(command.x,command.y,command.width/2,0,Math.PI*2);context.stroke();
+        } else context.strokeRect(command.x-command.width/2,command.y-command.height/2,command.width,command.height);
+      } finally {context.restore();}
+    }
     if (command.op === "rect") {
       context.fillStyle = command.color || "#76b9f2";
       context.fillRect(command.x, command.y, command.width, command.height);
@@ -120,6 +138,14 @@ export function createGameInterop(canvas) {
     context,
     isKeyDown: (key) => keys.has(key) || keys.has(key.toLowerCase()),
     getKeys: () => [...keys],
+    setDebugColliders(value) {
+      debugColliders=Boolean(value);
+      window.dispatchEvent(new CustomEvent('java-lab-game-debug',{detail:{enabled:debugColliders}}));
+      if(lastFrame) {
+        lastFrame={...lastFrame,commands:(lastFrame.commands || []).map(item=>item.op==='debug'?{...item,enabled:debugColliders}:item)};
+        onGameDraw({detail:lastFrame});
+      }
+    },
     resize,
     clear: (color = "#0b2033") => { context.fillStyle = color; context.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight); },
     drawObject: (name, x, y, color = "#76b9f2", size = 25) => {

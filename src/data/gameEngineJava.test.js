@@ -78,6 +78,50 @@ public class EngineTests {
   expect(runJava({...gameEngineRuntimeFiles,'EngineTests.java':tests})).toContain('PASS engine');
 },45000);
 
+it('supports top-down running, platformer grounding and input bindings added during play',()=>{
+  const source=`import engine.*;
+public class ControllerTests {
+ static void check(boolean ok,String label){if(!ok)throw new AssertionError(label);}
+ public static void main(String[] args){
+  Game g=new Game();GameObject p=g.createObject("player").setPosition(100,100);Sprite sprite=p.addComponent(new Sprite());
+  TopDownCharacterController2D c=p.addComponent(new TopDownCharacterController2D());
+  Component movement=p.addComponent(new Component(){public void onUpdate(double dt){c.move(1,1);}});
+  g.start();g.step(0.1);check(c.isWalk()&&!c.isRunning(),"walking state");
+  check(Math.abs(Math.hypot(c.velocity.x,c.velocity.y)-120)<0.001,"diagonal normalized");
+  c.setRunning(true);g.step(0.1);check(c.isRunning()&&!c.isWalk(),"running persists in move(x,y)");
+  check(Math.abs(Math.hypot(c.velocity.x,c.velocity.y)-240)<0.001,"running speed");
+  movement.enabled=false;g.step(0.1);check(!c.isRunning()&&!c.isWalk(),"idle state after reset");
+  c.walk(-1,0);check(sprite.flipX,"automatic flip");
+  int[] single={0},doubleTap={0},idle={0},late={0};
+  p.addComponent(new KeyPressed("W",()->{single[0]++;g.debug=true;}));
+  p.addComponent(new KeyDoublePressed("D",()->{doubleTap[0]++;c.setRunning(true);}));
+  p.addComponent(new NoneOfKeysPressed(new String[]{"W","A","S","D"},()->idle[0]++));
+  Input.setKey("w",true);g.step(0.05);g.debug=false;g.step(0.05);check(single[0]==1&&!g.debug,"pressed once, uppercase key");
+  Input.setKey("w",false);Input.setKey("d",true);g.step(0.05);g.step(0.05);check(doubleTap[0]==0,"holding not double press");
+  Input.setKey("d",false);g.step(0.05);Input.setKey("D",true);g.step(0.05);check(doubleTap[0]==1,"double press");
+  Input.setKey("d",false);g.step(0.05);Input.setKey("d",true);g.step(0.05);Input.setKey("d",false);
+  for(int i=0;i<4;i++)g.step(0.1);Input.setKey("d",true);g.step(0.01);check(doubleTap[0]==1,"expired double press window");
+  Input.setKey("d",false);int before=idle[0];Input.setKey("a",true);g.step(0.05);check(idle[0]==before,"idle callback blocked while key held");
+  Input.setKey("a",false);g.step(0.05);check(idle[0]==before+1,"none of keys callback");
+  KeyPressed binding=g.createObject("controls").addComponent(new KeyPressed("2",()->late[0]++));Input.setKey("2",true);g.step(0.05);check(late[0]==1,"late component initialized");
+  Input.setKey("2",false);g.step(0.05);binding.enabled=false;Input.setKey("2",true);g.step(0.05);check(late[0]==1,"disabled binding");Input.setKey("2",false);g.dispose();
+  Game platform=new Game();GameObject hero=platform.createObject("hero").setPosition(200,174);hero.addComponent(new Sprite());hero.addComponent(new Collider2D(false));
+  PlatformerCharacterController2D pc=hero.addComponent(new PlatformerCharacterController2D());
+  GameObject floor=platform.createObject("floor").setPosition(200,200);floor.addComponent(new Sprite("stone",200,20));floor.addComponent(new Collider2D());
+  GameObject ceiling=platform.createObject("ceiling").setPosition(200,130);ceiling.addComponent(new Sprite("stone",100,20));ceiling.addComponent(new Collider2D());
+  platform.start();check(pc.isGrounded(),"initial ground");check(pc.jump(),"jump from floor");check(!pc.jump(),"no double jump");
+  platform.step(0.1);check(Math.abs(hero.transform.y-156)<0.01 && pc.velocity.y==0,"ceiling stops upward velocity");
+  for(int i=0;i<10;i++)platform.step(0.1);check(pc.isGrounded()&&Math.abs(hero.transform.y-174)<0.01,"land on platform");
+  floor.destroy();ceiling.destroy();platform.step(0.1);check(!pc.isGrounded()&&hero.transform.y>174,"gravity after floor removed");platform.dispose();
+  Game debug=new Game();GameObject sensor=debug.createObject("sensor").setPosition(50,60);sensor.addComponent(new CircleCollider2D(10)).isTrigger=true;
+  sensor.addComponent(new Sprite("coin"));sensor.transform.scale.x=3;debug.debug=true;debug.start();debug.step(0);
+  check(GameCanvas.frame().contains("debug|true"),"Java debug flag");check(GameCanvas.frame().contains("collider|circle|50.0|60.0|20.0|20.0|true"),"physics geometry unaffected by scale");debug.dispose();
+  System.out.println("PASS controllers, bindings and debug");
+ }
+}`;
+  expect(runJava({...gameEngineRuntimeFiles,'ControllerTests.java':source},'ControllerTests')).toContain('PASS controllers, bindings and debug');
+},45000);
+
 it('compiles and runs every game solution and its Java behavior assertions',()=>{
   const files={...gameEngineRuntimeFiles};const calls=[];
   const tasks=allLessons.filter(lesson=>lesson.track==='game-dev').flatMap(lesson=>lesson.tasks);

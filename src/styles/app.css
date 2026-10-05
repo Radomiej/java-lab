@@ -15,7 +15,8 @@ pre { margin: 0; }
 .app-shell--sidebar-collapsed .sidebar-region { display: none; }
 .app-shell.app-shell--no-inspector { grid-template-columns: var(--sidebar-size, 260px) 5px minmax(0, 1fr); }
 .app-shell.app-shell--no-inspector.app-shell--sidebar-collapsed { grid-template-columns: 0 0 minmax(0, 1fr); }
-.game-preview-actions { display: flex; align-items: center; gap: 8px; }
+.game-preview-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.game-preview-actions button[aria-pressed="true"] { color: var(--teal-600); background: var(--teal-soft); border-color: #25b8a7; }
 .game-preview.game-preview--fullscreen { position: fixed; z-index: 100; inset: 12px; display: flex; flex-direction: column; margin: 0; box-shadow: 0 0 0 100vmax rgb(8 24 37 / 75%); }
 .game-preview--fullscreen .game-stage { flex: 1; min-height: 0; }
 .panel-resizer { z-index: 5; width: 5px; padding: 0; border: 0; background: transparent; cursor: col-resize; }
@@ -60,7 +61,7 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
 .offline-badge { color: #9db2c1; }
 .main-region { min-width: 0; padding: 29px clamp(22px, 3vw, 50px) 56px; background: var(--canvas); }
 .inspector-region { position: sticky; top: 0; align-self: start; min-width: 0; max-height: 100dvh; padding: 22px 15px; border-left: 1px solid var(--line); background: #edf3f6; overflow-y: auto; }
-.workspace-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 36px; margin: -4px 0 20px; }
+.workspace-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; min-height: 36px; margin: -4px 0 20px; }
 .toolbar-note { color: var(--ink-500); font-size: 10px; }
 .mobile-header { display: none; }
 .lesson-workspace { max-width: 860px; margin: 0 auto; }
@@ -205,7 +206,8 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
   .mobile-brand { display: flex; align-items: center; gap: 8px; margin-right: auto; color: var(--ink-900); font-size: 12px; font-weight: 800; }
   .mobile-brand .brand-mark { width: 28px; height: 28px; flex-basis: 28px; font-size: 12px; }
   .mobile-status { color: var(--ink-500); font-size: 10px; }
-  .workspace-toolbar { display: none; }
+  .workspace-toolbar { display: flex; }
+  .workspace-toolbar .sidebar-toggle, .workspace-toolbar .toolbar-note { display: none; }
   .inspector-region { position: static; max-height: none; padding: 0 20px 35px; border-left: 0; overflow: visible; }
 }
 

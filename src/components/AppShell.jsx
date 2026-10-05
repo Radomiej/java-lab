@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import EngineGuide from './EngineGuide.jsx';
 
 export default function AppShell({ sidebar, main, inspector }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -40,9 +41,10 @@ export default function AppShell({ sidebar, main, inspector }) {
           <span className="mobile-status"><span className="status-dot" /> w przeglądarce</span>
         </header>
         <div className="workspace-toolbar">
-          <button className="button button--ghost" type="button" onClick={() => setSidebarCollapsed((value) => !value)}>
+          <button className="button button--ghost sidebar-toggle" type="button" onClick={() => setSidebarCollapsed((value) => !value)}>
             {sidebarCollapsed ? "Pokaż panel ścieżek" : "Schowaj panel ścieżek"}
           </button>
+          <EngineGuide />
           <span className="toolbar-note">TeaVM · WebAssembly · Java 21 · zasoby lokalne</span>
         </div>
         {main}

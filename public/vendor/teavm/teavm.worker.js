@@ -164,6 +164,8 @@ function startGameRuntime(app, gameId) {
       if (parts[0] === "rect") drawCommands.push({ op: "rect", x: Number(parts[1]), y: Number(parts[2]), width: Number(parts[3]), height: Number(parts[4]), color: parts[5] });
       if (parts[0] === "text") drawCommands.push({ op: "text", text: parts[1], x: Number(parts[2]), y: Number(parts[3]), color: parts[4], align: parts[5] || "left" });
       if (parts[0] === "sprite") drawCommands.push({ op: "sprite", texture: parts[1], x: Number(parts[2]), y: Number(parts[3]), width: Number(parts[4]), height: Number(parts[5]), rotation: Number(parts[6] || 0), scaleX: Number(parts[7] ?? 1), scaleY: Number(parts[8] ?? 1) });
+      if (parts[0] === "collider") drawCommands.push({op:"collider",shape:parts[1],x:Number(parts[2]),y:Number(parts[3]),width:Number(parts[4]),height:Number(parts[5]),trigger:parts[6]==="true"});
+      if (parts[0] === "debug") drawCommands.push({op:"debug",enabled:parts[1]==="true"});
     }
     self.postMessage({ command: "game-draw", gameId, op: "frame", commands: drawCommands });
   };
@@ -217,6 +219,10 @@ initialize()
   .catch((error) => self.postMessage({ command: "init-error", error: error instanceof Error ? error.message : String(error) }));
 
 self.addEventListener("message", async ({ data }) => {
+  if (data?.command === "game-debug") {
+    invokeGameExport(gameRuntime,"setDebug",[Boolean(data.enabled)],stopGameRuntime,event=>self.postMessage(event));
+    return;
+  }
   if (data?.command === "game-resize") {
     gameSize = { width: data.width, height: data.height };
     invokeGameExport(gameRuntime, "resize", [data.width, data.height], stopGameRuntime, event => self.postMessage(event));

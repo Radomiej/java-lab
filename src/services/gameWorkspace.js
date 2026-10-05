@@ -19,6 +19,7 @@ public class GameLauncher {
     @JSExport public static void setKey(String key, boolean pressed) { Input.setKey(key, pressed); }
     @JSExport public static void resize(double width, double height) { GameCanvas.setSize(width, height); }
     @JSExport public static void dispose() { game.dispose(); }
+    @JSExport public static void setDebug(boolean enabled) { game.debug = enabled; }
 }
 `;
 

@@ -2,6 +2,25 @@ import { describe, expect, it, vi } from "vitest";
 import { createGameInterop, drawAtlasSprite } from "./gameInterop.js";
 
 describe("game interop", () => {
+  it('draws collider metadata only in debug and redraws when the toggle changes',()=>{
+    const context={setTransform(){},fillRect(){},save:vi.fn(),restore:vi.fn(),setLineDash:vi.fn(),beginPath:vi.fn(),arc:vi.fn(),stroke:vi.fn(),strokeRect:vi.fn()};
+    HTMLCanvasElement.prototype.getContext=()=>context;
+    const bridge=createGameInterop(document.createElement('canvas'));
+    const frame={op:'frame',commands:[{op:'clear'},{op:'debug',enabled:false},
+      {op:'collider',shape:'circle',x:50,y:60,width:20,height:20,trigger:true},
+      {op:'collider',shape:'rect',x:100,y:80,width:40,height:30,trigger:false}]};
+    try{
+      window.dispatchEvent(new CustomEvent('java-lab-game-draw',{detail:frame}));
+      expect(context.arc).not.toHaveBeenCalled();
+      bridge.setDebugColliders(true);
+      expect(context.arc).toHaveBeenCalledWith(50,60,10,0,Math.PI*2);
+      expect(context.strokeRect).toHaveBeenCalledWith(80,65,40,30);
+      expect(context.setLineDash).toHaveBeenCalledWith([4,3]);
+      context.arc.mockClear();bridge.setDebugColliders(false);expect(context.arc).not.toHaveBeenCalled();
+      window.dispatchEvent(new CustomEvent('java-lab-game-draw',{detail:{...frame,commands:frame.commands.map(c=>c.op==='debug'?{...c,enabled:true}:c)}}));
+      expect(context.arc).toHaveBeenCalledOnce();
+    }finally{bridge.dispose();}
+  });
   it('waits for the terrain image and uses the per-texture source without changing other sprites',async()=>{
     const context={setTransform(){},fillRect(){},drawImage:vi.fn()};
     HTMLCanvasElement.prototype.getContext=()=>context;

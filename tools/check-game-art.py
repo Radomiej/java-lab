@@ -112,7 +112,7 @@ def main():
     assert sum(pixel == base for row in grass for pixel in row) > 32 * 32 * .8
     assert all(pixel[3] == 255 for row in grass for pixel in row)
     print("PASS grass: opaque, matching edges, no dark border")
-    sprites = {name: texture(name) for name in ("player", "slime", "chest")}
+    sprites = {name: texture(name) for name in ("player", "slime-blue", "slime-red", "chest")}
     for name, pixels in sprites.items():
         assert any(pixel[3] for row in pixels for pixel in row)
         for x, y in ((True, False), (False, True), (True, True)):
@@ -120,8 +120,8 @@ def main():
             assert sorted(pixel for row in pixels for pixel in row) == sorted(pixel for row in flip(pixels, x, y) for pixel in row)
         print(f"PASS {name}: both flips preserve pixels and transparency")
     if args.preview:
-        preview = [[base for _ in range(384)] for _ in range(256)]
-        for row in range(8):
+        preview = [[base for _ in range(384)] for _ in range(352)]
+        for row in range(11):
             for column in range(12):
                 variant = (column * 31 + row * 17 + column * row * 7) & 3
                 tile = flip(grass, bool(variant & 1), bool(variant & 2))

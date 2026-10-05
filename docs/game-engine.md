@@ -1,8 +1,47 @@
 # Silnik Java Lab
 
-Dokumentacja wdrożonego API w gameCoreRuntime.js, gameExtrasRuntime.js i gamePhysicsRuntime.js. Bibliotekę składa gameEngineRuntime.js.
+Dokumentacja wdrożonego API w gameCoreRuntime.js, gameExtrasRuntime.js, gamePhysicsRuntime.js, gameControllersRuntime.js i gameInputRuntime.js. Bibliotekę składa gameEngineRuntime.js. W aplikacji ikonka książki otwiera koncepcję, architekturę i przeszukiwany wykaz wszystkich wbudowanych klas z przykładami.
 
-## Architektura
+## Kontrolery i bindingi klawiszy
+
+Do jednej postaci dodaj jeden kontroler:
+
+| Klasa | Użycie |
+| --- | --- |
+| `CharacterController2D` | podstawowy ruch i kolizje, używany również przez AI i pociski |
+| `TopDownCharacterController2D` | `walk(x,y)`, `run(x,y)`, `move(x,y)` bez grawitacji; automatyczny flipX |
+| `PlatformerCharacterController2D` | `walk(x)`, `run(x)`, `jump()`, `isGrounded()`; grawitacja i kolizje z podłożem/sufitem |
+
+Kontrolery postaci dziedziczą z CharacterController2D. Udostępniają walkSpeed=120, runSpeed=240, stop(), setRunning(boolean), isWalk() i isRunning(). Metody stanu opisują zadaną prędkość, nie faktyczne przemieszczenie przy blokującej ścianie. move(x,y) wybiera szybkość zgodnie z setRunning; move(x,y,speed), walk i run ustawiają ją jawnie. Platformer ignoruje Y w move; jego gravity=900, jumpSpeed=340 i maxFallSpeed=600. Wymiary i czasy podaj w px, px/s oraz sekundach.
+
+```java
+// W GameMain.onCreate, po utworzeniu gracza:
+TopDownCharacterController2D character = player.addComponent(new TopDownCharacterController2D());
+player.addComponent(new KeyPressed("W", () -> debug = true));
+player.addComponent(new KeyDoublePressed("D", () -> character.setRunning(true)));
+player.addComponent(new NoneOfKeysPressed(new String[]{"W","A","S","D"},
+    () -> character.setRunning(false)));
+// Następnie dodaj własny komponent, który wywołuje character.move(x,y).
+```
+
+KeyPressed reaguje raz na początek naciśnięcia. KeyDoublePressed wymaga dwóch naciśnięć z puszczeniem klawisza pomiędzy, domyślnie w ciągu 0.3 s czasu gry; maxDelaySeconds zmienia to okno. NoneOfKeysPressed wywołuje callback w każdej klatce, gdy żaden z podanych klawiszy nie jest trzymany. W/w są równoważne. Callback jest Runnable. Bindingi można dołączać podczas gry i wyłączać przez enabled=false. Dodawaj je przed komponentem ruchu, ponieważ komponenty aktualizują się w kolejności dodania.
+
+## Debug colliderów
+
+`Game.debug=true` włącza overlay już w onCreate lub podczas gry. Przycisk **Collidery** zmienia tę samą flagę przez ukryty eksport setDebug. Żółty kontur oznacza ciało, niebieski przerywany — trigger. Java wysyła rzeczywistą geometrię Physics2D, a JS tylko ją rysuje, uwzględniając kamerę. Obrót, flip i skala grafiki nie zmieniają tego konturu.
+
+```mermaid
+flowchart LR
+    Button[Przycisk Collidery] --> Export[GameLauncher.setDebug]
+    Binding[KeyPressed callback] --> Flag[Game.debug]
+    Export --> Flag
+    Flag --> Frame[Klatka Java: debug + geometria Physics2D]
+    Frame --> Overlay[Renderer JS: kontury ponad sprite’ami]
+```
+
+Tekstura player przedstawia bohatera RPG z mieczem, tarczą i czerwoną peleryną. slime/slime-blue są niebieskie, slime-red czerwony; źródłem jest characters.svg. Nie zmieniły się klucze istniejących przykładów.
+
+## Architektura wykonania
 
 Stan gry, komponenty, ruch i kontakty należą do Javy. JavaScript obsługuje wejście, transport komunikatów, atlas i rysowanie. Canvas nie jest źródłem stanu gry.
 

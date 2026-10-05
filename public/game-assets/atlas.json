@@ -1,6 +1,7 @@
 {
   "frames": {
     "player": {
+      "image": "characters.svg",
       "frame": {
         "x": 0,
         "y": 0,
@@ -21,6 +22,7 @@
       }
     },
     "slime": {
+      "image": "characters.svg",
       "frame": {
         "x": 32,
         "y": 0,
@@ -39,6 +41,14 @@
         "w": 32,
         "h": 32
       }
+    },
+    "slime-blue": {
+      "image": "characters.svg",
+      "frame": { "x": 32, "y": 0, "w": 32, "h": 32 }
+    },
+    "slime-red": {
+      "image": "characters.svg",
+      "frame": { "x": 64, "y": 0, "w": 32, "h": 32 }
     },
     "bat": {
       "frame": {
