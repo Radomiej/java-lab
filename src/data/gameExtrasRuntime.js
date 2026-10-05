@@ -17,9 +17,13 @@ public class TileMap extends Component {
     public TileMap(String texture, double tileSize) { this.texture = texture; this.tileSize = tileSize; }
     @Override public void onDrawBackground() {
         if (!Double.isFinite(tileSize) || tileSize < 8) throw new IllegalArgumentException("Rozmiar kafelka musi wynosic co najmniej 8");
-        for (double y=tileSize/2; y<GameCanvas.getHeight()+tileSize/2; y+=tileSize)
-            for (double x=tileSize/2; x<GameCanvas.getWidth()+tileSize/2; x+=tileSize)
-                GameCanvas.drawSprite(texture,x,y,tileSize,tileSize);
+        for (int row=0; row*tileSize<GameCanvas.getHeight(); row++)
+            for (int column=0; column*tileSize<GameCanvas.getWidth(); column++) {
+                int variant=(column*31+row*17+column*row*7)&3;
+                boolean grass=texture.equals("grass");
+                GameCanvas.drawSprite(texture,(column+0.5)*tileSize,(row+0.5)*tileSize,tileSize,tileSize,
+                    0,grass&&(variant&1)!=0?-1:1,grass&&(variant&2)!=0?-1:1);
+            }
     }
 }
 `,
@@ -42,7 +46,8 @@ public abstract class Steering2D extends Component {
         ObstacleAvoidance2D avoidance=getComponent(ObstacleAvoidance2D.class);
         if (avoidance!=null && avoidance.enabled) d=avoidance.steer(d.x,d.y);
         controller.move(d.x,d.y,speed);
-        if (d.x!=0 || d.y!=0) gameObject.transform.rotation.z=Math.atan2(d.y,d.x);
+        Sprite sprite=getComponent(Sprite.class);
+        if (sprite!=null && d.x!=0) sprite.flipX=d.x<0;
     }
 }
 `,

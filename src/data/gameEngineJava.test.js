@@ -78,7 +78,7 @@ public class EngineTests {
   expect(runJava({...gameEngineRuntimeFiles,'EngineTests.java':tests})).toContain('PASS engine');
 },45000);
 
-it('compiles and runs all 18 game solutions and their Java behavior assertions',()=>{
+it('compiles and runs every game solution and its Java behavior assertions',()=>{
   const files={...gameEngineRuntimeFiles};const calls=[];
   const tasks=allLessons.filter(lesson=>lesson.track==='game-dev').flatMap(lesson=>lesson.tasks);
   for(const [index,task] of tasks.entries()) {
@@ -87,8 +87,41 @@ it('compiles and runs all 18 game solutions and their Java behavior assertions',
       files[`${pkg}/${name}`]=`package ${pkg};\nimport engine.*;\n${source}`;
     calls.push(`${pkg}.JavaTest.main(args);`);
   }
-  files['AllSolutions.java']=`public class AllSolutions { public static void main(String[] args) { ${calls.join('\n')} System.out.println("PASS 18 solutions"); } }`;
-  expect(runJava(files,'AllSolutions')).toContain('PASS 18 solutions');
+  files['AllSolutions.java']=`public class AllSolutions { public static void main(String[] args) { ${calls.join('\n')} System.out.println("PASS ${tasks.length} solutions"); } }`;
+  expect(runJava(files,'AllSolutions')).toContain(`PASS ${tasks.length} solutions`);
+},45000);
+
+it('combines both sprite flips with scale and preserves shooting direction after stopping',()=>{
+  const task=allLessons.find(l=>l.order===405).tasks[0];
+  const files={...gameEngineRuntimeFiles};
+  for(const [name,source] of Object.entries(task.solutionFiles)) files[name]=`import engine.*;\n${source}`;
+  files['FlipTests.java']=`import engine.*;
+public class FlipTests {
+    static void check(boolean ok,String message){if(!ok)throw new AssertionError(message);}
+    public static void main(String[] args){
+        Game visual=new Game();
+        GameObject object=visual.createObject("sprite").setPosition(100,100);
+        Sprite sprite=object.addComponent(new Sprite());
+        sprite.flipX=true; sprite.flipY=true;
+        object.transform.scale.x=2; object.transform.scale.y=3;
+        visual.start(); visual.step(0);
+        check(GameCanvas.frame().contains("sprite|player|100.0|100.0|32.0|32.0|0.0|-2.0|-3.0"),"both flips reach renderer");
+        check(object.transform.scale.x==2 && object.transform.scale.y==3,"flips leave scale unchanged");
+        sprite.flipX=false; visual.step(0);
+        check(GameCanvas.frame().contains("|0.0|2.0|-3.0"),"independent vertical flip"); visual.dispose();
+        GameMain game=new GameMain(); game.start();
+        Input.setKey("w",true); game.step(0.1); Input.setKey("w",false); game.step(0.1);
+        game.player.getComponent(Sprite.class).flipY=true;
+        Input.setKey("Space",true); game.step(0.1);
+        Projectile2D shot=null;
+        for(GameObject candidate:game.getObjects())if(candidate.hasComponent(Projectile2D.class))shot=candidate.getComponent(Projectile2D.class);
+        check(shot!=null && shot.direction.x==0 && shot.direction.y==-1,"last aim survives stopping and flipY");
+        check(game.player.transform.rotation.z==0 && game.enemy.transform.rotation.z==0,"upright player and enemy");
+        check(game.enemy.getComponent(Sprite.class).flipX,"enemy mirrors toward player");
+        Input.setKey("Space",false); game.dispose(); System.out.println("PASS flips and aim");
+    }
+}`;
+  expect(runJava(files,'FlipTests')).toContain('PASS flips and aim');
 },45000);
 
 it('starts the first guided game as a working walking example',()=>{
@@ -101,7 +134,7 @@ it('starts the first guided game as a working walking example',()=>{
 it('runs the same flat-file course bundle that the TeaVM browser diagnostic consumes',()=>{
   const request=buildGameCourseContract(allLessons.filter(l=>l.track==='game-dev').flatMap(l=>l.tasks),gameEngineRuntimeFiles);
   const output=runJava(request.files,request.mainClass);
-  expect(output.match(/^PASS game-/gm)).toHaveLength(18);
+  expect(output.match(/^PASS game-/gm)).toHaveLength(allLessons.filter(l => l.track === 'game-dev').flatMap(l => l.tasks).length);
 },45000);
 
 it('preserves the existing physics contract including thin walls and paired callbacks',()=>{

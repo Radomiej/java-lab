@@ -2,6 +2,34 @@ import { describe, expect, it, vi } from "vitest";
 import { createGameInterop, drawAtlasSprite } from "./gameInterop.js";
 
 describe("game interop", () => {
+  it('waits for the terrain image and uses the per-texture source without changing other sprites',async()=>{
+    const context={setTransform(){},fillRect(){},drawImage:vi.fn()};
+    HTMLCanvasElement.prototype.getContext=()=>context;
+    const images=[];
+    vi.stubGlobal('Image',class {
+      set src(value){this.source=value;images.push(this);}
+    });
+    vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({frames:{
+      grass:{image:'terrain.svg',frame:{x:0,y:0,w:32,h:32}},
+      player:{frame:{x:0,y:0,w:32,h:32}},
+    }})}));
+    const bridge=createGameInterop(document.createElement('canvas'));
+    try {
+      window.dispatchEvent(new CustomEvent('java-lab-game-draw',{detail:{op:'frame',commands:[
+        {op:'sprite',texture:'grass',x:16,y:16,width:32,height:32},
+        {op:'sprite',texture:'player',x:80,y:80,width:32,height:32},
+      ]}}));
+      await vi.waitFor(()=>expect(images).toHaveLength(1));
+      images[0].onload();
+      await vi.waitFor(()=>expect(images).toHaveLength(2));
+      expect(context.drawImage).not.toHaveBeenCalled();
+      expect(images[1].source).toBe('/game-assets/terrain.svg');
+      images[1].onload();
+      await vi.waitFor(()=>expect(context.drawImage).toHaveBeenCalledTimes(2));
+      expect(context.drawImage).toHaveBeenNthCalledWith(1,images[1],0,0,32,32,0,0,32,32);
+      expect(context.drawImage).toHaveBeenNthCalledWith(2,images[0],0,0,32,32,64,64,32,32);
+    } finally {bridge.dispose();vi.unstubAllGlobals();}
+  });
   it('obraca i odbija sprite wokół środka oraz przywraca transformację canvasu', () => {
     const calls=[];
     const context=Object.fromEntries(['save','translate','rotate','scale','drawImage','restore'].map(name=>[name,(...args)=>calls.push([name,...args])]));

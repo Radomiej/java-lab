@@ -10,6 +10,7 @@ import GamePreview from "./components/GamePreview.jsx";
 import { getFeatureFlags, isFeatureEnabled } from "./config/featureFlags.js";
 import { gameEngineRuntimeFiles } from "./data/gameEngineRuntime.js";
 import {gameEditorFiles} from './services/gameWorkspace.js';
+import { createTaskFocusTracker, setUmamiAnalyticsEnabled, trackUmamiEvent, trackUmamiPageview } from "./services/umamiAnalytics.js";
 
 const emptyReport = { passed: false, score: 0, total: 0, results: [], summary: "Uruchom sprawdzanie, aby zobaczyć wyniki." };
 const emptyRunner = { status: "idle", output: "", error: null, stage: "", diagnostics: [], classVersions: [] };
@@ -32,6 +33,7 @@ export default function App() {
   }, []);
 
   const gameDevEnabled = isFeatureEnabled("game-dev.enabled", { __JAVA_LAB_FEATURE_FLAGS__: featureFlags });
+  const analyticsEnabled = isFeatureEnabled("analytics.enabled", { __JAVA_LAB_FEATURE_FLAGS__: featureFlags });
   const visibleTrackOrder = useMemo(() => trackOrder.filter((trackId) => trackId !== "game-dev" || gameDevEnabled), [gameDevEnabled]);
   const visibleLessons = useMemo(() => allLessons.filter((lesson) => lesson.track !== "game-dev" || gameDevEnabled), [gameDevEnabled]);
   const visibleTracks = useMemo(() => Object.fromEntries(visibleTrackOrder.map((trackId) => [trackId, tracks[trackId]])), [visibleTrackOrder]);
@@ -42,6 +44,7 @@ export default function App() {
   const [checkReport, setCheckReport] = useState(emptyReport);
   const [runner, setRunner] = useState(emptyRunner);
   const teavmRunner = useMemo(() => createTeaVMRunner(), []);
+  const taskFocusTracker = useMemo(() => createTaskFocusTracker({ track: trackUmamiEvent }), []);
   const executionVersion = useRef(0);
   const previousGameDev = useRef({ enabled: gameDevEnabled, track: selectedLesson.track });
 
@@ -97,6 +100,27 @@ export default function App() {
   );
   const completedCount = progress.completedTasks.length;
 
+  useEffect(() => {
+    setUmamiAnalyticsEnabled(analyticsEnabled);
+    if (analyticsEnabled) trackUmamiPageview();
+  }, [analyticsEnabled]);
+
+  useEffect(() => {
+    taskFocusTracker.attach();
+    return () => {
+      taskFocusTracker.detach();
+      setUmamiAnalyticsEnabled(false);
+    };
+  }, [taskFocusTracker]);
+
+  useEffect(() => {
+    taskFocusTracker.setTask(analyticsEnabled ? {
+      trackId: selectedLesson.track,
+      lessonNumber: selectedLesson.order,
+      taskId: activeTask.id,
+    } : null);
+  }, [analyticsEnabled, taskFocusTracker, selectedLesson.track, selectedLesson.order, activeTask.id]);
+
   const changeTrack = (trackId) => {
     executionVersion.current++;
     teavmRunner.stopGame();
@@ -124,6 +148,14 @@ export default function App() {
 
   const handleCheck = async () => {
     const version = ++executionVersion.current;
+    const analyticsTask = {
+      track_id: selectedLesson.track,
+      lesson_number: selectedLesson.order,
+      lesson_id: selectedLesson.id,
+      task_id: activeTask.id,
+      task_mode: activeTask.mode,
+    };
+    trackUmamiEvent("task_run_started", analyticsTask);
     setRunner({ ...emptyRunner, status: "compiling", stage: "Uruchamiam kod, aby sprawdzić wynik…" });
     try {
       let result = await teavmRunner.run(
@@ -144,6 +176,7 @@ export default function App() {
         result.output = [checkOutput,result.output].filter(Boolean).join('\n');
         if (!result.ok) report = evaluateTaskCheck(activeTask,files,{...result,error:result.error || diagnosticsText(result.diagnostics)});
       }
+      trackUmamiEvent("task_run_result", { ...analyticsTask, passed: report.passed });
       setCheckReport(report);
       progress.markTaskComplete(activeTask.id, report.passed);
       setRunner({
@@ -156,6 +189,7 @@ export default function App() {
       });
     } catch (error) {
       if (version !== executionVersion.current) return;
+      trackUmamiEvent("task_run_result", { ...analyticsTask, passed: false, failure_stage: "runner" });
       setRunner({ ...emptyRunner, status: "error", error: error.message });
       setCheckReport({ ...emptyReport, summary: `Nie udało się uruchomić programu: ${error.message}` });
     }

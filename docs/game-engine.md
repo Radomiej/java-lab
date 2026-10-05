@@ -59,7 +59,7 @@ Pola poniżej są publiczne, chyba że zaznaczono inaczej. Komponenty dziedzicz�
 | `Game` | `String background`; prywatne listy `objects`, `removed` oraz flagi `started`, `disposed` | `createObject`, `getObjects`, `start`, `step`, `isDisposed`, `dispatchContact`, `dispose`; hooki `onCreate`, `onUpdate`, `onDestroy` |
 | `GameObject` | `final Transform transform`, `String name`, `boolean active`, `boolean destroyed`, `final Game game`; prywatne `components`, `removed`, `listeners`, `updating` | `setPosition`, `addComponent`, `getComponent`, `getComponents`, `hasComponent`, `removeComponent`, `removeComponents`, `onComponentChange`, `destroy`; starsze `update`, `draw` |
 | `Component` | `GameObject gameObject`, `boolean enabled`; wewnętrzne flagi `created`, `removed`, `destroyed` | `getGame`, `getComponent`, `getComponents`, `hasComponent`, `removeComponents`, `requireComponent`; hooki cyklu życia i kontaktów, onDrawBackground, onDrawUI; starsze `start`, `update` |
-| `Sprite` | `String texture`, `double width`, `double height` | konstruktory z kluczem atlasu i opcjonalnym rozmiarem; domyślnie player, 32×32 |
+| `Sprite` | `String texture`, `double width`, `double height`, `boolean flipX`, `boolean flipY` | konstruktory z kluczem atlasu i opcjonalnym rozmiarem; domyślnie player, 32×32; oba odbicia domyślnie false |
 | `Collider2D` | `boolean isStatic`, `boolean isTrigger` | konstruktor domyślny i z flagą; uwaga: aktualna fizyka nie wykorzystuje flagi `isStatic` do wyboru ruchomego ciała |
 | `Trigger2D` | dziedziczy `Collider2D` | kontakt bez blokowania ruchu |
 | `CharacterController2D` | `final Vector2 velocity`, `boolean collideWorldBounds = true` | `move(x, y)`, `move(x, y, speed)` |
@@ -104,18 +104,20 @@ classDiagram
     ComponentChangeListener ..> ComponentChange
 ```
 
-## Ruch i obrót
+## Ruch, kierunek i odbicie
 
 ```java
 @Override public void onUpdate(double delta) {
     double x = Input.isKeyDown("d") ? 1 : Input.isKeyDown("a") ? -1 : 0;
     double y = Input.isKeyDown("s") ? 1 : Input.isKeyDown("w") ? -1 : 0;
     requireComponent(CharacterController2D.class).move(x, y, 120);
-    if (x != 0 || y != 0) gameObject.transform.rotation.z = Math.atan2(y, x);
+    if (x != 0) requireComponent(Sprite.class).flipX = x < 0;
 }
 ```
 
-Pozycja jest środkiem sprite'a, w pikselach CSS. Dodatnie Y biegnie w dół. Obrót `rotation.z` jest w radianach; dodatni obrót wizualnie jest zgodny z ruchem wskazówek zegara. `atan2` zakłada grafikę skierowaną w prawo — dla innych grafik potrzebna jest poprawka kąta. Renderer uwzględnia `scale.x/y`, także wartości ujemne. `rotation.x/y` i `scale.z` nie są używane w renderowaniu 2D.
+Pozycja jest środkiem sprite'a, w pikselach CSS. Dodatnie Y biegnie w dół. `flipX` odbija lewo/prawo względem osi Y, a `flipY` góra/dół względem osi X. Oba można łączyć; mnożą odpowiednią skalę renderowania przez -1, nie zmieniając collidera. Postacie i AI w kursie pozostają pionowo. `PlayerController.facing` zapamiętuje kierunek ruchu, a `Weapon` używa go do strzelania również po zatrzymaniu.
+
+Obrót `rotation.z` pozostaje dostępny w radianach; dodatni obrót jest zgodny z ruchem wskazówek zegara. Renderer uwzględnia `scale.x/y`, także wartości ujemne. `rotation.x/y` i `scale.z` nie są używane w renderowaniu 2D.
 
 `requireComponent(CharacterController2D.class)` pobiera istniejący komponent z tego samego obiektu. Nie tworzy go; brak powoduje `IllegalArgumentException`. Następnie `.move` ustawia prędkość, normalizując kierunek. Prędkość jest w px/s; domyślnie 200.
 
@@ -170,9 +172,35 @@ Tweens.scale(enemy,2,2,0.5).easing="smooth";
 
 ## Kurs, pliki i testy
 
-Zakresy: 101–199 podstawy, 201–299 obiekty, 301–399 dziedziczenie, 401–499 gry. Game Dev ma sześć lekcji i 18 zadań. IDs konsolowe są stabilne; stare wybory gry są mapowane bez przenoszenia starych zaliczeń na nowe wymagania. Stary kod zostaje w localStorage, ale nie otwiera się automatycznie w nowych zadaniach.
+Zakresy: 101–199 podstawy, 201–299 obiekty, 301–399 dziedziczenie, 401–499 gry. Game Dev ma osiem lekcji i 24 zadania. Lekcje 407–408 rozszerzają walkę z 405 o skrzynki i wybór ulepszenia. IDs konsolowe są stabilne; stare wybory gry są mapowane bez przenoszenia starych zaliczeń na nowe wymagania. Zapisany kod ucznia nie jest nadpisywany po aktualizacji przykładów; przycisk „Przywróć start” pobiera bieżący kod startowy.
 
 Pliki startowe i engine są chronione. Własne pliki usuwa przycisk „Usuń plik” z potwierdzeniem; operacja usuwa zapis pliku i zaliczenie zadania. Przed usunięciem skopiuj potrzebny kod — nie ma kosza.
 
 Testy deweloperskie gameEngineJava.test.js wymagają istniejącego JDK 21+ (JAVA_HOME, .jdks lub PATH). Nie jest ono potrzebne aplikacji ucznia. Testy przeglądarkowe: /tools/expanded-engine-check.html i /tools/game-runtime-check.html. Asercje zadań wykonuje JavaTest, nie regex ani obraz canvasu.
+
+## Skrzynki i wybór ulepszeń — klasy ucznia
+
+| Klasa | Pola | Zachowanie |
+| --- | --- | --- |
+| `Chest` | `gold = 20` | trigger przyznaje nagrodę tylko graczowi i usuwa skrzynkę; w 408 otwiera menu |
+| `WalletHUD` | brak | wyświetla `GameMain.points` |
+| `UpgradeMenu` | `opened`, `selections`, `speedBonus = 30` | `open()` zatrzymuje ruch i walkę; `select(1..3)` zmienia statystykę, zamyka menu i przywraca wcześniej aktywne komponenty |
+| `Weapon` | `cooldown`, `remaining`, `bulletSpeed`, `bulletLifetime`, `damage = 1` | tworzy pocisk w kierunku `PlayerController.facing`; przekazuje obrażenia do `Hit` |
+| `Hit` | `damage = 1` | odejmuje HP, niszczy pokonanego wroga |
+
+```mermaid
+flowchart LR
+    Contact[Kontakt gracza ze skrzynką] --> Chest[Chest.onTrigger]
+    Chest --> Gold[GameMain.points + gold]
+    Chest --> Open[UpgradeMenu.open]
+    Open --> Pause[Wyłączenie ruchu, AI, broni i pocisków]
+    Open --> HUD[onDrawUI: wybór 1–3]
+    HUD --> Select[select]
+    Select --> Speed[1: szybkość +30]
+    Select --> Cooldown[2: cooldown ×0.8, minimum 0.1]
+    Select --> Damage[3: obrażenia +1]
+    Select --> Resume[Wznowienie wcześniej aktywnych komponentów]
+```
+
+Reguły nagród i ulepszeń są klasami ucznia, nie stałymi regułami silnika. Jedno otwarcie daje jeden wybór. Trawa używa bezszwowego kafelka w `terrain.svg`; `TileMap` dobiera deterministyczne odbicia, aby ograniczyć powtarzalność. `atlas.json` może wskazać dodatkowy obraz przez pole `image` konkretnej tekstury. Renderer czeka na wszystkie obrazy przed narysowaniem klatki.
 

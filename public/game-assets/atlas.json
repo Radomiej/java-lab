@@ -181,9 +181,10 @@
       }
     },
     "grass": {
+      "image": "terrain.svg",
       "frame": {
-        "x": 32,
-        "y": 64,
+        "x": 0,
+        "y": 0,
         "w": 32,
         "h": 32
       },
@@ -319,6 +320,10 @@
         "w": 32,
         "h": 32
       }
+    },
+    "chest": {
+      "image": "terrain.svg",
+      "frame": { "x": 32, "y": 0, "w": 32, "h": 32 }
     },
     "coal-ore": {
       "frame": {

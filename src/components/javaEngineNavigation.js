@@ -1,4 +1,6 @@
 const docs = {
+  'Sprite.flipX': 'Odbija obraz lewo/prawo względem osi Y. true włącza odbicie. Nie zmienia pozycji, kierunku strzału ani collidera; mnoży renderowaną scale.x przez -1.',
+  'Sprite.flipY': 'Odbija obraz góra/dół względem osi X. true włącza odbicie. Nie zmienia pozycji ani collidera; mnoży renderowaną scale.y przez -1. Oba flipy można łączyć.',
   'CharacterController2D.move': 'Ustawia kierunek ruchu (`x`, `y`), nie pozycję. Silnik normalizuje kierunek, więc przekątna nie przyspiesza ruchu. `double speed` określa prędkość w pikselach na sekundę. Wariant bez speed używa 200. Kierunek (0, 0) zatrzymuje ruch. Silnik uwzględnia delta — nie mnoż kierunku przez czas. Zwraca void.\n\n```java\nrequireComponent(CharacterController2D.class).move(x, y, 120);\n```',
   'Component.requireComponent': 'Pobiera wymagany komponent z tego samego GameObject; nie tworzy nowego. `Class<T> type` określa typ: `CharacterController2D.class` oznacza klasę komponentu, a wynik T jest typu CharacterController2D. Brak komponentu powoduje `IllegalArgumentException`.\n\n```java\nCharacterController2D controller = requireComponent(CharacterController2D.class);\ncontroller.move(x, y, 120);\n```\nWywołanie łańcuchowe najpierw pobiera komponent, następnie uruchamia jego metodę move.',
   getComponent: 'Pobiera komponent podanego typu z obiektu. Zwraca null, jeśli go nie ma. Argument .class określa szukany typ.',
@@ -20,6 +22,7 @@ const docs = {
 };
 
 const classDocs={
+  Sprite:'Grafika obiektu: texture to nazwa tekstury, width/height to rozmiar w pikselach. flipX odbija lewo/prawo, flipY góra/dół. Obrót i skala należą do Transform; collider pozostaje niezależny.',
   CircleCollider2D:'Kołowy collider. radius: dodatni, skończony promień w pikselach świata. Środek to transform.x/y. isTrigger=true daje kontakt bez blokowania. Skala sprite’a nie zmienia promienia.',
   TileMap:'Komponent tła: texture to klucz atlasu (np. grass); tileSize to rozmiar kafelka w pikselach, minimum 8. Nie tworzy colliderów.',
   FollowTarget2D:'AI podążania: target z tej samej gry, speed w px/s, stopDistance w px. Wymaga CharacterController2D. Brak aktywnego celu zatrzymuje ruch.',
@@ -59,8 +62,9 @@ export function resolveEngineSymbol(sources, model, position) {
     visited.add(owner);
     const targetFile = `${owner}.java`;
     const matches = sources[targetFile].split('\n').flatMap((text, index) => {
-      const signature = text.trim().match(/^(?:public|protected)\s+.*?\([^)]*\)/)?.[0];
-      return signature && new RegExp(`\\b${word}\\s*\\(`).test(signature)
+      const signature = text.trim().match(/^(?:public|protected)\s+.*?\([^)]*\)/)?.[0]
+        ?? text.trim().match(/^(?:public|protected)\s+[^{}()]+;/)?.[0];
+      return signature && new RegExp(`\\b${word}\\b`).test(signature)
         ? [{line:index + 1,column:text.indexOf(word) + 1,signature}] : [];
     });
     if (matches.length) return {file:targetFile,owner,word,line:matches[0].line,column:matches[0].column,signatures:matches.map(item => item.signature)};

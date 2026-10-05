@@ -13,9 +13,9 @@ describe("Java Lab curriculum", () => {
   it("allocates an independent hundred-number block to each track", () => {
     expect(trackOrder).toHaveLength(4);
     expect(Object.keys(tracks)).toHaveLength(4);
-    expect(allLessons).toHaveLength(18);
+    expect(allLessons).toHaveLength(20);
     expect(allLessons.map((lesson) => lesson.order)).toEqual(
-      [101,102,103,104,201,202,203,204,301,302,303,304,401,402,403,404,405,406],
+      [101,102,103,104,201,202,203,204,301,302,303,304,401,402,403,404,405,406,407,408],
     );
   });
 

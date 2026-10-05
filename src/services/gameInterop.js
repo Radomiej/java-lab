@@ -40,8 +40,17 @@ export function createGameInterop(canvas) {
       image.onerror = () => reject(new Error('Nie można załadować tekstur gry'));
       image.src = '/game-assets/atlas.svg';
     }),
-  ]).then(([data, image]) => {
-    atlas = { data, image };
+  ]).then(async ([data, image]) => {
+    const images = Object.fromEntries(await Promise.all(
+      [...new Set(Object.values(data.frames).map(entry => entry.image).filter(Boolean))].map(source =>
+        new Promise((resolve, reject) => {
+          const extra = new Image();
+          extra.onload = () => resolve([source, extra]);
+          extra.onerror = () => reject(new Error(`Nie można załadować tekstury: ${source}`));
+          extra.src = `/game-assets/${source}`;
+        })),
+    ));
+    atlas = { data, image, images };
     if (!disposed && lastFrame) onGameDraw({ detail: lastFrame });
   }).catch(error => {
     atlasLoading = undefined;
@@ -92,13 +101,14 @@ export function createGameInterop(canvas) {
     if (command.op === 'sprite') {
       if (!atlas) { loadAtlas(); return; }
       const key = command.texture === 'wall' ? 'stone' : command.texture;
-      const frame = atlas.data.frames[key]?.frame;
+      const entry = atlas.data.frames[key];
+      const frame = entry?.frame;
       if (!frame) {
         window.dispatchEvent(new CustomEvent('java-lab-game-render-error', { detail: `Brak tekstury: ${command.texture}` }));
         return;
       }
       context.imageSmoothingEnabled = false;
-      drawAtlasSprite(context, atlas.image, frame, command);
+      drawAtlasSprite(context, entry.image ? atlas.images[entry.image] : atlas.image, frame, command);
     }
   };
   canvas.tabIndex = 0;

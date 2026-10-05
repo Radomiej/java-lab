@@ -16,6 +16,8 @@ public final class Vector2 {
 public class Sprite extends Component {
     public String texture;
     public double width, height;
+    /** Odbicie poziome (flipX) lub pionowe (flipY), bez zmiany collidera. */
+    public boolean flipX, flipY;
     public Sprite() { this("player", 32, 32); }
     public Sprite(String texture) { this(texture, 32, 32); }
     public Sprite(String texture, double width, double height) {
@@ -160,7 +162,7 @@ public class Game {
                 Sprite sprite = object.getComponent(Sprite.class);
                 if (object.active && !object.destroyed && sprite != null && sprite.enabled && sprite.created)
                     GameCanvas.drawSprite(sprite.texture, object.transform.x + object.transform.visualOffset.x - cameraX, object.transform.y + object.transform.visualOffset.y - cameraY, sprite.width, sprite.height,
-                        object.transform.rotation.z, object.transform.scale.x, object.transform.scale.y);
+                        object.transform.rotation.z, object.transform.scale.x * (sprite.flipX ? -1 : 1), object.transform.scale.y * (sprite.flipY ? -1 : 1));
             }
             if (!disposed) for (GameObject object : getObjects()) for (Component component : object.getComponents())
                 if(object.active&&!object.destroyed&&component.created&&component.enabled&&!component.removed)component.onDrawUI();
@@ -379,7 +381,7 @@ public abstract class PlayerController2D extends Component {
 };
 
 export const gameCoreApiDescription = [
-  { name: "Sprite", methods: "texture, width, height, enabled", description: "Tekstura z atlasu; pozycja obiektu oznacza środek sprite’a." },
+  { name: "Sprite", methods: "texture, width, height, flipX, flipY, enabled", description: "Tekstura z atlasu; pozycja obiektu oznacza środek sprite’a. flipX odbija lewo/prawo, flipY góra/dół, bez zmiany collidera." },
   { name: "Collider2D", methods: "isStatic, enabled", description: "Prostokątne ciało blokujące ruch kontrolera." },
   { name: "Trigger2D", methods: "onTrigger, enabled", description: "Kontakt bez blokowania ruchu; regułę kontaktu piszesz we własnym komponencie." },
   { name: "CharacterController2D", methods: "move, velocity, collideWorldBounds, enabled", description: "Ruch w Game.step; move normalizuje kierunek i przyjmuje prędkość w pikselach na sekundę." },

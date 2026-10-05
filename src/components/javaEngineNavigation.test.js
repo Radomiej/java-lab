@@ -8,6 +8,17 @@ function modelAt(word, content=line) {
     getLineContent:()=>content,getValue:()=>`public class PlayerController extends Component {\n${content}\n}`};
 }
 
+it('opens both sprite flip fields and explains their axes',()=>{
+  for (const [field,axis] of [['flipX','lewo/prawo'],['flipY','góra/dół']]) {
+    const model=modelAt(field,`requireComponent(Sprite.class).${field} = true;`);
+    const definition=createEngineDefinitionProvider(gameEngineRuntimeFiles,file=>({uri:file}))
+      .provideDefinition(model,{lineNumber:2,column:32});
+    expect(definition.uri).toBe('Sprite.java');
+    const hover=createEngineHoverProvider(gameEngineRuntimeFiles).provideHover(model,{lineNumber:2,column:32});
+    expect(hover.contents.map(item=>item.value).join('\n')).toContain(axis);
+  }
+});
+
 it('resolves the chained move call to the actual Java method', () => {
   const provider=createEngineDefinitionProvider(gameEngineRuntimeFiles,file=>({uri:`test://${file}`}));
   const definition=provider.provideDefinition(modelAt('move'),{lineNumber:2,column:56});

@@ -1,11 +1,12 @@
-<!doctype html><html lang="pl"><meta charset="utf-8"><title>18 rozwiązań Game Dev</title>
-<h1>Test 18 rozwiązań w TeaVM</h1><button id="run">Uruchom test kursu</button><pre id="result">Czeka.</pre>
+<!doctype html><html lang="pl"><meta charset="utf-8"><title>Rozwiązania Game Dev</title>
+<h1>Test rozwiązań w TeaVM</h1><button id="run">Uruchom test kursu</button><pre id="result">Czeka.</pre>
 <script type="module">
 import {buildGameCourseContract} from './course-contract.js';
 import {gameDevLessons} from '/src/data/lessons/gameDev.js';
 import {gameEngineRuntimeFiles} from '/src/data/gameEngineRuntime.js';
 import {createTeaVMRunner} from '/src/services/teavmRunner.js';
 const runner=createTeaVMRunner({timeoutMs:120000}),button=document.querySelector('#run'),result=document.querySelector('#result');
+document.querySelector('h1').textContent = `Test ${gameDevLessons.flatMap(l=>l.tasks).length} rozwiązań w TeaVM`;
 button.onclick=async()=>{button.disabled=true;result.textContent='Kompiluję wszystkie rozwiązania i ich asercje Java…';
  try {const response=await runner.run(buildGameCourseContract(gameDevLessons.flatMap(l=>l.tasks),gameEngineRuntimeFiles));
  result.textContent=response.ok?response.output:'BŁĄD: '+(response.error||JSON.stringify(response.diagnostics))+'\n'+response.output;}

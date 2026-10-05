@@ -88,7 +88,13 @@ Lista klas i pól, cykl klatki, ograniczenia kolizji oraz diagramy Mermaid:
 [Silnik Java Lab](docs/game-engine.md).
 
 Ścieżki mają osobne zakresy 101–199, 201–299, 301–399, 401–499.
-Game Dev obejmuje ruch/obrót, trawę, monety/HUD, AI, pociski i tweeny.
+Game Dev obejmuje ruch/odbicie, trawę, monety/HUD, AI, pociski, tweeny,
+skrzynki (407) i wybór ulepszeń (408). Każda lekcja ma trzy zadania,
+w tym dwa samodzielne bez podpowiedzi. `Sprite.flipX` odbija lewo/prawo,
+a `Sprite.flipY` góra/dół. Kierunek strzału jest zapisany osobno w `PlayerController.facing`.
+
+Kontrola krawędzi trawy i odbić grafiki w Pythonie, bez dodatkowych bibliotek:
+`python tools/check-game-art.py`. Opcja `--preview PATH.png` zapisuje podgląd kafelków i sprite’ów.
 CircleCollider2D obsługuje koła i kontakty z prostokątami, Projectile2D
 sprawdza odcinek lotu i pomija właściciela. AI ma gotowe zachowania
 podążania, ucieczki, flankowania i lokalnego omijania przeszkód (nie A*).
@@ -109,6 +115,24 @@ window.dispatchEvent(new Event("java-lab-feature-flags-changed"));
 
 Po wyłączeniu ścieżka 04 znika z nawigacji, a zapisany wybór wraca do
 dostępnej lekcji.
+
+Analityka Umami używa flagi `analytics.enabled`. Włącza się automatycznie w
+buildzie Vercel, jeśli ustawiono `VITE_UMAMI_SCRIPT_URL` (pełny adres skryptu,
+np. `https://stats.example.com/script.js`) i `VITE_UMAMI_WEBSITE_ID`. Opcjonalne
+`VITE_ANALYTICS_ENABLED=false` wyłącza ją również na Vercel, a `true` pozwala
+uruchomić skonfigurowaną analitykę lokalnie. Po zmianie zmiennych Vercel wymaga
+nowego deploymentu.
+
+Umami zapisuje `task_run_started`, `task_run_result`, `task_focus_minute` i
+`task_focus_session` z numerem lekcji, ID zadania, wynikiem oraz liczbą sekund
+widocznej pracy. Każdy `task_focus_minute` odpowiada minucie aktywnej karty, co
+pozwala porównywać czas zliczając zdarzenia dla zadania; końcówka jest zapisana
+w `task_focus_session`. Pomiar czasu zatrzymuje się, gdy karta przeglądarki jest
+ukryta. Nie wysyłamy kodu źródłowego,
+wyjścia programu ani treści diagnostyki. Można dynamicznie zmienić flagę przez
+`window.__JAVA_LAB_FEATURE_FLAGS__["analytics.enabled"]` i wysłać zdarzenie
+`java-lab-feature-flags-changed`; przykładowy plik zmiennych jest w
+[`.env.example`](.env.example).
 
 JUnit 5 nie jest ładowany do runtime'u lekcji. Każde sprawdzenie zadania wymaga
 poprawnej kompilacji i uruchomienia w TeaVM. Wszystkie 36 zadań konsolowych
