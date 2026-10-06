@@ -17,7 +17,7 @@ Code.
 
 Wymagania:
 
-- Node.js 18 lub nowszy,
+- Node.js 22 lub nowszy,
 - przeglądarka z obsługą WebAssembly GC,
 - brak JDK — nie jest potrzebne do pracy ucznia.
 
@@ -28,6 +28,24 @@ npm run dev
 ```
 
 Otwórz `http://127.0.0.1:5182`.
+
+## Playground i tutor AI
+
+Ścieżka **05 Playground** zawiera własny projekt gry: `GameMain.java` tworzy
+scenę, a `PlayerController.java` steruje bohaterem. RUN kompiluje i uruchamia
+grę w przeglądarce. Pliki zapisują się niezależnie od postępu kursu; przyciski
+eksportu i importu JSON pozwalają przenosić projekt (maksymalnie 256 KiB).
+
+Ikona robota otwiera tutora. Aby go włączyć, skopiuj `.env.example` do `.env`,
+uzupełnij `OPENROUTER_API_KEY` i uruchom ponownie `npm run dev`. Klucz zostaje
+na backendzie (port 5184), nigdy w kodzie przeglądarki. Lista modeli obejmuje
+tylko modele z zerową ceną w katalogu OpenRouter; nadal obowiązują ich limity.
+Kod jest wysyłany dopiero po zaznaczeniu „Dołącz kod”, a każda proponowana
+zmiana pliku wymaga osobnego zatwierdzenia. Rozmowa nie jest eksportowana.
+
+Java i canvas działają także bez tutora. Statyczny deploy wymaga osobnego
+backendu `/api/ai` dla AI; `npm run dev:frontend` uruchamia sam frontend.
+Flaga `game-dev.enabled = false` ukrywa zarówno Game Dev, jak i Playground.
 
 Oficjalne pliki TeaVM Playground są przechowywane w
 `public/vendor/teavm/cdn/`, a worker ładuje je z tego samego originu. Dzięki

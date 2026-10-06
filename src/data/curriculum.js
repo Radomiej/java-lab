@@ -5,6 +5,7 @@ import { gameDevLessons } from "./lessons/gameDev.js";
 import { addIndependentTasks } from "./lessonTasks.js";
 import { withConsoleExpectations } from "./consoleExpectations.js";
 import { trackOrder, tracks } from "./tracks.js";
+import { playgroundLesson } from './playground.js';
 
 export { trackOrder, tracks };
 
@@ -24,7 +25,7 @@ export const allLessons = numberLessons([
   ...objectLessons,
   ...inheritanceLessons,
   ...gameDevLessons,
-].map(addIndependentTasks).map(withConsoleExpectations)).sort((left, right) => left.order - right.order);
+].map(addIndependentTasks).map(withConsoleExpectations).concat(playgroundLesson)).sort((left, right) => left.order - right.order);
 
 export function getLessonById(lessonId) {
   return allLessons.find((lesson) => lesson.id === lessonId) || allLessons[0];

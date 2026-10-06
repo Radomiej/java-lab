@@ -5,7 +5,9 @@ function lessonIsComplete(lesson, completedTasks) {
 export default function Sidebar({ tracks, trackOrder, lessons, selectedTrack, selectedLessonId, completedTasks, completedCount, onTrackChange, onLessonChange, onOpenSettings }) {
   const track = tracks[selectedTrack] || tracks[trackOrder[0]];
   const trackLessons = lessons.filter((lesson) => lesson.track === selectedTrack);
-  const totalTasks = lessons.reduce((sum, lesson) => sum + lesson.tasks.length, 0);
+  const totalTasks = lessons.reduce((sum, lesson) => sum + lesson.tasks.filter(task=>task.mode!=='playground').length, 0);
+  const currentLesson=trackLessons.find(lesson=>lesson.id===selectedLessonId)||trackLessons[0];
+  const choose=(event,callback,id)=>{const picker=event.currentTarget.closest('details');picker.open=false;picker.querySelector('summary')?.focus();callback(id);};
 
   return (
     <nav className="sidebar" aria-label="Nawigacja kursu">
@@ -21,12 +23,14 @@ export default function Sidebar({ tracks, trackOrder, lessons, selectedTrack, se
         <span className="progress-caption">z {totalTasks} zadań zaliczonych</span>
       </div>
 
-      <div className="sidebar-section-title">Ścieżki nauki</div>
+      <div className="sidebar-navigation-scroll">
+      <details className="sidebar-track-picker">
+      <summary className="sidebar-track-trigger" aria-label="Wybierz ścieżkę"><span className="track-icon" aria-hidden="true" style={{'--track-accent':track.accent}}>{track.icon}</span><span className="sidebar-track-current"><small>Ścieżka nauki</small><strong>{track.label}</strong></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
       <div className="track-list" role="tablist" aria-label="Ścieżki nauki">
         {trackOrder.map((trackId) => {
           const item = tracks[trackId];
           return (
-            <button className={`track-button${selectedTrack === trackId ? " is-active" : ""}`} role="tab" aria-selected={selectedTrack === trackId} type="button" key={trackId} onClick={() => onTrackChange(trackId)}>
+            <button className={`track-button${selectedTrack === trackId ? " is-active" : ""}`} role="tab" aria-selected={selectedTrack === trackId} type="button" key={trackId} onClick={event => choose(event,onTrackChange,trackId)}>
               <span className="track-icon" style={{ "--track-accent": item.accent }}>{item.icon}</span>
               <span>{item.label}</span>
               <span className="track-count">{lessons.filter((lesson) => lesson.track === trackId).length}</span>
@@ -35,15 +39,19 @@ export default function Sidebar({ tracks, trackOrder, lessons, selectedTrack, se
         })}
       </div>
 
-      <div className="sidebar-section-heading"><span>{track.label}</span><span>{trackLessons.length} lekcje</span></div>
+      </details>
+      <details className="sidebar-track-picker sidebar-lesson-picker" key={selectedTrack}>
+      <summary className="sidebar-track-trigger" aria-label="Wybierz lekcję"><span className="sidebar-track-current"><small>Lekcja {currentLesson?.order}</small><strong>{currentLesson?.title}</strong></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
       <div className="lesson-list">
         {trackLessons.map((lesson) => (
-          <button className={`lesson-button${selectedLessonId === lesson.id ? " is-active" : ""}`} type="button" key={lesson.id} aria-current={selectedLessonId === lesson.id ? "page" : undefined} onClick={() => onLessonChange(lesson.id)}>
+          <button className={`lesson-button${selectedLessonId === lesson.id ? " is-active" : ""}`} type="button" key={lesson.id} aria-current={selectedLessonId === lesson.id ? "page" : undefined} onClick={event=>choose(event,onLessonChange,lesson.id)}>
             <span className="lesson-number">{String(lesson.order).padStart(2, "0")}</span>
-            <span className="lesson-copy"><strong>{lesson.title}</strong><small>{lesson.summary}</small><em>{lesson.tasks.length} {lesson.tasks.length === 1 ? "zadanie" : "zadania"}</em></span>
+            <span className="lesson-copy"><strong>{lesson.title}</strong><small>{lesson.summary}</small><em>{lesson.track==='playground'?'swobodna praca':`${lesson.tasks.length} ${lesson.tasks.length===1?'zadanie':'zadania'}`}</em></span>
             {lessonIsComplete(lesson, completedTasks) && <span className="lesson-check" aria-label="Ukończona">✓</span>}
           </button>
         ))}
+      </div>
+      </details>
       </div>
 
       <div className="sidebar-footer"><span>{lessons.length} lekcji</span><span className="offline-badge"><span className="status-dot" /> lokalnie</span></div>

@@ -4,7 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1 --port 5182",
+    "dev": "node scripts/dev.mjs",
+    "dev:frontend": "vite --host 127.0.0.1 --port 5182 --strictPort",
+    "dev:backend": "node --env-file-if-exists=.env server/index.js",
     "build": "vite build",
     "test": "vitest run"
   },

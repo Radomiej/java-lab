@@ -6,6 +6,7 @@ import {join} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {gameEngineRuntimeFiles} from './gameEngineRuntime.js';
 import {allLessons} from './curriculum.js';
+import {playgroundProject} from './playground.js';
 import {buildGameCourseContract} from '../../tools/course-contract.js';
 
 function javaBin(name) {
@@ -30,6 +31,20 @@ export function runJava(files, main='EngineTests') {
     return execFileSync(javaBin('java'),['-cp',dir,main],{encoding:'utf8',timeout:15000});
   } finally {rmSync(dir,{recursive:true,force:true});}
 }
+
+it('compiles the playground starter and moves the hero with real Java components',()=>{
+  const files={...gameEngineRuntimeFiles,...Object.fromEntries(Object.entries(playgroundProject.files).map(([name,source])=>[name,'import engine.*;\n'+source]))};
+  const output=runJava({...files,'PlaygroundTest.java':`import engine.*;
+public class PlaygroundTest {
+ public static void main(String[] args) {
+  GameMain game=new GameMain();game.start();game.step(0);
+  Input.setKey("D",true);game.step(0.1);Input.setKey("D",false);
+  String frame=GameCanvas.frame();if(!frame.contains("sprite|player|192.0|120.0"))throw new AssertionError(frame);
+  System.out.println("PLAYGROUND PASS");game.dispose();
+ }
+}`},'PlaygroundTest');
+  expect(output).toContain('PLAYGROUND PASS');
+});
 
 it('runs circle geometry, swept bullets, AI, tween and render layering in real Java',()=>{
   const tests=`import engine.*;

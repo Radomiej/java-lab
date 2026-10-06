@@ -8,6 +8,10 @@ import Sidebar from "./components/Sidebar.jsx";
 import LessonWorkspace from "./components/LessonWorkspace.jsx";
 import GamePreview from "./components/GamePreview.jsx";
 import { getFeatureFlags, isFeatureEnabled } from "./config/featureFlags.js";
+import { useGamePlayground } from './hooks/useGamePlayground.js';
+import PlaygroundWorkspace from './components/PlaygroundWorkspace.jsx';
+import GameTutor from './components/GameTutor.jsx';
+import { applyTutorProposal } from './services/tutorProposals.js';
 import { gameEngineRuntimeFiles } from "./data/gameEngineRuntime.js";
 import {gameEditorFiles} from './services/gameWorkspace.js';
 import { createTaskFocusTracker, setUmamiAnalyticsEnabled, trackUmamiEvent, trackUmamiPageview } from "./services/umamiAnalytics.js";
@@ -34,11 +38,13 @@ export default function App() {
 
   const gameDevEnabled = isFeatureEnabled("game-dev.enabled", { __JAVA_LAB_FEATURE_FLAGS__: featureFlags });
   const analyticsEnabled = isFeatureEnabled("analytics.enabled", { __JAVA_LAB_FEATURE_FLAGS__: featureFlags });
-  const visibleTrackOrder = useMemo(() => trackOrder.filter((trackId) => trackId !== "game-dev" || gameDevEnabled), [gameDevEnabled]);
-  const visibleLessons = useMemo(() => allLessons.filter((lesson) => lesson.track !== "game-dev" || gameDevEnabled), [gameDevEnabled]);
+  const visibleTrackOrder = useMemo(() => trackOrder.filter((trackId) => !['game-dev','playground'].includes(trackId) || gameDevEnabled), [gameDevEnabled]);
+  const visibleLessons = useMemo(() => allLessons.filter((lesson) => !['game-dev','playground'].includes(lesson.track) || gameDevEnabled), [gameDevEnabled]);
   const visibleTracks = useMemo(() => Object.fromEntries(visibleTrackOrder.map((trackId) => [trackId, tracks[trackId]])), [visibleTrackOrder]);
   const progress = useCourseProgress(visibleLessons);
   const selectedLesson = getLessonById(progress.selectedLessonId);
+  const playground=useGamePlayground();
+  const isPlayground=selectedLesson.track==='playground';
   const [activeTaskId, setActiveTaskId] = useState(selectedLesson.tasks[0]?.id);
   const [activeFile, setActiveFile] = useState("Main.java");
   const [checkReport, setCheckReport] = useState(emptyReport);
@@ -49,7 +55,7 @@ export default function App() {
   const previousGameDev = useRef({ enabled: gameDevEnabled, track: selectedLesson.track });
 
   useEffect(() => {
-    if (previousGameDev.current.enabled && !gameDevEnabled && previousGameDev.current.track === "game-dev") {
+    if (previousGameDev.current.enabled && !gameDevEnabled && ['game-dev','playground'].includes(previousGameDev.current.track)) {
       executionVersion.current++;
       teavmRunner.stopGame();
       setRunner(emptyRunner);
@@ -93,10 +99,10 @@ export default function App() {
 
   const activeTask = selectedLesson.tasks.find((task) => task.id === activeTaskId) || selectedLesson.tasks[0];
   const files = useMemo(
-    () => activeTask.engine
+    () => isPlayground ? playground.project.files : activeTask.engine
       ? {...activeTask.starterFiles, ...gameEditorFiles(progress.filesByTask[activeTask.id] || {})}
       : ({ ...activeTask.starterFiles, ...(progress.filesByTask[activeTask.id] || {}) }),
-    [activeTask, progress.filesByTask],
+    [activeTask, progress.filesByTask,isPlayground,playground.project.files],
   );
   const completedCount = progress.completedTasks.length;
 
@@ -159,7 +165,7 @@ export default function App() {
     setRunner({ ...emptyRunner, status: "compiling", stage: "Uruchamiam kod, aby sprawdzić wynik…" });
     try {
       let result = await teavmRunner.run(
-        buildTaskCheckRequest(activeTask, files),
+        isPlayground ? {files,mainClass:'GameMain',mode:'game'} : buildTaskCheckRequest(activeTask, files),
         { onStage: (stage) => { if (version === executionVersion.current) setRunner((current) => ({ ...current, stage })); } },
       );
       if (version !== executionVersion.current) return;
@@ -167,7 +173,7 @@ export default function App() {
         ...result,
         error: result.error || diagnosticsText(result.diagnostics),
       });
-      if (activeTask.engine && report.passed) {
+      if (activeTask.engine && report.passed && !isPlayground) {
         const checkOutput = result.output;
         result = await teavmRunner.run({files,mainClass:activeTask.mainClass,mode:'game'}, {
           onStage:stage => {if (version === executionVersion.current) setRunner(current => ({...current,stage}));},
@@ -178,7 +184,7 @@ export default function App() {
       }
       trackUmamiEvent("task_run_result", { ...analyticsTask, passed: report.passed });
       setCheckReport(report);
-      progress.markTaskComplete(activeTask.id, report.passed);
+      if(!isPlayground)progress.markTaskComplete(activeTask.id, report.passed);
       setRunner({
         status: result.ok === false ? "error" : "ready",
         output: result.output || "",
@@ -228,7 +234,8 @@ export default function App() {
     />
   );
 
-  const main = (
+  const stopForEdit=()=>{executionVersion.current++;teavmRunner.stopGame();setRunner(emptyRunner);setCheckReport(emptyReport);};
+  const main = isPlayground ? <PlaygroundWorkspace project={playground.project} activeFile={Object.hasOwn(files,activeFile)||Object.hasOwn(gameEngineRuntimeFiles,activeFile)?activeFile:'GameMain.java'} onFileChange={setActiveFile} runner={runner} onRun={handleCheck} onCodeChange={(name,value)=>{if(Object.hasOwn(gameEngineRuntimeFiles,name))return;stopForEdit();playground.setFiles({[name]:value});}} onDeleteFile={name=>{stopForEdit();playground.deleteFile(name);setActiveFile('GameMain.java');}} onImport={project=>{stopForEdit();playground.replaceProject(project);setActiveFile('GameMain.java');}} onReset={()=>{if(window.confirm('Przywrócić początkowy projekt gry?')){stopForEdit();playground.resetProject();setActiveFile('GameMain.java');}}}/> : (
     <LessonWorkspace
       lesson={selectedLesson}
       activeTask={activeTask}
@@ -262,5 +269,5 @@ export default function App() {
 
   const inspector = activeTask.engine ? <GamePreview runner={runner} /> : null;
 
-  return <AppShell sidebar={sidebar} main={main} inspector={inspector} />;
+  return <><AppShell sidebar={sidebar} main={main} inspector={inspector} />{isPlayground&&gameDevEnabled&&<GameTutor key={playground.revision} project={playground.project} projectRevision={playground.revision} onApply={(proposal,snapshot)=>{if(snapshot.revision!==playground.revision)throw new Error('Projekt został zastąpiony. Poproś o nową propozycję.');const next=applyTutorProposal(playground.project,snapshot.project,proposal);stopForEdit();playground.setFiles(next.files);setActiveFile(proposal.path);}}/>}</>;
 }

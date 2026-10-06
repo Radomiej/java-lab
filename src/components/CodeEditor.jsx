@@ -5,6 +5,7 @@ import EditorHelp from "./EditorHelp.jsx";
 import RuntimeConsole from './RuntimeConsole.jsx';
 import { gameEngineRuntimeFiles } from "../data/gameEngineRuntime.js";
 import {createEngineDefinitionProvider, createEngineHoverProvider, resolveEngineSymbol} from './javaEngineNavigation.js';
+import {acceptEditorChange} from './editorAcceptedChange.js';
 
 function fileIcon(fileName) {
   return fileName.endsWith(".java") ? "J" : "·";
@@ -56,6 +57,20 @@ export default function CodeEditor({
   const filesRef = useRef(files);
   const activeFileRef = useRef(activeFile);
   const onCodeChangeRef = useRef(onCodeChange);
+  const [editError, setEditError] = useState('');
+  const acceptChange = (file, value) => acceptEditorChange(() => onCodeChange(file, value), setEditError);
+  const watchModel = (model, file) => {
+    let accepted = model.getValue();
+    let reverting = false;
+    return model.onDidChangeContent(() => {
+      if (reverting) return;
+      const next = model.getValue();
+      if (acceptEditorChange(() => onCodeChangeRef.current(file, next), setEditError, () => {
+        reverting = true;
+        try { model.setValue(accepted); } finally { reverting = false; }
+      })) accepted = next;
+    });
+  };
   const [editorReady, setEditorReady] = useState(false);
   const [loadError, setLoadError] = useState(null);
 
@@ -209,9 +224,7 @@ export default function CodeEditor({
             `inmemory://java-lab/${encodeURIComponent(workspaceKey)}/${encodeURIComponent(fileName)}`,
           );
           const model = monaco.editor.createModel(filesRef.current[fileName] ?? (engine ? gameEngineRuntimeFiles[fileName] : '') ?? '', "java", uri);
-          const listener = model.onDidChangeContent(() => {
-            onCodeChangeRef.current(fileName, model.getValue());
-          });
+          const listener = watchModel(model, fileName);
           modelsRef.current.set(fileName, model);
           modelListenersRef.current.set(fileName, listener);
           return model;
@@ -293,9 +306,7 @@ export default function CodeEditor({
       `inmemory://java-lab/${encodeURIComponent(workspaceKey)}/${encodeURIComponent(activeFile)}`,
     );
     const nextModel = monacoRef.current.editor.createModel(source, "java", uri);
-    const listener = nextModel.onDidChangeContent(() => {
-      onCodeChangeRef.current(activeFile, nextModel.getValue());
-    });
+    const listener = watchModel(nextModel, activeFile);
     modelsRef.current.set(activeFile, nextModel);
     modelListenersRef.current.set(activeFile, listener);
     editorRef.current.setModel(nextModel);
@@ -352,11 +363,16 @@ export default function CodeEditor({
           return;
         }
         const file = `${name}.java`;
-        if (Object.hasOwn(files, file) || Object.hasOwn(gameEngineRuntimeFiles,file) || ['Main.java','GameLauncher.java'].includes(file)) {
+        if (Object.hasOwn(files, file) || Object.hasOwn(gameEngineRuntimeFiles,file) || ['Main.java','StudentGame.java','GameLauncher.java'].includes(file)) {
           setFileError("Taki plik już istnieje.");
           return;
         }
-        onCodeChange(file, `public class ${name} {\n}\n`);
+        try {
+          onCodeChange(file, `public class ${name} {\n}\n`);
+        } catch (error) {
+          setFileError(error.message);
+          return;
+        }
         onFileChange(file);
         setNewClassName("");
         setFileError("");
@@ -367,6 +383,7 @@ export default function CodeEditor({
         <button type="button" className="button button--ghost" onClick={() => setAddingFile(false)}>Anuluj</button>
         {fileError && <span role="alert">{fileError}</span>}
       </form>}
+      {editError && <p role="alert" className="editor-api-notice">{editError} Zmiana nie została zapisana; edytor zachował poprzednią wersję.</p>}
       {loadError ? (
         <div className="code-editor-wrap code-editor-fallback-wrap">
           <textarea
@@ -375,8 +392,8 @@ export default function CodeEditor({
             spellCheck="false"
             value={source}
             readOnly={readOnly}
-            onChange={(event) => onCodeChange(activeFile, event.target.value)}
-            onKeyDown={(event) => insertIndent(event, source, activeFile, onCodeChange)}
+            onChange={(event) => acceptChange(activeFile, event.target.value)}
+            onKeyDown={(event) => insertIndent(event, source, activeFile, acceptChange)}
           />
         </div>
       ) : (

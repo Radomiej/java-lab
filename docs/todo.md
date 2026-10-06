@@ -24,6 +24,19 @@ Rozszerzenie silnika i osiem lekcji są zaimplementowane. Szczegóły klas, pól
 
 ## Weryfikacja końcowa
 
+### Playground i tutor (2026-10-06)
+
+- [x] Własny projekt 501, zapis niezależny od kursu, import/eksport JSON i bezpośredni RUN gry.
+- [x] Selektory ścieżki i lekcji, przejęte z web-learning-lab.
+- [x] Tutor OpenRouter: tylko darmowy katalog, klucz na backendzie, kod opt-in, zmiany zatwierdzane osobno.
+- [x] Ochrona przed importem plików silnika, powtórzonymi kluczami JSON i utratą edycji po przekroczeniu limitu.
+- [x] In-app browser: lekcja 402 i Playground uruchamiają się; bohater reaguje na klawisze, debug pokazuje collider.
+- [x] Fullscreen/Escape, mobilny tutor i mobilny selektor ścieżek; tymczasowy viewport przywrócony.
+- [x] Końcowa integracja: 115 testów, build i przegląd kodu.
+- [ ] Sprawdzić rzeczywistą odpowiedź dostawcy po skonfigurowaniu OPENROUTER_API_KEY (bez klucza UI poprawnie wyłącza wysyłanie).
+
+### Wcześniejsza weryfikacja silnika
+
 - [x] Pełne `npm test` — rozwiązania 401–408 i regresje silnika.
 - [x] `npm run build`.
 - [x] Python: krawędzie trawy, przezroczystość sprite’ów, flipX/flipY i podgląd kafelków.

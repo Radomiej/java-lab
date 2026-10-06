@@ -8,8 +8,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/api": "http://127.0.0.1:3002",
-      "/runtime": "http://127.0.0.1:3002",
+      "/api/ai": "http://127.0.0.1:5184",
     },
   },
 });

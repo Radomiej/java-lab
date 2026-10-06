@@ -1,6 +1,7 @@
-export const trackOrder = ["fundamentals", "objects", "inheritance", "game-dev"];
+export const trackOrder = ["fundamentals", "objects", "inheritance", "game-dev", "playground"];
 
 export const tracks = {
+  playground: {id:'playground',label:'Playground',shortLabel:'Własna gra',description:'Własna gra w Javie.',accent:'#e58a69',icon:'05'},
   fundamentals: {
     id: "fundamentals",
     label: "Fundamenty",
