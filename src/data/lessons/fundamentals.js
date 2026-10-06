@@ -145,11 +145,11 @@ export const fundamentalsLessons = [
         id: "fundamentals-03-task",
         title: "Trzy rundy treningu",
         mode: "guided",
-        prompt: "Wypisz trzy numery rund i na końcu zdecyduj, czy gracz ma wystarczająco dużo punktów.",
+        prompt: "Wypisz numery rund 1, 2 i 3, każdy w osobnej linii. Po pętli sprawdź punkty i wypisz w czwartej linii Zaliczone, jeśli points >= 50, albo Ćwicz dalej w przeciwnym razie.",
         steps: [
           "Utwórz int points z wartością 75.",
-          "Napisz pętlę for z licznikiem od 1 do 3.",
-          "Dodaj if/else sprawdzający points >= 50.",
+          "Napisz pętlę for z licznikiem od 1 do 3. W jej środku wypisz licznik przez System.out.println(round).",
+          "Po pętli dodaj if/else sprawdzający points >= 50. Wypisz Zaliczone lub Ćwicz dalej — nie oba komunikaty.",
         ],
         hints: ["Warunek może być zapisany jako points >= 50."],
         starterFiles: {

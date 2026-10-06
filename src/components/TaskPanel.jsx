@@ -1,5 +1,9 @@
+import ConsoleOutput from "./ConsoleOutput.jsx";
+
 export default function TaskPanel({ lesson, activeTask, completedTasks, onTaskChange }) {
   const modeLabels = { guided: "prowadzone", independent: "samodzielne", practice: "ćwiczenie", challenge: "wyzwanie" };
+  const expected = activeTask.outputChecks?.find(check => check.kind === "outputLines" || check.kind === "outputEquals");
+  const output = expected?.kind === "outputLines" ? `${expected.values.join("\n")}\n` : expected?.value;
 
   return (
     <section className="task-panel" aria-labelledby="task-title">
@@ -14,6 +18,7 @@ export default function TaskPanel({ lesson, activeTask, completedTasks, onTaskCh
         ))}
       </div>
       <div className="task-prompt"><span className="prompt-label">{activeTask.mode === "guided" ? "Polecenie prowadzone" : "Zadanie samodzielne"}</span><p>{activeTask.prompt}</p><ol>{activeTask.steps.map((step) => <li key={step}>{step}</li>)}</ol>{activeTask.mode === "guided" && activeTask.hints?.[0] && <p className="task-hint"><strong>Podpowiedź:</strong> {activeTask.hints[0]}</p>}</div>
+      {expected && <ConsoleOutput key={activeTask.id} label="Oczekiwane wyjście konsoli" output={output} revealWhitespace />}
     </section>
   );
 }
