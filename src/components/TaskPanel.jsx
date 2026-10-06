@@ -3,7 +3,7 @@ export default function TaskPanel({ lesson, activeTask, completedTasks, onTaskCh
 
   return (
     <section className="task-panel" aria-labelledby="task-title">
-      <div className="section-heading-row"><div><p className="eyebrow">Krok po kroku</p><h2 id="task-title">Wykonaj zadanie</h2></div><span className="count-badge">{lesson.tasks.length} {lesson.tasks.length === 1 ? "zadanie" : "zadania"}</span></div>
+      <div className="section-heading-row"><h2 id="task-title"><span aria-hidden="true">☑ </span>Wykonaj zadanie</h2><span className="count-badge">{lesson.tasks.length} {lesson.tasks.length === 1 ? "zadanie" : "zadania"}</span></div>
       <div className="task-list" role="tablist" aria-label="Zadania lekcji">
         {lesson.tasks.map((task, index) => (
           <button className={`task-button${activeTask.id === task.id ? " is-active" : ""}`} type="button" role="tab" aria-selected={activeTask.id === task.id} key={task.id} onClick={() => onTaskChange(task.id)}>

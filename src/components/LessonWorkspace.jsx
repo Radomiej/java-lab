@@ -10,7 +10,7 @@ export default function LessonWorkspace({ lesson, activeTask, activeFile, files,
       <TaskPanel lesson={lesson} activeTask={activeTask} completedTasks={completedTasks} onTaskChange={onTaskChange} />
       <section className="editor-section" aria-labelledby="editor-title">
         <div className="section-heading-row">
-          <div><p className="eyebrow">Laboratorium kodu</p><h2 id="editor-title">Zbuduj rozwiązanie</h2></div>
+          <h2 id="editor-title"><span aria-hidden="true">⌨ </span>Zbuduj rozwiązanie</h2>
           <span className="language-badge">Java 21 · WebAssembly</span>
         </div>
         <CodeEditor files={files} protectedFiles={activeTask.starterFiles} activeFile={activeFile} taskId={activeTask.id} onFileChange={onFileChange} onCodeChange={onCodeChange} onDeleteFile={onDeleteFile} onCheck={onCheck} onReset={onReset} onSolution={onSolution} runner={runner} engine={activeTask.engine} />

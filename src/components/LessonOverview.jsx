@@ -1,8 +1,8 @@
 export default function LessonOverview({ lesson }) {
   return (
     <section className="lesson-overview" aria-labelledby="lesson-title">
-      <div className="breadcrumb"><span>KURS JAVA</span><span>›</span><span>{lesson.track === "game-dev" ? "GAME DEV" : lesson.track === "inheritance" ? "OOP II" : lesson.track === "objects" ? "OOP I" : "FUNDAMENTY"}</span></div>
-      <div className="lesson-heading-row"><div><h1 id="lesson-title">{lesson.title}</h1><p className="lesson-summary">{lesson.objective}</p></div><span className="lesson-tag">Lekcja {String(lesson.order).padStart(2, "0")}</span></div>
+      <div className="breadcrumb"><span>Kurs Java · {lesson.track === "game-dev" ? "Game Dev" : lesson.track === "inheritance" ? "OOP II" : lesson.track === "objects" ? "OOP I" : "Fundamenty"} · Lekcja {lesson.order}</span></div>
+      <div className="lesson-heading-row"><h1 id="lesson-title"><span aria-hidden="true">▤ </span>{lesson.title}</h1></div>
       <div className="theory-list">
         {lesson.theory.map((block) => (
           <article className="theory-block" key={block.title}><h2>{block.title}</h2><p>{block.text}</p><pre><code>{block.code}</code></pre></article>
