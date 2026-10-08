@@ -8,23 +8,38 @@ const docs = {
   'PlatformerCharacterController2D.isRunning': 'Zwraca true dla aktywnego, zadanego ruchu poziomego w trybie biegu. Samo spadanie/skok nie jest biegiem.',
   'Sprite.flipX': 'Odbija obraz lewo/prawo względem osi Y. true włącza odbicie. Nie zmienia pozycji, kierunku strzału ani collidera; mnoży renderowaną scale.x przez -1.',
   'Sprite.flipY': 'Odbija obraz góra/dół względem osi X. true włącza odbicie. Nie zmienia pozycji ani collidera; mnoży renderowaną scale.y przez -1. Oba flipy można łączyć.',
-  'CharacterController2D.move': 'Ustawia kierunek ruchu (`x`, `y`), nie pozycję. Silnik normalizuje kierunek, więc przekątna nie przyspiesza ruchu. `double speed` określa prędkość w pikselach na sekundę. Wariant bez speed używa 200. Kierunek (0, 0) zatrzymuje ruch. Silnik uwzględnia delta — nie mnoż kierunku przez czas. Zwraca void.\n\n```java\nrequireComponent(CharacterController2D.class).move(x, y, 120);\n```',
+  'CharacterController2D.move': 'Ustawia kierunek ruchu (`x`, `y`), nie pozycję. Silnik normalizuje kierunek, więc przekątna nie przyspiesza ruchu. `double speed` określa prędkość w pikselach na sekundę. Wariant bez speed używa 120 px/s. Kierunek (0, 0) zatrzymuje ruch. Silnik uwzględnia delta — nie mnoż kierunku przez czas. Zwraca void.\n\n```java\nrequireComponent(CharacterController2D.class).move(x, y, 120);\n```',
   'Component.requireComponent': 'Pobiera wymagany komponent z tego samego GameObject; nie tworzy nowego. `Class<T> type` określa typ: `CharacterController2D.class` oznacza klasę komponentu, a wynik T jest typu CharacterController2D. Brak komponentu powoduje `IllegalArgumentException`.\n\n```java\nCharacterController2D controller = requireComponent(CharacterController2D.class);\ncontroller.move(x, y, 120);\n```\nWywołanie łańcuchowe najpierw pobiera komponent, następnie uruchamia jego metodę move.',
   getComponent: 'Pobiera komponent podanego typu z obiektu. Zwraca null, jeśli go nie ma. Argument .class określa szukany typ.',
   addComponent: 'Dodaje komponent do obiektu i zwraca dodaną instancję.',
   hasComponent: 'Sprawdza, czy obiekt ma komponent podanego typu. Zwraca boolean.',
   isKeyDown: 'Sprawdza, czy klawisz jest obecnie wciśnięty.',
   createObject: 'Tworzy obiekt gry i dodaje go do sceny.',
+  getObjectsWith:'Kopia obiektów posiadających wszystkie wskazane typy komponentów, uporządkowana według ID. Np. getGame().getObjectsWith(Player.class, Collider2D.class). Dodanie i usunięcie komponentu aktualizuje indeks.',
+  getObjectsWithTag:'Kopia żywych obiektów z tagiem, uporządkowana według ID. Np. getGame().getObjectsWithTag("enemy").',
+  addTag:'addTag(String) dodaje niepusty tag i zwraca GameObject. Tag nie zmienia reguł kontaktu.',
+  removeTag:'removeTag(String) usuwa tag; zwraca boolean.',
+  hasTag:'hasTag(String) sprawdza tag obiektu; zwraca boolean.',
+  getTags:'getTags() zwraca kopię tagów obiektu.',
+  setActive:'setActive(boolean) zmienia aktywność, unieważnia cache przestrzenny i po wyłączeniu zwalnia fokus przycisków.',
+  setEnabled:'setEnabled(boolean) zmienia aktywność komponentu i po wyłączeniu przycisku zwalnia jego fokus oraz uzbrojenie.',
+  onContactEnter:'onContactEnter(ComponentType.class, callback) wywołuje callback raz przy wejściu pary w kontakt. Zwraca Runnable do wypisania nasłuchu; uruchom unsubscribe.run(). Podstawowe onCollision/onTrigger działają w każdej klatce kontaktu.',
+  consumeKey:'consumeKey(String) ukrywa klawisz przed pozostałymi odczytami do końca klatki. Button przechwytuje Enter/Space przed aktywacją.',
+  consumeMouse:'consumeMouse(button) ukrywa przycisk myszy do końca klatki. Button wywołuje to przed onClick, aby WORLD nie powtórzył akcji UI.',
+  remainingLifetime:'Pozostały czas lotu w sekundach. Sweep ostatniej klatki podróżuje tylko przez ten czas; po jego wyczerpaniu pocisk znika.',
+  'Physics2D.queryRadius':'queryRadius(x,y,radius,layer) wybiera aktywne zainicjalizowane collidery przecinające koło. Wynik jest uporządkowany według ID.',
+  'Physics2D.findNearest':'findNearest(x,y,radius,layer) wybiera po odległości środka spośród kandydatów queryRadius; remis rozstrzyga ID.',
+  'Physics2D.refresh':'Odświeża indeks po bezpośrednich zmianach pól Java wewnątrz WORLD. setPosition/setActive/setEnabled unieważniają go automatycznie.',
   'Tweens.position': 'Animuje pozycję środka do x/y. seconds to czas w sekundach. Zwraca Tween z easing (linear/smooth) i cancel(). Nowa animacja zastępuje poprzednią tej właściwości.',
   'Tweens.scale': 'Animuje scale.x/y do podanych wartości. seconds to czas w sekundach; 0 ustawia wynik od razu. Zwraca Tween z easing i cancel(). Skala obrazu nie zmienia collidera.',
-  'Tweens.rotation': 'Animuje rotation.z do kąta radians w radianach. seconds to czas w sekundach. Zwraca Tween z easing i cancel().',
+  'Tweens.rotation': 'Animuje rotation do kąta radians w radianach. seconds to czas w sekundach. Zwraca Tween z easing i cancel().',
   'Tweens.shake': 'Wstrząsa obrazem: strength w pikselach, seconds w sekundach. Nie zmienia pozycji fizycznej. Zwraca Tween; cancel() usuwa offset bez dryfu.',
-  'Tween.cancel': 'Zatrzymuje tween i usuwa jego komponent. Pozycja/skala/obrót pozostają aktualne; shake przywraca zerowy offset.',
+  'Tween.cancel': 'Zatrzymuje tween i usuwa jego komponent. Pozycja/skala/obrót pozostają aktualne; shake usuwa tylko własny wkład do visualOffset.',
   'Camera2D.shake': 'Wstrząsa renderowanymi sprite’ami: strength w pikselach, seconds w sekundach. Nie zmienia colliderów, pozycji ani HUD.',
-  'Camera2D.stopShake': 'Kończy shake kamery i zeruje offsetX/offsetY.',
+  'Camera2D.stopShake': 'Kończy shake kamery; zachowuje offsetX/offsetY i śledzony cel.',
   'ObstacleAvoidance2D.steer': 'Zwraca skorygowany kierunek x/y przy pobliskich colliderach. lookAhead podaj w pikselach, weight to waga korekty. Nie wyszukuje drogi w labiryncie.',
   'Physics2D.overlaps': 'Test geometrii koło–koło, koło–prostokąt lub AABB–AABB, bez emisji kontaktów. Obrót i skala sprite’a nie zmieniają kształtu collidera.',
-  onDrawBackground: 'Rysowanie komponentu po clear, przed aktualizacją i sprite’ami. Dobry hook do tła i ścieżek.',
+  onDrawBackground: 'Rysowanie komponentu przed grafiką świata. Dobry hook do tła i ścieżek.',
   onDrawUI: 'Rysowanie po fizyce i sprite’ach. Odczytaj aktualne punkty/zdrowie i narysuj HUD.',
 };
 
@@ -42,7 +57,7 @@ const classDocs={
   FlankTarget2D:'AI flankowania: target, speed w px/s, radius w px i clockwise. Zbliża się do promienia i obiega cel.',
   Steering2D:'Baza AI. Jeden aktywny generator kierunku na obiekt; ObstacleAvoidance2D może korygować ruch.',
   ObstacleAvoidance2D:'Lokalne omijanie colliderów: lookAhead w px, weight to siła korekty. Nie gwarantuje przejścia labiryntu.',
-  Projectile2D:'Pocisk: direction, speed w px/s, lifetime w sekundach, owner. Dodaje kontroler i domyślny kołowy trigger; pomija owner i znika po trafieniu. Własne obrażenia piszesz w onTrigger.',
+  Projectile2D:'Pocisk: direction, speed w px/s, remainingLifetime w sekundach, owner, hitLayers, maxHits i hits. Dodaje kontroler i kołowy trigger; pomija owner i znika po maxHits lub upływie życia. Własne obrażenia piszesz w onTrigger.',
   Tween:'Animacja: property, easing (linear/smooth), completed. cancel() zatrzymuje animację, a shake usuwa offset.',
   Tweens:'Fabryka position, scale, rotation i shake. Czasy w sekundach. Nowy tween tej samej właściwości zastępuje poprzedni.',
   Camera2D:'offsetX/offsetY przesuwają renderowane sprite’y. shake(strength,seconds), stopShake(). Tło ekranowe i HUD pozostają nieruchome.',
@@ -65,7 +80,7 @@ export function resolveEngineSymbol(sources, model, position) {
     const receiver = prefix.match(/(\w+)\s*\.\s*$/)?.[1];
     if (receiver) {
       if (Object.hasOwn(sources, `${receiver}.java`)) owner = receiver;
-      else if (receiver === 'gameObject' && /extends\s+(Component|PlayerController2D)\b/.test(content)) owner = 'GameObject';
+      else if (receiver === 'gameObject' && /extends\s+Component\b/.test(content)) owner = 'GameObject';
       else owner = content.match(new RegExp(`\\b(\\w+)\\s+${receiver}\\b`))?.[1];
     } else owner = content.match(/\bclass\s+\w+\s+extends\s+(\w+)/)?.[1] ?? content.match(/\bclass\s+(\w+)/)?.[1];
   }

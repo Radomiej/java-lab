@@ -6,6 +6,8 @@ import RuntimeConsole from './RuntimeConsole.jsx';
 import { gameEngineRuntimeFiles } from "../data/gameEngineRuntime.js";
 import {createEngineDefinitionProvider, createEngineHoverProvider, resolveEngineSymbol} from './javaEngineNavigation.js';
 import {acceptEditorChange} from './editorAcceptedChange.js';
+import { EditorIcon, useEditorTabs } from '../../shared/lab-game-v2/editor/EditorUI.jsx';
+import {createEngineCompletionProvider,createEngineSignatureProvider} from './engineIntellisense.js';
 
 function fileIcon(fileName) {
   return fileName.endsWith(".java") ? "J" : "·";
@@ -44,6 +46,7 @@ export default function CodeEditor({
   const [addingFile, setAddingFile] = useState(false);
   const source = files[activeFile] ?? (engine ? gameEngineRuntimeFiles[activeFile] : '') ?? '';
   const [openedApi, setOpenedApi] = useState([]);
+  const tabLayout = useEditorTabs([...Object.keys(files), ...openedApi], taskId);
   const onFileChangeRef = useRef(onFileChange);
   const definitionProviderRef = useRef(null);
   const hoverProviderRef = useRef(null);
@@ -145,6 +148,7 @@ export default function CodeEditor({
           tabSize: 2,
           theme: "vs-dark",
           wordWrap: "off",
+          editContext: false,
         });
 
         const editorActions = [
@@ -236,6 +240,9 @@ export default function CodeEditor({
           createJavaCompletionProvider(monaco),
         );
         if (engine) {
+          const ownsModel=model=>[...modelsRef.current.values()].includes(model);
+          editorActionsRef.current.push(monaco.languages.registerCompletionItemProvider('java',createEngineCompletionProvider(monaco,ownsModel)));
+          editorActionsRef.current.push(monaco.languages.registerSignatureHelpProvider('java',createEngineSignatureProvider(ownsModel)));
           const openApi = position => {
             const symbol = position && resolveEngineSymbol(gameEngineRuntimeFiles, editor.getModel(), position);
             if (!symbol) return;
@@ -324,35 +331,44 @@ export default function CodeEditor({
   return (
     <div className="editor-shell">
       <div className="editor-action-bar" role="toolbar" aria-label="Akcje edytora">
-        <button className="button button--primary" type="button" onClick={onCheck} disabled={runner.status === "compiling"}>▶ RUN</button>
+        <button className="button button--primary editor-format-icon" type="button" aria-label="▶ RUN" title="Uruchom (Ctrl+Enter)" onClick={onCheck} disabled={runner.status === "compiling"}><EditorIcon action="run" /></button>
         <div className="editor-action-bar-secondary">
+          <button className="button button--ghost editor-format-icon" type="button"
+            aria-label="Formatuj kod" title="Formatuj kod (Shift+Alt+F)" disabled={readOnly}
+            onClick={() => {
+              if (editorRef.current) editorRef.current.getAction('java-lab.format-document')?.run();
+              else acceptChange(activeFile, formatJavaSource(source));
+            }}>
+            <EditorIcon action="format" />
+          </button>
           {engine && !readOnly && onDeleteFile && !Object.hasOwn(protectedFiles,activeFile) && <button className="button button--ghost" type="button" onClick={()=>{
             if(window.confirm(`Usunąć plik ${activeFile}? Jego kod zostanie usunięty z zapisanego zadania.`))onDeleteFile(activeFile);
-          }}>Usuń plik</button>}
+          }} aria-label="Usuń plik" title="Usuń plik"><EditorIcon action="remove" /></button>}
           {readOnly && <button className="button button--ghost" type="button" onClick={() => {
             setOpenedApi(current => current.filter(file => file !== activeFile));
             onFileChange(Object.keys(files)[0]);
-          }}>Zamknij źródło API</button>}
-          {onSolution && <button className="button button--ghost" type="button" onClick={onSolution}>Pokaż rozwiązanie</button>}
-          <button className="button button--ghost" type="button" onClick={onReset}>Przywróć start</button>
+          }} aria-label="Zamknij źródło API" title="Zamknij źródło API"><EditorIcon action="close" /></button>}
+          {onSolution && <button className="button button--ghost" type="button" onClick={onSolution} aria-label="Pokaż rozwiązanie" title="Pokaż rozwiązanie"><EditorIcon action="solution" /></button>}
+          <button className="button button--ghost" type="button" onClick={onReset} aria-label="Przywróć start" title="Przywróć start"><EditorIcon action="reset" /></button>
           <EditorHelp />
         </div>
       </div>
       <div className="editor-tabs" role="tablist" aria-label="Pliki lekcji">
-        {[...Object.keys(files), ...openedApi].map((fileName) => (
+        {tabLayout.order.map((fileName) => (
           <button
             className={`editor-tab${activeFile === fileName ? " is-active" : ""}`}
             type="button"
             role="tab"
             aria-selected={activeFile === fileName}
             key={fileName}
+            {...tabLayout.tabProps(fileName)}
             onClick={() => onFileChange(fileName)}
           >
             <span className="file-icon">{fileIcon(fileName)}</span>
             {fileName}
           </button>
         ))}
-      {engine && <button className="editor-tab editor-tab--add" type="button" onClick={() => { setAddingFile(!addingFile); setFileError(""); }}>+ Dodaj plik</button>}
+      {engine && <button className="editor-tab editor-tab--add" type="button" aria-label="+ Dodaj plik" title="Dodaj plik" onClick={() => { setAddingFile(!addingFile); setFileError(""); }}><EditorIcon action="add" /></button>}
       </div>
       {readOnly && <div className="editor-api-notice">{activeFile} · API silnika (tylko odczyt)</div>}
       {engine && addingFile && <form className="editor-add-file" onSubmit={(event) => {

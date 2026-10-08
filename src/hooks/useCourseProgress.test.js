@@ -48,10 +48,10 @@ describe("useCourseProgress", () => {
     expect(again.result.current.filesByTask[id]['Enemy.java']).toBeUndefined();
   });
 
-  it('maps old game selection but does not transfer old game completion',()=>{
+  it('drops a removed game selection and completion while preserving saved source files',()=>{
     localStorage.setItem('java-lab-progress-v1',JSON.stringify({selectedTrack:'game-dev',selectedLessonId:'game-dev-14',filesByTask:{old:{'Main.java':'saved'}},completedTasks:['game-dev-14-task']}));
     const {result}=renderHook(()=>useCourseProgress(allLessons));
-    expect(result.current.selectedLessonId).toBe('game-dev-401');
+    expect(result.current.selectedLessonId).toBe(allLessons[0].id);
     expect(result.current.completedTasks).toEqual([]);
     expect(result.current.filesByTask.old['Main.java']).toBe('saved');
   });

@@ -1,5 +1,9 @@
+import { createRenderer } from '../../shared/lab-game-v2/renderer.js';
+import { assetManifest } from '../../shared/lab-game-v2/assets/Assets.js';
 const CONTROL_KEYS = new Set(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d", " "]); 
 const normalizeKey = (key) => key === " " ? "Space" : key.length === 1 ? key.toLowerCase() : key;
+let activeAssetsReady=Promise.resolve();
+export function getGameAssetsReady(){return activeAssetsReady;}
 
 export function drawAtlasSprite(context, image, frame, command) {
   const rotation = command.rotation ?? 0;
@@ -28,35 +32,10 @@ export function createGameInterop(canvas) {
   let lastFrame;
   let disposed = false;
   let debugColliders = false;
-  let atlas;
-  let atlasLoading;
-  const loadAtlas = () => atlasLoading ||= Promise.all([
-    fetch('/game-assets/atlas.json').then(response => {
-      if (!response.ok) throw new Error('Nie można załadować atlasu gry');
-      return response.json();
-    }),
-    new Promise((resolve, reject) => {
-      const image = new Image();
-      image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error('Nie można załadować tekstur gry'));
-      image.src = '/game-assets/atlas.svg';
-    }),
-  ]).then(async ([data, image]) => {
-    const images = Object.fromEntries(await Promise.all(
-      [...new Set(Object.values(data.frames).map(entry => entry.image).filter(Boolean))].map(source =>
-        new Promise((resolve, reject) => {
-          const extra = new Image();
-          extra.onload = () => resolve([source, extra]);
-          extra.onerror = () => reject(new Error(`Nie można załadować tekstury: ${source}`));
-          extra.src = `/game-assets/${source}`;
-        })),
-    ));
-    atlas = { data, image, images };
-    if (!disposed && lastFrame) onGameDraw({ detail: lastFrame });
-  }).catch(error => {
-    atlasLoading = undefined;
-    if (!disposed) window.dispatchEvent(new CustomEvent('java-lab-game-render-error', { detail: error.message }));
-  });
+  const renderer=createRenderer(assetManifest);
+  const assetsReady=renderer.load(window).then(()=>{if(!disposed&&lastFrame)onGameDraw({detail:lastFrame});});
+  activeAssetsReady=assetsReady;
+  assetsReady.catch(error=>{if(!disposed)window.dispatchEvent(new CustomEvent('java-lab-game-render-error',{detail:error.message}));});
   const resize = () => {
     const rect = canvas.getBoundingClientRect();
     const ratio = window.devicePixelRatio || 1;
@@ -69,6 +48,10 @@ export function createGameInterop(canvas) {
     if (lastFrame) onGameDraw({ detail: lastFrame });
   };
   const emitInput = (key, pressed) => window.dispatchEvent(new CustomEvent("java-lab-game-input", { detail: { key, pressed } }));
+  const mouseButtons=new Set();
+  const onPointerMove=event=>{const rect=canvas.getBoundingClientRect();window.dispatchEvent(new CustomEvent('java-lab-game-input',{detail:{kind:'pointer',x:event.clientX-rect.left,y:event.clientY-rect.top}}));};
+  const onPointerDown=event=>{canvas.focus();onPointerMove(event);mouseButtons.add(event.button);canvas.setPointerCapture?.(event.pointerId);window.dispatchEvent(new CustomEvent('java-lab-game-input',{detail:{kind:'mouse',button:event.button,pressed:true}}));};
+  const onPointerUp=event=>{onPointerMove(event);mouseButtons.delete(event.button);window.dispatchEvent(new CustomEvent('java-lab-game-input',{detail:{kind:'mouse',button:event.button,pressed:false}}));};
   const onKeyDown = (event) => {
     if (CONTROL_KEYS.has(event.key) || CONTROL_KEYS.has(event.key.toLowerCase())) event.preventDefault();
     const key = normalizeKey(event.key);
@@ -80,7 +63,7 @@ export function createGameInterop(canvas) {
     keys.delete(key);
     emitInput(key, false);
   };
-  const onBlur = () => { keys.forEach((key) => emitInput(key, false)); keys.clear(); };
+  const onBlur = () => { keys.forEach((key) => emitInput(key, false)); keys.clear();mouseButtons.clear();window.dispatchEvent(new CustomEvent('java-lab-game-input',{detail:{kind:'clear'}})); };
   const onGameDraw = (event) => {
     const command = event.detail;
     if (command.op === "frame") {
@@ -106,36 +89,18 @@ export function createGameInterop(canvas) {
         } else context.strokeRect(command.x-command.width/2,command.y-command.height/2,command.width,command.height);
       } finally {context.restore();}
     }
-    if (command.op === "rect") {
-      context.fillStyle = command.color || "#76b9f2";
-      context.fillRect(command.x, command.y, command.width, command.height);
-    }
-    if (command.op === "text") {
-      context.fillStyle = command.color || "#d9eff0";
-      context.font = "11px monospace";
-      context.textAlign = command.align === "center" ? "center" : "left";
-      context.fillText(command.text || "", command.x, command.y);
-    }
-    if (command.op === 'sprite') {
-      if (!atlas) { loadAtlas(); return; }
-      const key = command.texture === 'wall' ? 'stone' : command.texture;
-      const entry = atlas.data.frames[key];
-      const frame = entry?.frame;
-      if (!frame) {
-        window.dispatchEvent(new CustomEvent('java-lab-game-render-error', { detail: `Brak tekstury: ${command.texture}` }));
-        return;
-      }
-      context.imageSmoothingEnabled = false;
-      drawAtlasSprite(context, entry.image ? atlas.images[entry.image] : atlas.image, frame, command);
-    }
+    if (['rect','text','sprite','ninepatch','progress'].includes(command.op)) renderer.draw(context,command);
+
   };
   canvas.tabIndex = 0;
+  canvas.addEventListener('pointermove',onPointerMove);canvas.addEventListener('pointerdown',onPointerDown);canvas.addEventListener('pointerup',onPointerUp);canvas.addEventListener('pointercancel',onBlur);
   canvas.addEventListener("keydown", onKeyDown);
   canvas.addEventListener("keyup", onKeyUp);
   canvas.addEventListener("blur", onBlur);
   const api = {
     canvas,
     context,
+    assetsReady,
     isKeyDown: (key) => keys.has(key) || keys.has(key.toLowerCase()),
     getKeys: () => [...keys],
     setDebugColliders(value) {
@@ -174,6 +139,7 @@ export function createGameInterop(canvas) {
       canvas.removeEventListener("keydown", onKeyDown);
       canvas.removeEventListener("keyup", onKeyUp);
       canvas.removeEventListener("blur", onBlur);
+      canvas.removeEventListener('pointermove',onPointerMove);canvas.removeEventListener('pointerdown',onPointerDown);canvas.removeEventListener('pointerup',onPointerUp);canvas.removeEventListener('pointercancel',onBlur);
       window.removeEventListener("resize", resize);
       window.removeEventListener("blur", onBlur);
       window.removeEventListener("java-lab-game-draw", onGameDraw);
@@ -187,6 +153,7 @@ export function createGameInterop(canvas) {
   window.addEventListener("java-lab-game-draw", onGameDraw);
   const dispose = api.dispose;
   api.dispose = () => {
+    if(activeAssetsReady===assetsReady)activeAssetsReady=Promise.resolve();
     disposed = true;
     resizeObserver?.disconnect();
     onBlur();

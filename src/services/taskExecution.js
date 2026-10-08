@@ -16,7 +16,7 @@ export function evaluateTaskCheck(task, files, result) {
       passed, score: passed ? 1 : 0, total: 1,
       results: [{passed,label:task.javaTestMainClass ? 'Testy Java' : 'Kompilacja i start sandboxa',
         detail:passed ? 'Program uruchomił się poprawnie.' : result.error || 'Kompilacja lub uruchomienie nie powiodło się.'}],
-      summary:passed ? 'Sandbox działa. Możesz rozwijać własną grę.' : 'Popraw błędy programu.',
+      summary:passed ? 'Sandbox działa. Możesz rozwijać własną grę.' : result.validationFailure ? 'Zadanie nie spełnia jeszcze kryteriów.' : 'Popraw błędy programu.',
     };
   }
   return mergeCompilationResult(checkSource(files,[...(task.checks || []),...(task.outputChecks || [])],result.output || ''),result);

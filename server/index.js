@@ -1,3 +1,4 @@
+import { sendTutorStream } from '../shared/lab-game-v2/tutorStream.js';
 import { createServer } from 'node:http';
 import { pathToFileURL } from 'node:url';
 import { createTutorHandler } from './tutor.js';
@@ -20,11 +21,12 @@ export function createTutorServer({apiKey=process.env.OPENROUTER_API_KEY,handler
     requests.set(address,[...recent,time]);active++;
     const controller=new AbortController();
     res.on('close',()=>{if(!res.writableEnded)controller.abort();});
-    const timer=setTimeout(()=>{controller.abort();send(res,408,{message:'Przekroczono czas zapytania.'});},60000);
+    const timer=setTimeout(()=>{controller.abort();send(res,408,{message:'Przekroczono czas zapytania.'});},120000);
     try{
       const chunks=[];let size=0;
       for await(const chunk of req){size+=chunk.length;if(size>262144){send(res,413,{message:'Zapytanie jest zbyt duże.'});req.resume();return;}chunks.push(chunk);}
       let payload;try{payload=JSON.parse(Buffer.concat(chunks).toString());}catch{return send(res,400,{message:'Nieprawidłowy JSON.'});}
+      if (payload.stream === true) return await sendTutorStream(res, handler, payload, controller.signal);
       const result=await handler(payload,controller.signal);send(res,result.status,result.body);
     }catch{send(res,400,{message:'Nie udało się odczytać zapytania.'});}finally{clearTimeout(timer);active--;}
   });

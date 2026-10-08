@@ -14,16 +14,16 @@ describe("Java Lab curriculum", () => {
   it("allocates an independent hundred-number block to each track", () => {
     expect(trackOrder).toHaveLength(5);
     expect(Object.keys(tracks)).toHaveLength(5);
-    expect(courseLessons).toHaveLength(20);
+    expect(courseLessons).toHaveLength(36);
     expect(allLessons.map((lesson) => lesson.order)).toEqual(
-      [101,102,103,104,201,202,203,204,301,302,303,304,401,402,403,404,405,406,407,408,501],
+      [101,102,103,104,201,202,203,204,301,302,303,304,...Array.from({length:24},(_,i)=>401+i),501],
     );
   });
 
   it("gives every lesson a step-by-step starter task", () => {
     for (const lesson of courseLessons) {
       expect(lesson.objective).toBeTruthy();
-      expect(lesson.theory.length).toBeGreaterThanOrEqual(2);
+      expect(lesson.theory.length).toBeGreaterThanOrEqual(lesson.track==='game-dev'?1:2);
       expect(lesson.tasks.length).toBeGreaterThanOrEqual(1);
       const entry = lesson.track === 'game-dev' ? 'GameMain' : 'Main';
       expect(lesson.tasks[0].starterFiles[`${entry}.java`]).toContain(`class ${entry}`);
@@ -34,7 +34,7 @@ describe("Java Lab curriculum", () => {
   it("gives every lesson one guided task and two independent tasks", () => {
     for (const lesson of courseLessons) {
       expect(lesson.tasks).toHaveLength(3);
-      expect(lesson.tasks.map((task) => task.mode)).toEqual(["guided", "independent", "independent"]);
+      expect(lesson.tasks.map((task) => task.mode)).toEqual(lesson.track==='game-dev'?["guided", "modified", "independent"]:["guided", "independent", "independent"]);
       expect(lesson.tasks.slice(1).every((task) => !task.hints || task.hints.length === 0)).toBe(true);
     }
   });

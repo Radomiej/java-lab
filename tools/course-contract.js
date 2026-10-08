@@ -3,7 +3,7 @@
 export function buildGameCourseContract(tasks,engineFiles) {
   const files={...engineFiles},calls=[];
   for(const [index,task] of tasks.entries()) {
-    const sources={...task.solutionFiles,...task.javaTestFiles};
+    const sources=Object.fromEntries(Object.entries({...task.solutionFiles,...task.javaTestFiles}).filter(([name])=>name.endsWith('.java')));
     const names=Object.keys(sources).map(file=>file.replace(/\.java$/,''));
     const pattern=new RegExp(`\\b(${names.join('|')})\\b`,'g');
     for(const [name,source] of Object.entries(sources))

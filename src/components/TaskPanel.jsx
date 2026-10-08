@@ -1,4 +1,5 @@
 import ConsoleOutput from "./ConsoleOutput.jsx";
+import MovementHint from '../../shared/lab-game-v2/editor/MovementHint.jsx';
 
 export default function TaskPanel({ lesson, activeTask, completedTasks, onTaskChange }) {
   const modeLabels = { guided: "prowadzone", independent: "samodzielne", practice: "ćwiczenie", challenge: "wyzwanie" };
@@ -18,6 +19,7 @@ export default function TaskPanel({ lesson, activeTask, completedTasks, onTaskCh
         ))}
       </div>
       <div className="task-prompt"><span className="prompt-label">{activeTask.mode === "guided" ? "Polecenie prowadzone" : "Zadanie samodzielne"}</span><p>{activeTask.prompt}</p><ol>{activeTask.steps.map((step) => <li key={step}>{step}</li>)}</ol>{activeTask.mode === "guided" && activeTask.hints?.[0] && <p className="task-hint"><strong>Podpowiedź:</strong> {activeTask.hints[0]}</p>}</div>
+      <MovementHint key={`hint-${activeTask.id}`} taskId={activeTask.id} language="java" />
       {expected && <ConsoleOutput key={activeTask.id} label="Oczekiwane wyjście konsoli" output={output} revealWhitespace />}
     </section>
   );

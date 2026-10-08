@@ -12,6 +12,7 @@ it('runs playground only in game mode, does not grade it and stops when the feat
     terminate(){terminated=true;}
   }
   vi.stubGlobal('Worker',TestWorker);
+  vi.stubGlobal('Image',class{set src(value){queueMicrotask(()=>this.onload());}});
   render(<App/>);fireEvent.click(screen.getByRole('tab',{name:/Playground/}));fireEvent.click(screen.getByRole('button',{name:/RUN/}));
   await screen.findByText('Gra gotowa');
   const requests=posted.filter(item=>item.command==='compile-and-run');expect(requests).toHaveLength(1);expect(requests[0].mode).toBe('game');expect(requests[0].mainClass).toBe('lab.GameLauncher');

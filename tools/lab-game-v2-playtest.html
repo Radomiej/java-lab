@@ -1,0 +1,23 @@
+<!doctype html><html lang="pl"><meta charset="utf-8"><title>Lab Game v2 — TeaVM i mysz</title>
+<style>body{background:#142234;color:#e8edf5;font:16px system-ui;margin:20px}button{padding:12px;margin:4px}canvas{display:block;width:640px;height:360px;max-width:100%;border:1px solid #57718b}pre{white-space:pre-wrap}h1{font-size:22px}</style>
+<h1>Lab Game v2 — test wspólnego API</h1><button id="reference">C38: pięć kroków TeaVM</button><button id="ui">Sprite, ProgressBar i Button</button><button id="stop">Zatrzymaj</button>
+<canvas class="game-canvas" tabindex="0"></canvas><pre id="status">Gotowy</pre>
+<script type="module">
+import {createTeaVMRunner} from '../src/services/teavmRunner.js';
+import {createGameInterop} from '../src/services/gameInterop.js';
+import {conformanceReferenceFiles} from '../src/data/labGameConformanceReference.js';
+const status=document.querySelector('#status'),canvas=document.querySelector('canvas');
+const bridge=createGameInterop(canvas),runner=createTeaVMRunner();bridge.resize();
+window.addEventListener('java-lab-game-error',e=>status.textContent='BŁĄD: '+e.detail.error);
+window.addEventListener('java-lab-game-output',e=>status.textContent+='\n'+e.detail.output);
+async function run(files,mainClass,mode){status.textContent='Kompilacja TeaVM…';try{runner.stopGame();const result=await runner.run({files,mainClass,mode});status.textContent=result.ok?'PASS\n'+result.output:'FAIL\n'+JSON.stringify(result);return result;}catch(e){status.textContent='BŁĄD: '+e.message;}}
+document.querySelector('#reference').onclick=()=>run({...conformanceReferenceFiles,'Reference.java':`public class Reference {
+public static void main(String[] args){GameCanvas.setSize(640,360);GameMain g=new GameMain();g.start();for(int i=0;i<5;i++)g.step(.1);GameObject p=g.find("P");System.out.println("POSITION "+p.transform.x+" "+p.transform.y);for(String e:g.events)System.out.println("EVENT "+e);System.out.print(GameCanvas.frame());g.dispose();}
+}`},'Reference','console');
+document.querySelector('#ui').onclick=()=>run({'GameMain.java':`public class GameMain extends Game {
+ProgressBar bar;Button button;int clicks;
+@Override public void onCreate(){GameObject p=createObject("Player").setPosition(80,130);p.addComponent(new Sprite(Assets.PLAYER01,64,64));createObject("Fireball").setPosition(180,130).addComponent(new Sprite(Assets.FIREBALL,64,64));GameObject hud=createObject("Health").setPosition(180,40);bar=hud.addComponent(new ProgressBar(260,28));bar.setProgress(50);GameObject menu=createObject("Menu").setPosition(190,230);UITransform layout=menu.addComponent(new UITransform(300,52));layout.anchor=UIAnchor.TOP_LEFT;layout.pivot=new Vector2(.5,.5);button=menu.addComponent(new Button(300,52));button.text="Kliknij: HP +10%";button.onClick=()->{clicks++;bar.setProgress(bar.getProgress()+10);System.out.println("Kliknięcia="+clicks+"; HP="+bar.getProgress());};}
+}`},'GameMain','game');
+document.querySelector('#stop').onclick=()=>{runner.stopGame();status.textContent='Zatrzymano';};
+window.addEventListener('pagehide',()=>{runner.dispose();bridge.dispose();});
+</script></html>

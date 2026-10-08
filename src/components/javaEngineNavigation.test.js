@@ -42,7 +42,7 @@ it('documents speed, normalization and both overloads of move', () => {
   const text=hover.contents.map(part=>part.value).join('\n');
   expect(text).toContain('double speed');
   expect(text).toContain('pikselach na sekundę');
-  expect(text).toContain('200');
+  expect(text).toContain('120');
   expect(text).toContain('normalizuje');
 });
 

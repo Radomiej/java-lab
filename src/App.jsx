@@ -14,6 +14,7 @@ import GameTutor from './components/GameTutor.jsx';
 import { applyTutorProposal } from './services/tutorProposals.js';
 import { gameEngineRuntimeFiles } from "./data/gameEngineRuntime.js";
 import {gameEditorFiles} from './services/gameWorkspace.js';
+import { formatJavaSource } from './components/javaEditorCommands.js';
 import { createTaskFocusTracker, setUmamiAnalyticsEnabled, trackUmamiEvent, trackUmamiPageview } from "./services/umamiAnalytics.js";
 
 const emptyReport = { passed: false, score: 0, total: 0, results: [], summary: "Uruchom sprawdzanie, aby zobaczyć wyniki." };
@@ -204,7 +205,9 @@ export default function App() {
   const handleSolution = () => {
     executionVersion.current++;
     teavmRunner.stopGame();
-    progress.updateFiles(activeTask.id, activeTask.solutionFiles);
+    const formattedFiles = Object.fromEntries(Object.entries(activeTask.solutionFiles).map(([name, code]) =>
+      [name, name.endsWith('.java') ? formatJavaSource(code) : code]));
+    progress.updateFiles(activeTask.id, formattedFiles);
     setActiveFile(Object.keys(activeTask.solutionFiles)[0] || "Main.java");
     setCheckReport(emptyReport);
     setRunner(emptyRunner);
@@ -269,5 +272,5 @@ export default function App() {
 
   const inspector = activeTask.engine ? <GamePreview runner={runner} /> : null;
 
-  return <><AppShell sidebar={sidebar} main={main} inspector={inspector} />{isPlayground&&gameDevEnabled&&<GameTutor key={playground.revision} project={playground.project} projectRevision={playground.revision} onApply={(proposal,snapshot)=>{if(snapshot.revision!==playground.revision)throw new Error('Projekt został zastąpiony. Poproś o nową propozycję.');const next=applyTutorProposal(playground.project,snapshot.project,proposal);stopForEdit();playground.setFiles(next.files);setActiveFile(proposal.path);}}/>}</>;
+  return <><AppShell sidebar={sidebar} main={main} inspector={inspector} />{isPlayground&&gameDevEnabled&&<GameTutor key={playground.revision} project={playground.project} projectRevision={playground.revision} onApply={(proposal,snapshot)=>{if(snapshot.revision!==playground.revision)throw new Error('Projekt został zastąpiony. Poproś o nową propozycję.');const next=applyTutorProposal(playground.project,snapshot.project,proposal);stopForEdit();if(proposal.operation==='delete')playground.deleteFile(proposal.path);else playground.setFiles(next.files);setActiveFile(proposal.operation==='delete'?'GameMain.java':proposal.path);}}/>}</>;
 }

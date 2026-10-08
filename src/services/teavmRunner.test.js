@@ -23,6 +23,23 @@ function createWorkerHarness({ stalled = false, initStalled = false } = {}) {
 }
 
 describe("TeaVM browser runner", () => {
+  it('stamps mouse packets and drops input belonging to a previous scene',async()=>{
+    const worker=createWorkerHarness();const runner=createTeaVMRunner({workerFactory:()=>worker});
+    try {
+      await runner.run({files:{},mainClass:'Main',mode:'game'});
+      window.dispatchEvent(new CustomEvent('java-lab-game-input',{detail:{kind:'mouse',button:0,pressed:true}}));
+      expect(worker.postMessage).toHaveBeenLastCalledWith({command:'game-input',kind:'mouse',button:0,pressed:true,gameId:1});
+      await runner.run({files:{},mainClass:'Main',mode:'game'});
+      worker.postMessage.mockClear();
+      window.dispatchEvent(new CustomEvent('java-lab-game-input',{detail:{kind:'mouse',button:0,pressed:false,gameId:1}}));
+      expect(worker.postMessage).not.toHaveBeenCalled();
+      window.dispatchEvent(new CustomEvent('java-lab-game-input',{detail:{kind:'clear'}}));
+      expect(worker.postMessage).toHaveBeenCalledWith({command:'game-input',kind:'clear',gameId:2});
+      runner.stopGame();worker.postMessage.mockClear();
+      window.dispatchEvent(new CustomEvent('java-lab-game-input',{detail:{kind:'pointer',x:1,y:2}}));
+      expect(worker.postMessage).not.toHaveBeenCalled();
+    } finally {runner.dispose();}
+  });
   it("ignores late frames and errors from a previous game run", async () => {
     const worker = createWorkerHarness();
     const runner = createTeaVMRunner({ workerFactory: () => worker });

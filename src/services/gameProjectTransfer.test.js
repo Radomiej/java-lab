@@ -1,9 +1,9 @@
 import { describe,it,expect } from 'vitest';
 import { parseGameProject, serializeGameProject } from './gameProjectTransfer.js';
 import { validateProposals,applyTutorProposal } from './tutorProposals.js';
-const project={version:1,mainClass:'GameMain',files:{'GameMain.java':'public class GameMain extends Game {}','Player.java':'class Player {}'}};
+const project={version:1,engineApiVersion:'2.0.0',mainClass:'GameMain',files:{'GameMain.java':'public class GameMain extends Game {}','Player.java':'class Player {}'}};
 it('round trips exports close to the byte limit',()=>{
-  const large={...project,files:{'GameMain.java':'x'.repeat(262075)}};
+  const large={...project,files:{'GameMain.java':'x'.repeat(262000)}};
   expect(parseGameProject(serializeGameProject(large))).toEqual(large);
 });
 it('rejects duplicate JSON members including escaped filenames',()=>{

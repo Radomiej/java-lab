@@ -16,7 +16,7 @@ function initialState(lessons) {
 function sanitizeState(value, lessons) {
   const fallback = initialState(lessons);
   if (!value || typeof value !== "object") return fallback;
-  const migratedId = ({'game-dev-13':'game-dev-401','game-dev-14':'game-dev-401','game-dev-15':'game-dev-403'})[value.selectedLessonId] || value.selectedLessonId;
+  const migratedId = value.selectedLessonId;
   const lesson = lessons.find((candidate) => candidate.id === migratedId)
     || lessons.find((candidate) => candidate.id === fallback.selectedLessonId)
     || lessons[0];

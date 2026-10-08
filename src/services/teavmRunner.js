@@ -1,6 +1,6 @@
 import {prepareGameRequest} from './gameWorkspace.js';
 
-const defaultWorkerFactory = () => new Worker("/vendor/teavm/teavm.worker.js?v=game-wrapper-10", { type: "module" });
+const defaultWorkerFactory = () => new Worker("/vendor/teavm/teavm.worker.js?v=game-wrapper-12", { type: "module" });
 
 function createRunnerError(code, message) {
   const error = new Error(message);
@@ -19,6 +19,12 @@ export function createTeaVMRunner({ workerFactory = defaultWorkerFactory, timeou
   let lastGameFrame = 0;
   const stopWatchdog = () => { clearInterval(gameWatchdog); gameWatchdog = undefined; };
   const onVisibilityChange = () => { lastGameFrame = Date.now(); };
+  const gameInputHandler = event => {
+    if (!activeGameRequest) return;
+    const packet = { ...event.detail, gameId: event.detail.gameId ?? activeGameRequest.id };
+    if (packet.gameId !== activeGameRequest.id) return;
+    worker?.postMessage({ command: 'game-input', ...packet });
+  };
 
   const rejectPending = (error) => {
     for (const request of pending.values()) {
@@ -136,7 +142,7 @@ export function createTeaVMRunner({ workerFactory = defaultWorkerFactory, timeou
       let initializationTimeout;
       try {
         await Promise.race([
-          ensureWorker(),
+          Promise.all([ensureWorker(),payload.mode==='game'?getGameAssetsReady():Promise.resolve()]),
           new Promise((_, reject) => {
             initializationTimeout = setTimeout(() => reject(createRunnerError(
               "COMPILER_UNAVAILABLE", "Nie udało się załadować kompilatora TeaVM w wyznaczonym czasie.",
@@ -194,10 +200,6 @@ export function createTeaVMRunner({ workerFactory = defaultWorkerFactory, timeou
   };
 }
 
-function gameInputHandler(event) {
-  globalThis.__javaLabTeaVMWorker?.postMessage({ command: "game-input", ...event.detail });
-}
-
 function gameResizeHandler(event) {
   globalThis.__javaLabTeaVMWorker?.postMessage({ command: "game-resize", ...event.detail });
 }
@@ -205,3 +207,4 @@ function gameResizeHandler(event) {
 function gameDebugHandler(event) {
   globalThis.__javaLabTeaVMWorker?.postMessage({command:'game-debug',enabled:event.detail.enabled});
 }
+import {getGameAssetsReady} from './gameInterop.js';

@@ -8,7 +8,7 @@ public class KeyPressed extends Component {
         if(key==null || key.isEmpty() || action==null)throw new IllegalArgumentException("Wymagany klawisz i callback");
         this.key=key;this.action=action;
     }
-    @Override public void onUpdate(double delta) {if(Input.isKeyPressed(key))action.run();}
+    @Override public void onUpdate(double delta) {if(getGame().input.isKeyPressed(key))action.run();}
 }
 `,
   'KeyDoublePressed.java': `package engine;
@@ -21,7 +21,7 @@ public class KeyDoublePressed extends KeyPressed {
     @Override public void onUpdate(double delta) {
         if(!Double.isFinite(maxDelaySeconds)||maxDelaySeconds<=0)throw new IllegalArgumentException("Niepoprawne okno podwojnego nacisniecia");
         elapsed+=delta;
-        if(!Input.isKeyPressed(key))return;
+        if(!getGame().input.isKeyPressed(key))return;
         if(armed && elapsed<=maxDelaySeconds){armed=false;action.run();}
         else {armed=true;elapsed=0;}
     }
@@ -38,7 +38,7 @@ public class NoneOfKeysPressed extends Component {
         for(String key:this.keys)if(key==null || key.isEmpty())throw new IllegalArgumentException("Niepoprawny klawisz");
     }
     @Override public void onUpdate(double delta) {
-        for(String key:keys)if(Input.isKeyDown(key))return;
+        for(String key:keys)if(getGame().input.isKeyDown(key))return;
         action.run();
     }
 }

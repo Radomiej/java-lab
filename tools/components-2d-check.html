@@ -7,150 +7,35 @@ import { createTeaVMRunner } from '/src/services/teavmRunner.js';
 const runner = createTeaVMRunner();
 const source = `import engine.*;
 public class Main {
- static void check(boolean value, String label) {
-  if (!value) throw new IllegalArgumentException(label);
-  System.out.println("PASS " + label);
- }
+ static class Player extends Component{}static class ArmoredPlayer extends Player{}
+ static void check(boolean b,String m) {if(!b)throw new AssertionError(m);}
+ static void near(double a,double b){check(Math.abs(a-b)<1e-6,a+" != "+b);}
  public static void main(String[] args) {
-  Sprite sprite = new Sprite();
-  check(sprite.texture.equals("player") && sprite.width == 32 && sprite.height == 32, "domyslny sprite");
-  Sprite custom = new Sprite("coin", 16, 20);
-  check(custom.texture.equals("coin") && custom.width == 16 && custom.height == 20, "wymiary sprite");
-  check(new Collider2D().isStatic && !new Collider2D(false).isStatic, "typ ciala");
-  GameObject object = new GameObject("trigger", 0, 0);
-  Trigger2D trigger = object.addComponent(new Trigger2D());
-  check(object.getComponent(Collider2D.class) == trigger, "trigger dziedziczy collider");
-  CharacterController2D controller = new CharacterController2D();
-  controller.move(3, 4, 100);
-  check(Math.abs(controller.velocity.x - 60) < 0.0001 && Math.abs(controller.velocity.y - 80) < 0.0001, "normalizacja ruchu");
-  controller.move(0, 0);
-  check(controller.velocity.x == 0 && controller.velocity.y == 0, "zatrzymanie");
-  controller.move(1, 0);
-  check(controller.velocity.x == 200 && controller.velocity.y == 0, "domyslna predkosc");
-  Game game = new Game();
-  GameObject hero = game.createObject("hero").setPosition(40, 40);
-  hero.addComponent(new Sprite("player", 20, 20));
-  CharacterController2D movement = hero.addComponent(new CharacterController2D());
-  final int[] hits = {0, 0};
-  hero.addComponent(new Component() {
-   public void onUpdate(double dt) { movement.move(1, 0, 100); }
-   public void onCollision(GameObject other) { hits[0]++; }
-   public void onTrigger(GameObject other) { hits[1]++; }
-  });
-  game.start(); game.step(0.1);
-  check(hero.transform.x == 50 && hero.transform.y == 40, "ruch w kroku gry");
-  check(GameCanvas.frame().contains("sprite|player|50.0|40.0|20.0|20.0"), "sprite trafia do klatki");
-  hero.getComponent(Sprite.class).enabled = false; game.step(0);
-  check(!GameCanvas.frame().contains("sprite|player|"), "wylaczony sprite znika");
-  hero.getComponent(Sprite.class).enabled = true;
-  GameObject wall = game.createObject("wall").setPosition(75, 40);
-  wall.addComponent(new Sprite("wall", 20, 20)); wall.addComponent(new Collider2D());
-  game.step(0.1);
-  check(hero.transform.x == 55 && hits[0] == 1, "collider blokuje ruch i emituje kontakt");
-  wall.destroy();
-  GameObject coin = game.createObject("coin").setPosition(75, 40);
-  coin.addComponent(new Sprite("coin", 20, 20)); coin.addComponent(new Trigger2D());
-  game.step(0.1);
-  check(hero.transform.x == 65 && hits[1] == 1, "trigger nie blokuje ruchu");
-  movement.enabled = false; game.step(0.1);
-  check(hero.transform.x == 65, "wylaczony kontroler nie przesuwa obiektu");
+  check(new Sprite(Assets.FIREBALL).texture.equals("fireball"),"typed sprite");
+  Game indexed=new Game();check(indexed.getObjectsWith(Player.class).isEmpty(),"empty index");GameObject first=indexed.createObject("first").addTag("player");Player marker=first.addComponent(new ArmoredPlayer());first.addComponent(new CircleCollider2D(10));GameObject second=indexed.createObject("second");second.addComponent(new Player());check(indexed.getObjectsWith(Player.class).size()==2,"inheritance index");check(indexed.getObjectsWith(Player.class,Collider2D.class).get(0)==first,"component intersection");indexed.getObjectsWith(Player.class).clear();check(indexed.getObjectsWith(Player.class).size()==2,"index snapshot");first.removeComponent(marker);check(indexed.getObjectsWith(Player.class).size()==1,"remove immediate");check(indexed.getObjectsWithTag("player").get(0)==first,"tag");first.removeTag("player");check(indexed.getObjectsWithTag("player").isEmpty(),"remove tag");second.destroy();check(indexed.getObjectsWith(Player.class).isEmpty(),"destroy index");indexed.dispose();
+  InputManager mouse=new InputManager();mouse.setPointer(30,40);Vector2 copy=mouse.getPointerPosition();copy.x=900;near(mouse.getPointerPosition().x,30);
+  mouse.setMouseButton(InputManager.MOUSE_RIGHT,true);mouse.setMouseButton(InputManager.MOUSE_RIGHT,true);check(mouse.isMousePressed(InputManager.MOUSE_RIGHT),"right pressed");mouse.endFrame();check(!mouse.isMousePressed(InputManager.MOUSE_RIGHT)&&mouse.isMouseDown(InputManager.MOUSE_RIGHT),"one-frame pressed");mouse.setMouseButton(InputManager.MOUSE_RIGHT,false);check(mouse.isMouseReleased(InputManager.MOUSE_RIGHT),"right released");mouse.clear();check(!mouse.isMouseReleased(InputManager.MOUSE_RIGHT),"blur clears edges");
+  Game game=new Game(); GameObject hero=game.createObject("hero").setPosition(100,100);
+  hero.addComponent(new Sprite(Assets.PLAYER01));hero.transform.scale.x=5;
+  hero.addComponent(new CircleCollider2D(12));hero.addComponent(new CharacterController2D());
+  hero.addComponent(new Component(){public void onUpdate(double dt){requireComponent(CharacterController2D.class).move(1,0,600);}});
+  game.createObject("wall").setPosition(140,110).addComponent(new Collider2D(2,400));
+  game.start();game.step(.1);near(hero.transform.x,127);
+  game.pause();game.step(.1);near(hero.transform.x,127);near(game.time.elapsed,.1);near(game.time.unscaledElapsed,.2);
+  ProgressBar pb=game.createObject("hp").addComponent(new ProgressBar(200,20));
+  pb.setProgress(50);near(pb.getProgress(),50);pb.setValue(3,5);near(pb.getProgress(),60);
+  pb.setProgress(120);near(pb.getProgress(),100);pb.setValue(3,0);near(pb.getProgress(),0);
+  check(game.physics.findNearest(100,100,40,1)==hero,"nearest");
+  final int[] clicks={0};Button button=game.createObject("button").setPosition(100,50).addComponent(new Button(120,40));button.onClick=()->clicks[0]++;
+  game.input.setPointer(100,50);game.input.setMouseButton(0,true);game.step(.1);
+  check(game.input.isMouseDown(0),"mouse down");game.input.setMouseButton(0,false);game.step(.1);check(clicks[0]==1,"mouse activates once");game.step(.1);check(clicks[0]==1,"mouse stays once");
+  UITransform layout=game.createObject("anchored").setPosition(12,12).addComponent(new UITransform(200,18));layout.anchor=UIAnchor.TOP_LEFT;near(layout.getBounds().left,12);near(layout.getBounds().bottom,30);
+  Camera2D camera=game.createObject("camera").addComponent(new Camera2D());GameObject target=game.createObject("target").setPosition(600,400);camera.follow(target);GameCanvas.setSize(640,360);near(camera.worldToScreen(new Vector2(600,400)).x,320);near(camera.screenToWorld(new Vector2(320,180)).y,400);
   game.dispose();
-  Game fastGame = new Game();
-  GameObject fast = fastGame.createObject("fast").setPosition(40, 40);
-  fast.addComponent(new Sprite("player", 20, 20));
-  CharacterController2D fastController = fast.addComponent(new CharacterController2D());
-  fast.addComponent(new Component() {
-   public void onUpdate(double dt) { fastController.move(1, 0, 2000); }
-  });
-  GameObject thinWall = fastGame.createObject("thin wall").setPosition(100, 40);
-  thinWall.addComponent(new Sprite("wall", 4, 40)); thinWall.addComponent(new Collider2D());
-  fastGame.start(); fastGame.step(0.1);
-  check(fast.transform.x == 88, "szybki ruch nie przenika cienkiej sciany");
-  fastGame.dispose();
-  Game pairGame = new Game();
-  GameObject a = pairGame.createObject("a").setPosition(40, 40);
-  GameObject b = pairGame.createObject("b").setPosition(65, 40);
-  a.addComponent(new Sprite("player",20,20)); b.addComponent(new Sprite("player",20,20));
-  CharacterController2D ac = a.addComponent(new CharacterController2D());
-  b.addComponent(new CharacterController2D());
-  final int[] pairHits = {0,0};
-  a.addComponent(new Component() {
-   public void onUpdate(double dt) { ac.move(1,0,100); }
-   public void onCollision(GameObject other) { pairHits[0]++; }
-  });
-  b.addComponent(new Component() { public void onCollision(GameObject other) { pairHits[1]++; } });
-  pairGame.start(); pairGame.step(0.1);
-  check(a.transform.x == 45 && b.transform.x == 65, "dwa kontrolery maja ciala bez dodatkowego collidera");
-  check(pairHits[0] == 1 && pairHits[1] == 1, "kontakt pary jest dostarczony raz obu obiektom");
-  pairGame.dispose();
-  GameCanvas.setSize(100, 60);
-  Game boundsGame = new Game();
-  GameObject bounded = boundsGame.createObject("bounded").setPosition(80,40);
-  bounded.addComponent(new Sprite("player",32,32));
-  CharacterController2D boundedController = bounded.addComponent(new CharacterController2D());
-  bounded.addComponent(new Component() {
-   public void onUpdate(double dt) { boundedController.move(1,1,1000); }
-  });
-  boundsGame.start(); boundsGame.step(0.1);
-  check(bounded.transform.x == 84 && bounded.transform.y == 44, "kontroler ogranicza caly sprite do swiata");
-  GameCanvas.setSize(50,40); boundsGame.step(0);
-  check(bounded.transform.x == 34 && bounded.transform.y == 24, "zmniejszenie swiata koryguje pozycje");
-  boundedController.collideWorldBounds = false; boundsGame.step(0.1);
-  check(bounded.transform.x > 50 && bounded.transform.y > 40, "granice swiata mozna wylaczyc");
-  boundsGame.dispose(); GameCanvas.setSize(600,400);
-  Game mutationGame = new Game();
-  GameObject collector = mutationGame.createObject("collector").setPosition(40,40);
-  collector.addComponent(new CharacterController2D());
-  GameObject token = mutationGame.createObject("token").setPosition(40,40);
-  token.addComponent(new Trigger2D());
-  final int[] mutationCounts = {0,0,0};
-  final Component[] observer = {null};
-  collector.addComponent(new Component() {
-   public void onTrigger(GameObject other) {
-    mutationCounts[0]++; collector.removeComponent(observer[0]);
-    if (mutationCounts[0] == 2) other.destroy();
-   }
-  });
-  observer[0] = collector.addComponent(new Component() {
-   public void onTrigger(GameObject other) { mutationCounts[2]++; }
-  });
-  token.addComponent(new Component() { public void onDestroy() { mutationCounts[1]++; } });
-  mutationGame.start(); mutationGame.step(0.1); mutationGame.step(0.1); mutationGame.step(0.1);
-  check(mutationCounts[0] == 2 && mutationCounts[1] == 1 && mutationGame.getObjects().size() == 1,
-      "destroy podczas automatycznego kontaktu sprzata obiekt raz");
-  check(mutationCounts[2] == 0, "komponent usuniety w kontakcie nie dostaje zdarzenia");
-  mutationGame.dispose();
-  Game closingGame = new Game();
-  GameObject closingHero = closingGame.createObject("hero").setPosition(40,40);
-  closingHero.addComponent(new CharacterController2D());
-  closingHero.addComponent(new Component() { public void onTrigger(GameObject other) { closingGame.dispose(); } });
-  closingGame.createObject("trigger").setPosition(40,40).addComponent(new Trigger2D());
-  closingGame.start(); closingGame.step(0.1);
-  check(closingGame.isDisposed() && closingGame.getObjects().size() == 0, "dispose w kontakcie bezpiecznie konczy krok");
-  Game visualGame = new Game();
-  GameObject visual = visualGame.createObject("visual").setPosition(80,80);
-  visual.addComponent(new Sprite("player",32,20));
-  check(visual.transform.rotation.z == 0 && visual.transform.scale.x == 1 && visual.transform.scale.y == 1, "domyslna transformacja sprite");
-  visual.transform.rotation.z = 0.5; visual.transform.scale.x = -2; visual.transform.scale.y = 3;
-  visualGame.start(); visualGame.step(0);
-  check(GameCanvas.frame().contains("sprite|player|80.0|80.0|32.0|20.0|0.5|-2.0|3.0"), "obrot i skala trafiaja do renderera");
-  visualGame.dispose();
-  Game occlusionGame = new Game();
-  GameObject mover = occlusionGame.createObject("mover").setPosition(40,40);
-  mover.addComponent(new Sprite("player",20,20));
-  CharacterController2D oc = mover.addComponent(new CharacterController2D());
-  final int[] hiddenContacts = {0};
-  mover.addComponent(new Component() {
-   public void onUpdate(double dt) { oc.move(1,0,2000); }
-   public void onTrigger(GameObject other) { hiddenContacts[0]++; }
-  });
-  GameObject hidden = occlusionGame.createObject("behind wall").setPosition(140,40);
-  hidden.addComponent(new Sprite("coin",20,20)); hidden.addComponent(new Trigger2D());
-  GameObject blocker = occlusionGame.createObject("wall").setPosition(100,40);
-  blocker.addComponent(new Sprite("wall",4,40)); blocker.addComponent(new Collider2D());
-  occlusionGame.start(); occlusionGame.step(0.1);
-  check(mover.transform.x == 88 && hiddenContacts[0] == 0, "trigger za sciana nie dostaje kontaktu niezaleznie od kolejnosci");
-  occlusionGame.dispose();
+  Game tweenGame=new Game();GameObject targetTween=tweenGame.createObject("target");tweenGame.start();final int[] finished={0};Tween tween=Tweens.position(targetTween,20,0,.2).onComplete(()->finished[0]++);tweenGame.step(.1);near(targetTween.transform.x,10);tweenGame.pause();tweenGame.step(.1);near(targetTween.transform.x,10);tweenGame.resume();tweenGame.step(.1);near(targetTween.transform.x,20);check(finished[0]==1,"natural completion once");tween.onComplete(()->finished[0]++);check(finished[0]==2,"late callback");Tweens.scale(targetTween,2,2,0).onComplete(()->finished[0]++);near(targetTween.transform.scale.x,2);check(finished[0]==3,"zero duration callback");Tween cancelled=Tweens.rotation(targetTween,3,1).onComplete(()->finished[0]++);cancelled.cancel();tweenGame.step(.1);check(finished[0]==3,"cancel ignores callback");targetTween.transform.visualOffset.set(5,7);Tween shake=Tweens.shake(targetTween,10,1);tweenGame.step(.1);shake.cancel();near(targetTween.transform.visualOffset.x,5);near(targetTween.transform.visualOffset.y,7);Tween uiTween=Tweens.position(targetTween,40,0,.1);uiTween.updateMode="UI";tweenGame.pause();tweenGame.step(.1);near(targetTween.transform.x,40);tweenGame.dispose();
+  for(int count:new int[]{100,1000,5000}){Game many=new Game();for(int i=0;i<count;i++)many.createObject().setPosition((i%100)*100,(i/100)*100).addComponent(new Trigger2D(20,20));many.start();many.step(.1);check(many.physics.narrowPhaseTests<count,"spatial hash avoids all pairs: "+count);many.dispose();}
+  System.out.println("V2 PASS");
+  Game contacts=new Game();GameObject contactPlayer=contacts.createObject("player");contactPlayer.addComponent(new Player());contactPlayer.addComponent(new CircleCollider2D(10));Trigger2D contactSensor=contacts.createObject("sensor").addComponent(new Trigger2D(40,40));final int[] entered={0};Runnable off=contactSensor.onContactEnter(Player.class,()->entered[0]++);contacts.start();contacts.step(0);contacts.step(.1);check(entered[0]==1,"enter once");contactPlayer.setPosition(100,100);contacts.step(.1);contactPlayer.setPosition(0,0);contacts.step(.1);check(entered[0]==2,"reenter");off.run();contactPlayer.setPosition(100,100);contacts.step(.1);contactPlayer.setPosition(0,0);contacts.step(.1);check(entered[0]==2,"unsubscribe");contacts.dispose();
  }
 }`;
 const button = document.querySelector('#run'), result = document.querySelector('#result');
@@ -160,7 +45,7 @@ button.onclick = async () => {
   const response = await runner.run({files:{...gameCoreRuntimeFiles,'Main.java':source},mainClass:'Main',mode:'console'});
   if (!response.ok) throw new Error(response.error || JSON.stringify(response.diagnostics));
   result.textContent = response.output;
-  if (response.output.split('\n').filter(line => line.startsWith('PASS ')).length !== 25) throw new Error('Niepełny kontrakt');
+  if (!response.output.includes('V2 PASS')) throw new Error('Niepełny kontrakt v2');
  } catch(error) { result.textContent += '\nBŁĄD: ' + error.message; }
  finally { button.disabled = false; }
 };

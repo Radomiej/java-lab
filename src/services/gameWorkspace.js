@@ -16,7 +16,10 @@ public class GameLauncher {
     public static void main(String[] args) { game = new GameMain(); game.start(); }
     @JSExport public static void tick(double delta) { game.step(delta); }
     @JSExport public static String frame() { return GameCanvas.frame(); }
-    @JSExport public static void setKey(String key, boolean pressed) { Input.setKey(key, pressed); }
+    @JSExport public static void setKey(String key, boolean pressed) { game.input.setKey(key, pressed); }
+    @JSExport public static void setPointer(double x,double y) { game.input.setPointer(x,y); }
+    @JSExport public static void setMouseButton(int button,boolean pressed) { game.input.setMouseButton(button,pressed); }
+    @JSExport public static void clearInput() { game.input.clear(); }
     @JSExport public static void resize(double width, double height) { GameCanvas.setSize(width, height); }
     @JSExport public static void dispose() { game.dispose(); }
     @JSExport public static void setDebug(boolean enabled) { game.debug = enabled; }
@@ -27,6 +30,7 @@ export function prepareGameRequest(request) {
   if (!request.files?.['GameMain.java']) return request;
   const files = {...gameEngineRuntimeFiles};
   for (const [name, source] of Object.entries(gameEditorFiles(request.files))) {
+    if(!name.endsWith('.java'))continue;
     // All student files share a namespace; engine remains a separate library.
     const declaration = /^\s*package\s+([\w.]+)\s*;/m.exec(source);
     if (declaration && declaration[1] !== 'lab') throw new Error('Pliki gry używają wspólnego pakietu lab. Usuń własną deklarację package.');

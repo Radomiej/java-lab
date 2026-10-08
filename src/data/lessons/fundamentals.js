@@ -203,8 +203,23 @@ export const fundamentalsLessons = [
         code: "static int calculateReward(int base) {\n    return base * 2;\n}",
       },
       {
+        title: "static: pytasz klasę, nie konkretny obiekt",
+        text: "Metoda static należy do klasy. Pomyśl o niej jak o kalkulatorze: podajesz liczbę i dostajesz wynik, bez wybierania konkretnego gracza. calculateReward potrzebuje tylko argumentu base, dlatego nie tworzymy obiektu Main przez new. Wywołanie Main.calculateReward(15) oznacza: poproś klasę Main o obliczenie nagrody. W tej samej klasie można skrócić je do calculateReward(15).",
+        code: "// Wywołanie metody klasy — bez new Main()\nint reward = Main.calculateReward(15);\nSystem.out.println(reward); // 30",
+      },
+      {
+        title: "Zwykła metoda: pytasz konkretny obiekt",
+        text: "Metoda bez static jest metodą obiektu (instancji). Wyobraź sobie dwóch graczy: Ada ma 10 punktów, a Borin 40. Wywołanie ada.addPoints(5) zmienia punkty Ady, nie Borina. Obiekt wskazujesz przed kropką. To zapowiedź następnego kursu o obiektach — tutaj korzystamy z metod static, bo obliczamy wynik z argumentów, bez danych konkretnego gracza.",
+        code: "// Fragment klasy Player — metoda bez static\nint points;\n\nvoid addPoints(int amount) {\n    points += amount; // punkty tego gracza\n}\n\n// Przykładowe wywołania w main:\n// Player ada = new Player();\n// Player borin = new Player();\n// ada.addPoints(5); // Borin pozostaje bez zmian",
+      },
+      {
+        title: "static nie oznacza public",
+        text: "static odpowiada na pytanie: czy potrzebuję obiektu? public i private odpowiadają: kto może wywołać metodę? Metoda static nie jest automatycznie dostępna dla wszystkich. private static można wywołać tylko wewnątrz jej klasy. public static można wywołać z innej klasy, jeśli sama klasa też jest dostępna. Bez public/private metoda jest dostępna w tym samym pakiecie — do pakietów wrócimy później.",
+        code: "// Te deklaracje umieszczamy wewnątrz klasy Main:\npublic static int calculateReward(int base) {\n    return base * 2;\n}\n\nprivate static int doublePoints(int points) {\n    return points * 2;\n}",
+      },
+      {
         title: "Wywołaj metodę w main",
-        text: "Metoda nie wykona się sama. Wywołujemy ją z nazwą i argumentem, a wynik możemy przypisać do zmiennej albo wypisać.",
+        text: "Metoda nie wykona się sama. Wywołujemy ją z nazwą i argumentem, a wynik możemy przypisać do zmiennej albo wypisać. main też jest static: środowisko uruchamia ją bez tworzenia obiektu Main. Dlatego możemy w niej bezpośrednio wywołać naszą calculateReward, która również jest static. Zwykłą metodę wywołalibyśmy na wskazanym obiekcie. Metoda static nie ma własnego this i nie odczytuje bezpośrednio pól konkretnego obiektu.",
         code: "int reward = calculateReward(10);\nSystem.out.println(reward);",
       },
     ],

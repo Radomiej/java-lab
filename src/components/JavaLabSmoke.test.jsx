@@ -5,6 +5,13 @@ import App from "../App.jsx";
 afterEach(() => {cleanup(); vi.restoreAllMocks(); localStorage.clear();});
 
 describe("Java Lab workspace", () => {
+  it('offers formatting as an accessible icon without visible button text', () => {
+    render(<App />);
+    const format = screen.getByRole('button', {name:'Formatuj kod'});
+    expect(format.textContent).toBe('');
+    expect(format).toHaveAttribute('title', 'Formatuj kod (Shift+Alt+F)');
+    expect(format.querySelector('svg')).not.toBeNull();
+  });
   it('lets the student delete a newly created file after confirmation, not a starter file',()=>{
     vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockReturnValue({setTransform(){},fillRect(){},fillText(){}});
     const confirm=vi.spyOn(window,'confirm').mockReturnValue(false);

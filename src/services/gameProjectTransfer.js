@@ -1,12 +1,15 @@
 import { gameEngineRuntimeFiles } from '../data/gameEngineRuntime.js';
 export const MAX_GAME_PROJECT_BYTES=262144;
+export const ENGINE_API_VERSION='2.0.0';
 export function validateJavaFile(name,content) {
+  if(['README.md','CHECKPOINT.md','REPORT.md'].includes(name)&&typeof content==='string')return;
   if(typeof name!=='string'||!/^[A-Za-z][A-Za-z0-9_]*\.java$/.test(name)||['Main.java','StudentGame.java','GameLauncher.java'].includes(name)||Object.hasOwn(gameEngineRuntimeFiles,name)||typeof content!=='string') throw new Error('Niedozwolony plik Java lub nazwa zarezerwowana przez silnik.');
 }
 export function normalizeGameProject(value) {
   if(!value||value.version!==1||value.mainClass!=='GameMain'||!value.files||typeof value.files!=='object'||Array.isArray(value.files)||!Object.hasOwn(value.files,'GameMain.java')||Object.keys(value.files).length>100)throw new Error('Nieprawidłowy projekt. Wymagany format 1 i GameMain.java.');
   for(const [name,code] of Object.entries(value.files))validateJavaFile(name,code);
-  const result={version:1,mainClass:'GameMain',files:{...value.files}};
+  if(value.engineApiVersion!==undefined&&value.engineApiVersion!==ENGINE_API_VERSION)throw new Error('Nieobsługiwana wersja API silnika.');
+  const result={version:1,engineApiVersion:ENGINE_API_VERSION,mainClass:'GameMain',files:{...value.files}};
   if(new TextEncoder().encode(JSON.stringify(result)).length>MAX_GAME_PROJECT_BYTES)throw new Error('Projekt jest zbyt duży (maksymalnie 256 KiB).');
   return result;
 }
@@ -52,5 +55,6 @@ export function parseGameProject(text) {
   if(typeof text!=='string'||new TextEncoder().encode(text).length>MAX_GAME_PROJECT_BYTES)throw new Error('Projekt jest zbyt duży.');
   const parsed = JSON.parse(text);
   rejectDuplicateMembers(text);
+  if(parsed.engineApiVersion!==ENGINE_API_VERSION)throw new Error('Projekt wymaga engineApiVersion 2.0.0. Starsze API nie jest obsługiwane.');
   return normalizeGameProject(parsed);
 }

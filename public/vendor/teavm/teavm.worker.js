@@ -1,5 +1,6 @@
 import { prepareJavaSources } from "./source-path.js";
 import { disposeGameRuntime, invokeGameExport } from "./game-lifecycle.js";
+import { acceptsSceneInput } from './input-transport.js';
 
 const TEAVM_URLS = {
   // Official TeaVM Playground assets are vendored because the CDN does not expose
@@ -121,6 +122,15 @@ async function compileAndRun(message) {
       const mainResult = app.exports.main([]);
       if (message.mode !== "game") await mainResult;
       else startGameRuntime(app, message.id);
+    } catch (error) {
+      const failedCriterion = output.find(line => line.startsWith('LAB_CHECK_FAILED:'));
+      if (message.mainClass.endsWith('JavaTest') && failedCriterion) {
+        return { command: 'result', id: message.id, ok: false, validationFailure: true,
+          phase: 'sprawdzanie zadania', diagnostics, classVersions: versions,
+          output: output.filter(line => !line.startsWith('LAB_CHECK_FAILED:')).join('\n'),
+          error: failedCriterion.slice('LAB_CHECK_FAILED:'.length) };
+      }
+      throw error;
     } finally {
       console.log = previousLog;
       console.error = previousError;
@@ -161,9 +171,11 @@ function startGameRuntime(app, gameId) {
       if (!line) continue;
       const parts = line.split("|");
       if (parts[0] === "clear") drawCommands.push({ op: "clear", color: parts[1] });
-      if (parts[0] === "rect") drawCommands.push({ op: "rect", x: Number(parts[1]), y: Number(parts[2]), width: Number(parts[3]), height: Number(parts[4]), color: parts[5] });
-      if (parts[0] === "text") drawCommands.push({ op: "text", text: parts[1], x: Number(parts[2]), y: Number(parts[3]), color: parts[4], align: parts[5] || "left" });
+      if (parts[0] === "rect") drawCommands.push({ op: "rect", x: Number(parts[1]), y: Number(parts[2]), width: Number(parts[3]), height: Number(parts[4]), color: parts[5],rotation:Number(parts[6]||0),scaleX:Number(parts[7]??1),scaleY:Number(parts[8]??1) });
+      if (parts[0] === "text") drawCommands.push({ op: "text", text: parts[1], x: Number(parts[2]), y: Number(parts[3]), color: parts[4], align: parts[5] || "center",fontSize:Number(parts[6]||16),baseline:parts[7]||"middle" });
       if (parts[0] === "sprite") drawCommands.push({ op: "sprite", texture: parts[1], x: Number(parts[2]), y: Number(parts[3]), width: Number(parts[4]), height: Number(parts[5]), rotation: Number(parts[6] || 0), scaleX: Number(parts[7] ?? 1), scaleY: Number(parts[8] ?? 1) });
+      if (parts[0] === "progress") drawCommands.push({op:"progress",x:Number(parts[1]),y:Number(parts[2]),width:Number(parts[3]),height:Number(parts[4]),progress:Number(parts[5]),frame:parts[6],track:parts[7],fill:parts[8]});
+      if (parts[0] === "ninepatch") drawCommands.push({op:"ninepatch",texture:parts[1],x:Number(parts[2]),y:Number(parts[3]),width:Number(parts[4]),height:Number(parts[5]),border:Number(parts[6])});
       if (parts[0] === "collider") drawCommands.push({op:"collider",shape:parts[1],x:Number(parts[2]),y:Number(parts[3]),width:Number(parts[4]),height:Number(parts[5]),trigger:parts[6]==="true"});
       if (parts[0] === "debug") drawCommands.push({op:"debug",enabled:parts[1]==="true"});
     }
@@ -229,6 +241,10 @@ self.addEventListener("message", async ({ data }) => {
     return;
   }
   if (data?.command === "game-input") {
+    if (!acceptsSceneInput(data, gameRuntime?.gameId)) return;
+      if(data.kind==="clear"){gameKeys.clear();invokeGameExport(gameRuntime,"clearInput",[],stopGameRuntime,event=>self.postMessage(event));return;}
+    if(data.kind==="pointer"){invokeGameExport(gameRuntime,"setPointer",[data.x,data.y],stopGameRuntime,event=>self.postMessage(event));return;}
+    if(data.kind==="mouse"){invokeGameExport(gameRuntime,"setMouseButton",[data.button,data.pressed],stopGameRuntime,event=>self.postMessage(event));return;}
     if (data.pressed) gameKeys.add(data.key);
     else gameKeys.delete(data.key);
     invokeGameExport(gameRuntime, "setKey", [data.key, data.pressed], stopGameRuntime, event => self.postMessage(event));

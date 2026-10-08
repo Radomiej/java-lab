@@ -1,26 +1,39 @@
 export const gamePhysicsRuntimeFiles = {
   'Physics2D.java': `package engine;
 public final class Physics2D {
-    private Physics2D() {}
+    private final Game game;
+    public int candidates,narrowPhaseTests;
+    public static final class Stats {public int candidates,narrowPhaseTests;}
+    public final Stats stats=new Stats();
+    private java.util.HashSet<Long> previousContacts=new java.util.HashSet<>();
+    private SpatialHash2D queryIndex;
+    private long queryRevision=-1;
+    void beginFrame(){queryIndex=null;}
+    public void refresh(){queryIndex=build(game.getObjects());queryRevision=game.spatialRevision;}
+    private SpatialHash2D queryIndex(){if(!game.isStepping()||queryIndex==null||queryRevision!=game.spatialRevision)refresh();return queryIndex;}
+    public Physics2D(Game game) {this.game=game;}
     private static boolean live(GameObject o){return o.active&&!o.destroyed;}
     private static Collider2D collider(GameObject o){return o.getComponent(Collider2D.class);}
     public static double extent(GameObject o,boolean x) {
         Collider2D c=collider(o);
         if(c instanceof CircleCollider2D){double r=((CircleCollider2D)c).radius;if(!Double.isFinite(r)||r<=0)throw new IllegalArgumentException("Niepoprawny promien");return r;}
-        Sprite s=o.getComponent(Sprite.class);return s==null?16:(x?s.width:s.height)/2;
+        return c==null?16:(x?c.width:c.height)/2;
     }
     private static boolean circle(GameObject o){return collider(o) instanceof CircleCollider2D;}
     private static double clamp(double x,double min,double max){return Math.max(min,Math.min(max,x));}
     public static boolean overlaps(GameObject a,GameObject b) {
+        return overlaps(a,b,1e-6);
+    }
+    private static boolean overlaps(GameObject a,GameObject b,double margin) {
         double dx=a.transform.x-b.transform.x,dy=a.transform.y-b.transform.y;
-        if(circle(a)&&circle(b)){double r=extent(a,true)+extent(b,true);return dx*dx+dy*dy<=r*r;}
+        if(circle(a)&&circle(b)){double r=extent(a,true)+extent(b,true)+margin;return dx*dx+dy*dy<=r*r;}
         if(circle(a)||circle(b)) {
-            GameObject c=circle(a)?a:b,box=circle(a)?b:a;double r=extent(c,true);
+            GameObject c=circle(a)?a:b,box=circle(a)?b:a;double r=extent(c,true)+margin;
             double x=c.transform.x-clamp(c.transform.x,box.transform.x-extent(box,true),box.transform.x+extent(box,true));
             double y=c.transform.y-clamp(c.transform.y,box.transform.y-extent(box,false),box.transform.y+extent(box,false));
             return x*x+y*y<=r*r;
         }
-        return Math.abs(dx)<extent(a,true)+extent(b,true)&&Math.abs(dy)<extent(a,false)+extent(b,false);
+        return Math.abs(dx)<=extent(a,true)+extent(b,true)+margin&&Math.abs(dy)<=extent(a,false)+extent(b,false)+margin;
     }
     private static boolean body(GameObject o) {
         Collider2D c=collider(o);CharacterController2D v=o.getComponent(CharacterController2D.class);
@@ -64,43 +77,51 @@ public final class Physics2D {
         }
         return extent(moving,x)+extent(other,x);
     }
+    private static boolean masks(GameObject a,GameObject b){Collider2D x=collider(a),y=collider(b);return x!=null&&y!=null&&(x.mask&y.layer)!=0&&(y.mask&x.layer)!=0;}
+    private static boolean ready(GameObject o){Collider2D c=collider(o);return live(o)&&c!=null&&c.created&&c.enabled;}
+    private static SpatialHash2D build(java.util.ArrayList<GameObject> objects){SpatialHash2D grid=new SpatialHash2D();for(GameObject o:objects)if(ready(o))grid.update(o);return grid;}
+    private static java.util.ArrayList<GameObject> around(SpatialHash2D grid,GameObject o,double dx,double dy){return grid.query(o.transform.x+Math.min(0,dx)-extent(o,true),o.transform.y+Math.min(0,dy)-extent(o,false),o.transform.x+Math.max(0,dx)+extent(o,true),o.transform.y+Math.max(0,dy)+extent(o,false));}
+    public java.util.ArrayList<GameObject> queryRadius(double x,double y,double radius,int layer){
+        if(!Double.isFinite(x)||!Double.isFinite(y)||!Double.isFinite(radius)||radius<0)throw new IllegalArgumentException("Niepoprawne zapytanie");
+        SpatialHash2D grid=queryIndex();java.util.ArrayList<GameObject> result=new java.util.ArrayList<>();
+        for(GameObject o:grid.query(x-radius,y-radius,x+radius,y+radius))if(ready(o)&&(collider(o).layer&layer)!=0){
+            double dx=x-o.transform.x,dy=y-o.transform.y;
+            if(circle(o)){double r=radius+extent(o,true)+1e-6;if(dx*dx+dy*dy<=r*r)result.add(o);}
+            else{double rx=x-clamp(x,o.transform.x-extent(o,true),o.transform.x+extent(o,true)),ry=y-clamp(y,o.transform.y-extent(o,false),o.transform.y+extent(o,false));if(rx*rx+ry*ry<=(radius+1e-6)*(radius+1e-6))result.add(o);}
+        }return result;
+    }
+    public GameObject findNearest(double x,double y,double radius,int layer){GameObject best=null;double distance=Double.POSITIVE_INFINITY;for(GameObject o:queryRadius(x,y,radius,layer)){double dx=o.transform.x-x,dy=o.transform.y-y,d=dx*dx+dy*dy;if(d<distance){distance=d;best=o;}}return best;}
+    private static void dispatch(Game game,java.util.HashSet<Long> sent,GameObject a,GameObject b,boolean sensor){long key=((long)Math.min(a.id,b.id)<<32)|(Math.max(a.id,b.id)&0xffffffffL);if(ready(a)&&ready(b)&&sent.add(key)){if(!game.physics.previousContacts.contains(key)){collider(a).fireContactEnter(b);if(ready(a)&&ready(b))collider(b).fireContactEnter(a);}if(ready(a)&&ready(b))game.dispatchContact(a,b,sensor);}}
     static void step(Game game,java.util.ArrayList<GameObject> objects,double delta) {
-        java.util.ArrayList<GameObject> first=new java.util.ArrayList<>(),second=new java.util.ArrayList<>();
-        for(GameObject o:objects) {
-            CharacterController2D v=o.getComponent(CharacterController2D.class);Collider2D own=collider(o);
-            if(!live(o)||v==null||!v.enabled||!v.created||own!=null&&!own.enabled)continue;
+        SpatialHash2D grid=build(objects);game.physics.queryIndex=grid;game.physics.queryRevision=game.spatialRevision;java.util.HashSet<Long> sent=new java.util.HashSet<>();game.physics.candidates=game.physics.narrowPhaseTests=0;game.physics.stats.candidates=game.physics.stats.narrowPhaseTests=0;
+        for(GameObject o:objects){
+            CharacterController2D v=o.getComponent(CharacterController2D.class);if(!ready(o)||v==null||!v.enabled||!v.created)continue;
             double dx=v.velocity.x*delta,dy=v.velocity.y*delta;
-            if(!Double.isFinite(dx)||!Double.isFinite(dy))throw new IllegalArgumentException("Niepoprawny ruch");
-            Projectile2D projectile=o.getComponent(Projectile2D.class);
-            if(projectile!=null&&projectile.enabled) {
-                double earliest=2;GameObject target=null;
-                for(GameObject other:objects)if(other!=o&&live(other)&&body(other)&&!ignored(o,other)){
-                    double t=hit(o,other,dx,dy);if(t<earliest){earliest=t;target=other;}
+            Projectile2D p=o.getComponent(Projectile2D.class);
+            if(p!=null&&p.enabled){
+                double sx=o.transform.x,sy=o.transform.y;java.util.ArrayList<GameObject> targets=new java.util.ArrayList<>();java.util.HashMap<GameObject,Double> times=new java.util.HashMap<>();
+                for(GameObject other:around(grid,o,dx,dy)){game.physics.candidates++;game.physics.stats.candidates++;if(other==o||!ready(other)||!masks(o,other)||ignored(o,other)||(collider(other).layer&p.hitLayers)==0||p.hitObjects.contains(other.id))continue;game.physics.narrowPhaseTests++;game.physics.stats.narrowPhaseTests++;double t=hit(o,other,dx,dy);if(t<=1){targets.add(other);times.put(other,t);}}
+                targets.sort((a,b)->{int n=Double.compare(times.get(a),times.get(b));return n==0?Integer.compare(a.id,b.id):n;});
+                for(GameObject target:targets){if(!ready(o)||!ready(target))continue;double t=times.get(target);o.setPosition(sx+dx*t,sy+dy*t);dispatch(game,sent,o,target,true);p.hitObjects.add(target.id);p.hits++;if(p.hits>=p.maxHits)o.destroy();}
+                if(live(o)){o.setPosition(sx+dx,sy+dy);p.finishFrame(delta);}
+            }else for(int axis=0;axis<2&&live(o);axis++){
+                double movement=axis==0?dx:dy;if(movement==0)continue;double mx=axis==0?movement:0,my=axis==1?movement:0,travel=1;
+                java.util.ArrayList<GameObject> targets=new java.util.ArrayList<>();java.util.HashMap<GameObject,Double> times=new java.util.HashMap<>();
+                for(GameObject other:around(grid,o,mx,my)){game.physics.candidates++;game.physics.stats.candidates++;if(other==o||!ready(other)||!masks(o,other)||ignored(o,other))continue;Projectile2D q=other.getComponent(Projectile2D.class);if(q!=null&&q.enabled)continue;
+                    game.physics.narrowPhaseTests++;game.physics.stats.narrowPhaseTests++;double origin=axis==0?o.transform.x:o.transform.y;if(axis==0)o.transform.x+=Math.signum(movement)*4e-6;else o.transform.y+=Math.signum(movement)*4e-6;boolean entering=overlaps(o,other,-1e-6);if(axis==0)o.transform.x=origin;else o.transform.y=origin;
+                    double t=hit(o,other,mx,my);if(t>1||t==0&&!entering)continue;targets.add(other);times.put(other,t);if(!trigger(o)&&!trigger(other))travel=Math.min(travel,t);
                 }
-                double travel=target==null?1:earliest;o.transform.x+=dx*travel;o.transform.y+=dy*travel;
-                if(target!=null){game.dispatchContact(o,target,true);o.destroy();}
-                if(!o.destroyed)projectile.finishFrame(delta);
-                if(game.isDisposed())return;
-                continue;
+                if(axis==0)o.transform.x+=movement*travel;else o.transform.y+=movement*travel;
+                targets.sort((a,b)->{int n=Double.compare(times.get(a),times.get(b));return n==0?Integer.compare(a.id,b.id):n;});
+                for(GameObject target:targets)if(times.get(target)<=travel+1e-6)dispatch(game,sent,o,target,trigger(o)||trigger(target));
             }
-            int steps=(int)Math.min(2048,Math.max(1,Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))/Math.max(1,Math.min(extent(o,true),extent(o,false))/2))));
-            for(int n=0;n<steps&&live(o);n++)for(int axis=0;axis<2&&live(o);axis++) {
-                double movement=(axis==0?dx:dy)/steps,origin=axis==0?o.transform.x:o.transform.y;
-                if(axis==0)o.transform.x+=movement;else o.transform.y+=movement;
-                for(GameObject other:objects) {
-                    // Projectile contacts belong exclusively to their swept pass.
-                    Projectile2D otherProjectile=other.getComponent(Projectile2D.class);
-                    if(other==o||!live(o)||!live(other)||!body(other)||otherProjectile!=null&&otherProjectile.enabled||ignored(o,other)||!overlaps(o,other))continue;
-                    boolean sensor=trigger(o)||trigger(other);
-                    if(!sensor&&movement!=0){double bound=(axis==0?other.transform.x:other.transform.y)+(movement>0?-1:1)*axisExtent(o,other,axis==0);if(axis==0)o.transform.x=bound;else o.transform.y=bound;}
-                    boolean sent=false;for(int i=0;i<first.size();i++)if(first.get(i)==o&&second.get(i)==other||first.get(i)==other&&second.get(i)==o)sent=true;
-                    if(!sent){first.add(o);second.add(other);game.dispatchContact(o,other,sensor);}
-                    if(game.isDisposed())return;
-                }
-            }
-            if(live(o)&&v.collideWorldBounds){double w=Math.min(extent(o,true),GameCanvas.getWidth()/2),h=Math.min(extent(o,false),GameCanvas.getHeight()/2);o.transform.x=clamp(o.transform.x,w,GameCanvas.getWidth()-w);o.transform.y=clamp(o.transform.y,h,GameCanvas.getHeight()-h);}
-            if(live(o)&&v.enabled)v.onAfterMove(delta);
+            if(live(o)&&v.constrainToBounds&&game.worldBounds!=null){double[] b=game.worldBounds;double w=Math.min(extent(o,true),b[2]/2),h=Math.min(extent(o,false),b[3]/2);o.transform.x=clamp(o.transform.x,b[0]+w,b[0]+b[2]-w);o.transform.y=clamp(o.transform.y,b[1]+h,b[1]+b[3]-h);}
+            if(ready(o))grid.update(o);else grid.remove(o);game.physics.queryRevision=game.spatialRevision;if(live(o)&&v.enabled)v.onAfterMove(delta);if(game.isDisposed())return;
         }
+        for(GameObject a:objects)if(ready(a)&&a.getComponent(Projectile2D.class)==null)for(GameObject b:around(grid,a,0,0)){
+            if(!ready(a)||b.id<=a.id||!ready(b)||!masks(a,b)||ignored(a,b)||b.getComponent(Projectile2D.class)!=null)continue;game.physics.candidates++;game.physics.stats.candidates++;game.physics.narrowPhaseTests++;game.physics.stats.narrowPhaseTests++;if(overlaps(a,b))dispatch(game,sent,a,b,trigger(a)||trigger(b));if(game.isDisposed())return;
+        }
+        game.physics.previousContacts=new java.util.HashSet<>(sent);
     }
 }
 `,

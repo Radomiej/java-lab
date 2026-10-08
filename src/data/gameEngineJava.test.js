@@ -21,13 +21,14 @@ function javaBin(name) {
 export function runJava(files, main='EngineTests') {
   const dir=mkdtempSync(join(tmpdir(),'java-lab-tests-'));
   try {
-    const paths=Object.entries(files).map(([file,source])=>{
+    const paths=Object.entries(files).filter(([file])=>file.endsWith('.java')).map(([file,source])=>{
       const pkg=source.match(/package\s+([\w.]+);/)?.[1];
       const folder=pkg?join(dir,...pkg.split('.')):dir;
       mkdirSync(folder,{recursive:true});
       const path=join(folder,file.split('/').pop());writeFileSync(path,source);return path;
     });
-    execFileSync(javaBin('javac'),['--release','21','-encoding','UTF-8','-d',dir,...paths],{encoding:'utf8',timeout:30000});
+    const argFile=join(dir,'sources.txt');writeFileSync(argFile,paths.map(path=>'"'+path.replaceAll('\\','/')+'"').join('\n'));
+    execFileSync(javaBin('javac'),['--release','21','-encoding','UTF-8','-d',dir,'@'+argFile],{encoding:'utf8',timeout:30000});
     return execFileSync(javaBin('java'),['-cp',dir,main],{encoding:'utf8',timeout:15000});
   } finally {rmSync(dir,{recursive:true,force:true});}
 }
@@ -58,7 +59,7 @@ public class EngineTests {
     Game g=new Game();
     GameObject a=circle(g,"a",100,100,10),b=circle(g,"b",120,100,10);
     check(Physics2D.overlaps(a,b),"circle tangent");b.transform.x=121;check(!Physics2D.overlaps(a,b),"circle gap");
-    GameObject box=g.createObject("box").setPosition(150,150);box.addComponent(new Sprite("stone",20,20));box.addComponent(new Collider2D());
+    GameObject box=g.createObject("box").setPosition(150,150);box.addComponent(new Sprite("stone",20,20));box.addComponent(new Collider2D(20,20));
     a.setPosition(132,132);check(!Physics2D.overlaps(a,box),"rounded corner rejects AABB false positive");
     a.setPosition(135,145);check(Physics2D.overlaps(a,box),"circle box edge");
     boolean rejected=false;try { new CircleCollider2D(0); } catch(IllegalArgumentException e){rejected=true;}check(rejected,"invalid radius");
@@ -120,10 +121,10 @@ public class ControllerTests {
   Input.setKey("a",false);g.step(0.05);check(idle[0]==before+1,"none of keys callback");
   KeyPressed binding=g.createObject("controls").addComponent(new KeyPressed("2",()->late[0]++));Input.setKey("2",true);g.step(0.05);check(late[0]==1,"late component initialized");
   Input.setKey("2",false);g.step(0.05);binding.enabled=false;Input.setKey("2",true);g.step(0.05);check(late[0]==1,"disabled binding");Input.setKey("2",false);g.dispose();
-  Game platform=new Game();GameObject hero=platform.createObject("hero").setPosition(200,174);hero.addComponent(new Sprite());hero.addComponent(new Collider2D(false));
+  Game platform=new Game();GameObject hero=platform.createObject("hero").setPosition(200,174);hero.addComponent(new Sprite());hero.addComponent(new Collider2D(32,32));
   PlatformerCharacterController2D pc=hero.addComponent(new PlatformerCharacterController2D());
-  GameObject floor=platform.createObject("floor").setPosition(200,200);floor.addComponent(new Sprite("stone",200,20));floor.addComponent(new Collider2D());
-  GameObject ceiling=platform.createObject("ceiling").setPosition(200,130);ceiling.addComponent(new Sprite("stone",100,20));ceiling.addComponent(new Collider2D());
+  GameObject floor=platform.createObject("floor").setPosition(200,200);floor.addComponent(new Sprite("stone",200,20));floor.addComponent(new Collider2D(200,20));
+  GameObject ceiling=platform.createObject("ceiling").setPosition(200,130);ceiling.addComponent(new Sprite("stone",100,20));ceiling.addComponent(new Collider2D(100,20));
   platform.start();check(pc.isGrounded(),"initial ground");check(pc.jump(),"jump from floor");check(!pc.jump(),"no double jump");
   platform.step(0.1);check(Math.abs(hero.transform.y-156)<0.01 && pc.velocity.y==0,"ceiling stops upward velocity");
   for(int i=0;i<10;i++)platform.step(0.1);check(pc.isGrounded()&&Math.abs(hero.transform.y-174)<0.01,"land on platform");
@@ -151,7 +152,7 @@ it('compiles and runs every game solution and its Java behavior assertions',()=>
 },45000);
 
 it('combines both sprite flips with scale and preserves shooting direction after stopping',()=>{
-  const task=allLessons.find(l=>l.order===405).tasks[0];
+  const task=allLessons.find(l=>l.id==='g2d.weapons').tasks[0];
   const files={...gameEngineRuntimeFiles};
   for(const [name,source] of Object.entries(task.solutionFiles)) files[name]=`import engine.*;\n${source}`;
   files['FlipTests.java']=`import engine.*;
@@ -170,30 +171,29 @@ public class FlipTests {
         check(GameCanvas.frame().contains("|0.0|2.0|-3.0"),"independent vertical flip"); visual.dispose();
         GameMain game=new GameMain(); game.start();
         Input.setKey("w",true); game.step(0.1); Input.setKey("w",false); game.step(0.1);
-        game.player.getComponent(Sprite.class).flipY=true;
+        game.find("Player").getComponent(Sprite.class).flipY=true;
         Input.setKey("Space",true); game.step(0.1);
         Projectile2D shot=null;
         for(GameObject candidate:game.getObjects())if(candidate.hasComponent(Projectile2D.class))shot=candidate.getComponent(Projectile2D.class);
         check(shot!=null && shot.direction.x==0 && shot.direction.y==-1,"last aim survives stopping and flipY");
-        check(game.player.transform.rotation.z==0 && game.enemy.transform.rotation.z==0,"upright player and enemy");
-        check(game.enemy.getComponent(Sprite.class).flipX,"enemy mirrors toward player");
+        check(game.find("Player").transform.rotation==0,"upright player");
         Input.setKey("Space",false); game.dispose(); System.out.println("PASS flips and aim");
     }
 }`;
   expect(runJava(files,'FlipTests')).toContain('PASS flips and aim');
 },45000);
 
-it('starts the first guided game as a working walking example',()=>{
+it('requires work in the first guided v2 starter',()=>{
   const task=allLessons.find(l=>l.order===401).tasks[0];
   const files={...gameEngineRuntimeFiles};
   for(const [file,source] of Object.entries({...task.starterFiles,...task.javaTestFiles}))files[file]=`import engine.*;\n${source}`;
-  expect(runJava(files,'JavaTest')).toContain('PASS');
+  expect(()=>runJava(files,'JavaTest')).toThrow();
 },45000);
 
 it('runs the same flat-file course bundle that the TeaVM browser diagnostic consumes',()=>{
   const request=buildGameCourseContract(allLessons.filter(l=>l.track==='game-dev').flatMap(l=>l.tasks),gameEngineRuntimeFiles);
   const output=runJava(request.files,request.mainClass);
-  expect(output.match(/^PASS game-/gm)).toHaveLength(allLessons.filter(l => l.track === 'game-dev').flatMap(l => l.tasks).length);
+  expect(output.match(/^PASS g2d\./gm)).toHaveLength(allLessons.filter(l => l.track === 'game-dev').flatMap(l => l.tasks).length);
 },45000);
 
 it('preserves the existing physics contract including thin walls and paired callbacks',()=>{
@@ -215,23 +215,23 @@ public class ReviewTests {
    g.start();g.step(0.1);check(hits[0]==1,"one hit order "+order);g.dispose();
   }
   Game g=new Game();GameObject t=g.createObject("target").setPosition(200,115);t.addComponent(new CircleCollider2D(5));
-  GameObject s=g.createObject("rectshot").setPosition(50,100);s.addComponent(new Sprite("projectile",4,40));s.addComponent(new Collider2D());s.addComponent(new Projectile2D(1,0,3000,1,null));
+  GameObject s=g.createObject("rectshot").setPosition(50,100);s.addComponent(new Sprite("projectile",4,40));s.addComponent(new Collider2D(4,40));s.addComponent(new Projectile2D(1,0,3000,1,null));
   final int[] hits={0};t.addComponent(new Component(){public void onTrigger(GameObject other){hits[0]++;}});g.start();g.step(0.1);check(hits[0]==1,"tall projectile hit");g.dispose();
   Game wide=new Game();GameObject away=wide.createObject("target").setPosition(200,115);away.addComponent(new CircleCollider2D(5));
-  GameObject flat=wide.createObject("shot").setPosition(50,100);flat.addComponent(new Sprite("projectile",40,4));flat.addComponent(new Collider2D());flat.addComponent(new Projectile2D(1,0,3000,1,null));
+  GameObject flat=wide.createObject("shot").setPosition(50,100);flat.addComponent(new Sprite("projectile",40,4));flat.addComponent(new Collider2D(40,4));flat.addComponent(new Projectile2D(1,0,3000,1,null));
   wide.start();wide.step(0.1);check(!flat.destroyed,"flat projectile must miss");wide.dispose();
   Game ai=new Game();GameObject goal=ai.createObject("goal").setPosition(200,100);GameObject mob=ai.createObject("mob").setPosition(100,100);
   mob.addComponent(new CircleCollider2D(10));mob.addComponent(new CharacterController2D());mob.addComponent(new FollowTarget2D(goal));mob.addComponent(new ObstacleAvoidance2D());
-  GameObject wall=ai.createObject("wall").setPosition(130,150);wall.addComponent(new Sprite("stone",4,200));wall.addComponent(new Collider2D());
+  GameObject wall=ai.createObject("wall").setPosition(130,150);wall.addComponent(new Sprite("stone",4,200));wall.addComponent(new Collider2D(4,200));
   ai.start();ai.step(0.1);check(mob.transform.y!=100,"avoid tall obstacle");ai.dispose();System.out.println("PASS review");
  }
 }`;
   expect(runJava({...gameEngineRuntimeFiles,'ReviewTests.java':source},'ReviewTests')).toContain('PASS review');
 },45000);
 
-it('rejects a weapon without cooldown protection and a bullet with the old long lifetime',()=>{
-  const tasks=allLessons.find(l=>l.order===405).tasks;
-  for(const [task,mutate] of [[tasks[1],source=>source.replace(' || remaining>0','')],[tasks[2],source=>source.replace('bulletLifetime = 0.2','bulletLifetime = 2')]]){
+it('rejects missing weapon cooldown and target selection',()=>{
+  const tasks=allLessons.find(l=>l.id==='g2d.weapons').tasks;
+  for(const [task,mutate] of [[tasks[1],source=>source.replace('if(timer>1e-9)return;','')],[tasks[2],source=>source.replace('range=200','range=0')]]){
     const files={...gameEngineRuntimeFiles};
     for(const [name,source] of Object.entries({...task.solutionFiles,...task.javaTestFiles}))files[name]=`import engine.*;\n${name==='Weapon.java'?mutate(source):source}`;
     expect(()=>runJava(files,'JavaTest')).toThrow();

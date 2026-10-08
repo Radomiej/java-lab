@@ -5,3 +5,5 @@ tools/teavm-javac-java17/
 .env
 .env.*
 !.env.example
+
+.env.local

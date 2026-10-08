@@ -133,6 +133,7 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
 .editor-action-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--line); background: #f7fafc; }
 .editor-action-bar .button { min-height: 34px; padding: 8px 12px; }
 .editor-action-bar-secondary { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; }
+.editor-action-bar .editor-format-icon { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 7px; flex: 0 0 36px; }
 .editor-api-notice { padding: 8px 14px; color: var(--ink-700); font: 11px var(--mono); }
 .button { min-height: 36px; padding: 0 11px; border: 1px solid transparent; border-radius: 7px; font-size: 11px; font-weight: 800; }
 .button:disabled { opacity: .55; cursor: wait; }
@@ -251,3 +252,15 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+.editor-tabs .editor-tab[draggable="true"] { cursor: grab; }
+.editor-tabs .editor-tab[draggable="true"]:active { cursor: grabbing; }
+.movement-hint { margin: 10px 0; }
+.movement-hint-content { margin-top: 8px; padding: 12px; border: 1px solid #b9d2df; border-radius: 10px; background: #eff8fb; color: #183847; font-size: 14px; line-height: 1.6; }
+.movement-hint-content pre { overflow-x: auto; padding: 8px; background: #142234; color: #eef7ff; border-radius: 6px; }
+.playground-help { margin: 8px 0 16px; }
+.playground-help summary { width: fit-content; cursor: pointer; color: var(--ink-700, #36576b); font-size: 14px; padding: 6px 0; }
+.playground-help p { margin: 8px 0; }
+.playground-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 16px; }
+.playground-toolbar > .game-course-actions, .playground-toolbar > .playground-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; min-width: 0; }
+.playground-toolbar button, .playground-toolbar a.button { margin: 0; flex-shrink: 0; }
+.playground-toolbar .playground-tools > [role="status"] { flex-basis: 100%; margin: 4px 0 0; }

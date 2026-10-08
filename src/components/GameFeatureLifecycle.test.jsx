@@ -29,6 +29,7 @@ it("stops forwarding runtime frames when Game Dev is disabled dynamically", asyn
     terminate() {}
   }
   vi.stubGlobal("Worker", TestWorker);
+  vi.stubGlobal('Image',class{set src(value){queueMicrotask(()=>this.onload());}});
   render(<App />);
   fireEvent.click(screen.getByRole("tab", { name: /Game Dev w Javie/i }));
   fireEvent.click(screen.getByRole("button", { name: /RUN/ }));

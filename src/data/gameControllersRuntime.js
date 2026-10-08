@@ -48,10 +48,10 @@ public class PlatformerCharacterController2D extends TopDownCharacterController2
         velocity.y=verticalSpeed;
     }
     public boolean jump() {
-        if (!enabled || !grounded) return false;
+        if (!enabled || !isGrounded()) return false;
         verticalSpeed=-jumpSpeed;velocity.y=verticalSpeed;grounded=false;return true;
     }
-    public boolean isGrounded() { return grounded; }
+    public boolean isGrounded() { if(created&&gameObject!=null&&gameObject.active&&!gameObject.destroyed)onAfterMove(0);return grounded; }
     @Override public boolean isWalk() { return enabled && !running && velocity.x!=0; }
     @Override public boolean isRunning() { return enabled && running && velocity.x!=0; }
     private boolean solidAt(double offset) {
@@ -59,7 +59,8 @@ public class PlatformerCharacterController2D extends TopDownCharacterController2
         gameObject.transform.y+=offset;
         try {
             if(getGame()==null)return false;
-            for(GameObject other:getGame().getObjects()) {
+            double radius=Math.hypot(Physics2D.extent(gameObject,true),Physics2D.extent(gameObject,false))+Math.abs(offset);
+            for(GameObject other:getGame().physics.queryRadius(gameObject.transform.x,gameObject.transform.y,radius,0x7fffffff)) {
                 Collider2D collider=other.getComponent(Collider2D.class);
                 if(other!=gameObject && other.active && !other.destroyed && collider!=null && collider.enabled
                     && !collider.isTrigger && !(collider instanceof Trigger2D) && Physics2D.overlaps(gameObject,other)) return true;
@@ -69,8 +70,9 @@ public class PlatformerCharacterController2D extends TopDownCharacterController2
     }
     @Override public void onAfterMove(double delta) {
         double extent=Physics2D.extent(gameObject,false);
-        grounded=verticalSpeed>=0 && (solidAt(0.01) || collideWorldBounds && gameObject.transform.y>=GameCanvas.getHeight()-extent-0.01);
-        boolean ceiling=verticalSpeed<0 && (solidAt(-0.01) || collideWorldBounds && gameObject.transform.y<=extent+0.01);
+        double[] bounds=getGame().worldBounds;
+        grounded=verticalSpeed>=0 && (solidAt(0.01) || constrainToBounds && bounds!=null && gameObject.transform.y>=bounds[1]+bounds[3]-extent-0.01);
+        boolean ceiling=verticalSpeed<0 && (solidAt(-0.01) || constrainToBounds && bounds!=null && gameObject.transform.y<=bounds[1]+extent+0.01);
         if(grounded || ceiling){verticalSpeed=0;velocity.y=0;}
     }
 }
