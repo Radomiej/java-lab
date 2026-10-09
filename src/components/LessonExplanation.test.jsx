@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import LessonExplanation, { explanationPages } from '../../shared/lab-game-v2/editor/LessonExplanation.jsx';
-const lesson = { id: 'g2d.time', order: 403, title: 'Czas', theory: [{ title: 'Prędkość', text: 'Prędkość 120.5 px/s. Czas odmierzamy w sekundach.', code: 'x += speed * delta;' }], tips: ['Nie pomijaj delta.'] };
+const lesson = { id: 'test.time', order: 403, title: 'Czas', theory: [{ title: 'Prędkość', text: 'Prędkość 120.5 px/s. Czas odmierzamy w sekundach.', code: 'x += speed * delta;' }], tips: ['Nie pomijaj delta.'] };
 test('paginates explanations, disables boundaries and resets on lesson change', () => {
   const view = render(<LessonExplanation lesson={lesson} />);
   expect(screen.getByRole('button', { name: 'Poprzedni krok' })).toBeDisabled();
@@ -9,7 +9,7 @@ test('paginates explanations, disables boundaries and resets on lesson change', 
   expect(screen.getByRole('heading', { name: 'Zapamiętaj' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Następny krok' })).toBeDisabled();
   expect(screen.getByRole('button', { name: 'Krok 2' })).toHaveAttribute('aria-current', 'step');
-  view.rerender(<LessonExplanation lesson={{ ...lesson, id: 'g2d.input' }} />);
+  view.rerender(<LessonExplanation lesson={{ ...lesson, id: 'test.input' }} />);
   expect(screen.getByRole('heading', { name: 'Prędkość' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Krok 1' })).toHaveAttribute('aria-current', 'step');
 });
