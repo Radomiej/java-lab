@@ -71,6 +71,7 @@ export default function GamePreview({ runner }) {
           <button ref={fullscreenButtonRef} className="button button--ghost" type="button" onClick={() => setFullscreen(value => !value)} aria-label={fullscreen ? 'Zamknij pełny ekran gry' : 'Pełny ekran gry'}>{fullscreen ? '✕ Zamknij' : '⛶'}</button>
         </div>
       </div>
+      <p className="game-control-hint">Kliknij planszę, aby przechwycić klawiaturę. W zadaniach ze sterowaniem użyj WASD lub strzałek; jeśli zadanie ma TODO dotyczące ruchu, uzupełnij je.</p>
       <div className="game-stage" ref={stageRef} role="application" aria-label="Plansza gry. Kliknij, aby przechwycić klawisze.">
         <canvas ref={canvasRef} className="game-canvas" aria-label="Canvas gry" />
         {!isReady && <span>{runner.stage || "Uruchom program, aby zobaczyć scenę."}</span>}
@@ -79,3 +80,4 @@ export default function GamePreview({ runner }) {
     </section>
   );
 }
+

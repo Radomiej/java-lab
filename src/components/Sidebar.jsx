@@ -24,6 +24,7 @@ export default function Sidebar({ tracks, trackOrder, lessons, selectedTrack, se
       </div>
 
       <div className="sidebar-navigation-scroll">
+      {trackOrder.includes('playground') && selectedTrack !== 'playground' && <button className="track-button" type="button" onClick={()=>onTrackChange('playground')} title="Otwórz własny projekt gry"><span className="track-icon" aria-hidden="true">05</span><span>Playground · Własna gra</span></button>}
       <details className="sidebar-track-picker">
       <summary className="sidebar-track-trigger" aria-label="Wybierz ścieżkę"><span className="track-icon" aria-hidden="true" style={{'--track-accent':track.accent}}>{track.icon}</span><span className="sidebar-track-current"><small>Ścieżka nauki</small><strong>{track.label}</strong></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
       <div className="track-list" role="tablist" aria-label="Ścieżki nauki">

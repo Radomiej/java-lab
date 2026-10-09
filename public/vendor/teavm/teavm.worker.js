@@ -1,6 +1,7 @@
 import { prepareJavaSources } from "./source-path.js";
 import { disposeGameRuntime, invokeGameExport } from "./game-lifecycle.js";
 import { acceptsSceneInput } from './input-transport.js';
+import { formatJavaRuntimeError } from './java-errors.js';
 
 const TEAVM_URLS = {
   // Official TeaVM Playground assets are vendored because the CDN does not expose
@@ -201,7 +202,7 @@ function startGameRuntime(app, gameId) {
       emitFrame();
     } catch (error) {
       stopGameRuntime();
-      self.postMessage({ command: "game-error", gameId, error: error instanceof Error ? error.message : String(error) });
+      self.postMessage({ command: "game-error", gameId, error: formatJavaRuntimeError(error) });
     }
   }, 16);
 }
@@ -219,7 +220,7 @@ function stopGameRuntime() {
   try { disposeGameRuntime(previousRuntime); }
   catch (error) {
     ok = false;
-    self.postMessage({ command: "game-error", gameId: previousRuntime.gameId, error: error instanceof Error ? error.message : String(error) });
+    self.postMessage({ command: "game-error", gameId: previousRuntime.gameId, error: formatJavaRuntimeError(error) });
   } finally {
     console.log = previousLog; console.error = previousError;
     self.postMessage({ command: "game-stopped", gameId: previousRuntime.gameId, ok });
@@ -265,7 +266,7 @@ self.addEventListener("message", async ({ data }) => {
       ok: false,
       phase: error.phase || "TeaVM",
       code: error.code || "TEAVM_ERROR",
-      error: error instanceof Error ? `${error.message}\n${error.stack || ""}` : String(error),
+      error: formatJavaRuntimeError(error),
       stack: error instanceof Error ? error.stack : "",
       output: "",
     });

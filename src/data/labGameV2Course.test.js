@@ -26,6 +26,7 @@ const scenarios={
 test('all source contracts are exact and each ready Java example compiles against v2',()=>{
  expect(gameDevLessons).toHaveLength(24);
  const dir=mkdtempSync(join(tmpdir(),'lab-course-v2-'));
+ const visibility=[];
  try{
   const engine=join(dir,'engine-runtime');mkdirSync(engine,{recursive:true});
   const runtimePaths=Object.entries(gameEngineRuntimeFiles).map(([name,source])=>{const path=join(engine,name);writeFileSync(path,source);return path;});
@@ -38,14 +39,25 @@ test('all source contracts are exact and each ready Java example compiles agains
     const folder=join(dir,task.id);mkdirSync(folder,{recursive:true});
     const files={...Object.fromEntries(Object.entries(task.solutionFiles).map(([name,text])=>[name,'import engine.*;\n'+text])),...task.javaTestFiles};
     files['CourseChecks.java']=`import engine.*;public class CourseChecks {static void check(boolean value,String label) {if(!value)throw new AssertionError(label);}public static void main(String[] args) {GameMain game=new GameMain();try {GameCanvas.setSize(640,360);game.start();game.step(0);${scenarios[task.id]??'game.step(.01);'} }finally {game.dispose();}}}`;
+    if(task.solutionFiles['PlayerController.java'] && !['run-state','survivor','portability','pause','ui-flow','upgrades'].some(chapter=>task.id.includes('.'+chapter+'.'))){
+     files['MovementAudit.java']=`import engine.*;public class MovementAudit {public static void main(String[] args){GameMain game=new GameMain();try{game.start();game.step(0);GameObject p=game.find("Player");if(p!=null&&!game.isPaused()&&p.getComponent(PlayerController.class)!=null&&p.getComponent(PlayerController.class).enabled){double x=p.transform.x;game.input.setKey("d",true);game.step(.1);game.input.setKey("d",false);if(p.transform.x<=x)throw new AssertionError("${task.id}: D does not move Player");double stopped=p.transform.x;game.step(.1);if(Math.abs(p.transform.x-stopped)>1e-6)throw new AssertionError("${task.id}: Player keeps moving after release");}}finally{game.dispose();}}}`;
+    }
+    files['VisibilityAudit.java']=`import engine.*;public class VisibilityAudit {public static void main(String[] args)throws Exception{GameMain game=new GameMain();try{GameCanvas.setSize(640,360);game.start();game.step(0);GameObject run=game.find("Run");if(run!=null)for(Component c:run.getComponents())if(c.getClass().getSimpleName().equals("RunController"))c.getClass().getMethod("start").invoke(c);game.step(0);int visible=0;for(String line:GameCanvas.frame().split("\\n")){String[] p=line.split("[|]");String op=p[0];if(!op.equals("sprite")&&!op.equals("rect")&&!op.equals("text")&&!op.equals("ninepatch")&&!op.equals("progress"))continue;int offset=op.equals("rect")?1:2;double x=Double.parseDouble(p[offset]),y=Double.parseDouble(p[offset+1]);if(x>=0&&x<=640&&y>=0&&y<=360)visible++;}System.out.println(visible);}finally{game.dispose();}}}`;
     const paths=Object.entries(files).filter(([name])=>name.endsWith('.java')).map(([name,text])=>{const path=join(folder,name);writeFileSync(path,text);return path;});
     execFileSync(javac(),['--release','21','-encoding','UTF-8','-cp',engine,'-sourcepath',folder,'-d',folder,...paths],{encoding:'utf8',timeout:30000});
     const classpath=folder+(process.platform==='win32'?';':':')+engine;
     execFileSync(javac().replace(/javac(\.exe)?$/,'java$1'),['-cp',classpath,'CourseChecks'],{encoding:'utf8',timeout:15000});
     execFileSync(javac().replace(/javac(\.exe)?$/,'java$1'),['-cp',classpath,'JavaTest'],{encoding:'utf8',timeout:15000});
+    if(files['MovementAudit.java'])execFileSync(javac().replace(/javac(\.exe)?$/,'java$1'),['-cp',classpath,'MovementAudit'],{encoding:'utf8',timeout:15000});
+    const visible=Number(execFileSync(javac().replace(/javac(\.exe)?$/,'java$1'),['-cp',classpath,'VisibilityAudit'],{encoding:'utf8',timeout:15000}).trim());
+    visibility.push({lesson:401+index,task:task.id,visibleCommands:visible});
    }
   }
+  mkdirSync('artifacts',{recursive:true});writeFileSync('artifacts/course-visibility-audit.json',JSON.stringify(visibility,null,2));
  }finally{rmSync(dir,{recursive:true,force:true});}
 },180000);
+
+
+
 
 

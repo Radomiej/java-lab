@@ -18,7 +18,7 @@ export const fundamentalsLessons = [
         code: "public static void main(String[] args) {\n    System.out.println(\"Witaj, Java!\");\n}",
       },
     ],
-    tips: ["Java rozróżnia wielkość liter.", "Każda instrukcja kończy się średnikiem."],
+    tips: ["Java rozróżnia wielkość liter: Main i main to różne nazwy.", "Wywołanie println kończymy średnikiem; blok klasy lub metody zamykamy klamrą."],
     tasks: [
       {
         id: "fundamentals-01-task",
@@ -69,7 +69,7 @@ export const fundamentalsLessons = [
     theory: [
       {
         title: "Zmienna ma typ",
-        text: "Typ mówi Javie, jakie wartości przechowujemy. int służy do liczb całkowitych, double do ułamków, boolean do prawdy/fałszu, a String do tekstu.",
+        text: "Deklaracja ma kolejność: typ, nazwa, znak = i wartość. int przechowuje liczby całkowite, double liczby z częścią ułamkową, boolean true/false, a String tekst w cudzysłowie. W kodzie Javy separator dziesiętny to kropka, np. 7.5.",
         code: "int points = 10;\ndouble health = 7.5;\nboolean ready = true;\nString name = \"Ada\";",
       },
       {
@@ -135,7 +135,7 @@ export const fundamentalsLessons = [
       },
       {
         title: "Pętla for powtarza krok",
-        text: "Pętla for ma inicjalizację, warunek i zmianę licznika. Trzymaj licznik czytelny, żeby łatwo przewidzieć liczbę powtórzeń.",
+        text: "W for (int round = 1; round <= 3; round++) pierwsza część ustawia licznik raz. Przed każdym powtórzeniem Java sprawdza round <= 3. Po wykonaniu bloku round++ zwiększa licznik o 1. Blok wykona się dla 1, 2 i 3; przy 4 warunek jest fałszywy i pętla się kończy.",
         code: "for (int round = 1; round <= 3; round++) {\n    System.out.println(round);\n}",
       },
     ],

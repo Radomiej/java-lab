@@ -5,6 +5,13 @@ import App from "../App.jsx";
 afterEach(() => {cleanup(); vi.restoreAllMocks(); localStorage.clear();});
 
 describe("Java Lab workspace", () => {
+  it('offers solutions for guided and independent exercises when solution files exist',()=>{
+    render(<App />);
+    expect(screen.getByRole('button',{name:'Pokaż rozwiązanie'})).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab',{name:/Komunikat misji/i}));
+    fireEvent.click(screen.getByRole('button',{name:'Pokaż rozwiązanie'}));
+    expect(screen.getByRole('textbox',{name:'Kod pliku Main.java'}).textContent).not.toContain('TODO');
+  });
   it('offers formatting as an accessible icon without visible button text', () => {
     render(<App />);
     const format = screen.getByRole('button', {name:'Formatuj kod'});

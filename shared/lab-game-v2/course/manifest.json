@@ -5,9 +5,9 @@
     {
       "id": "g2d.scene",
       "order": 1,
-      "title": "Scena, obiekt i środek grafiki",
+      "title": "Scena, obiekt i pozycja w świecie",
       "objectives": [
-        "Rozróżniasz obiekt, jego Transform i komponent wyglądu. Tworzysz dwie niezależne instancje i odczytujesz pozycję jako środek."
+        "Rozróżniasz obiekt, jego Transform i komponent wyglądu. Tworzysz dwie niezależne instancje i odczytujesz pozycję obiektu na mapie."
       ],
       "tasks": [
         {

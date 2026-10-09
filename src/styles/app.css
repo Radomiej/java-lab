@@ -14,6 +14,11 @@ pre { margin: 0; }
 .app-shell { display: grid; grid-template-columns: var(--sidebar-size, 260px) 5px minmax(0, 1fr) 5px var(--inspector-size, 380px); min-height: 100vh; }
 .app-shell--sidebar-collapsed { grid-template-columns: 0 0 minmax(0, 1fr) 5px var(--inspector-size, 380px); }
 .app-shell--sidebar-collapsed .sidebar-region { display: none; }
+.sidebar-region { grid-column: 1; grid-row: 1; }
+.panel-resizer--sidebar { grid-column: 2; grid-row: 1; }
+.main-region { grid-column: 3; grid-row: 1; }
+.panel-resizer--inspector { grid-column: 4; grid-row: 1; }
+.inspector-region { grid-column: 5; grid-row: 1; }
 .app-shell.app-shell--no-inspector { grid-template-columns: var(--sidebar-size, 260px) 5px minmax(0, 1fr); }
 .app-shell.app-shell--no-inspector.app-shell--sidebar-collapsed { grid-template-columns: 0 0 minmax(0, 1fr); }
 .game-preview-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
@@ -213,6 +218,7 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
 
 @media (max-width: 1000px) {
   .app-shell { display: block; }
+  .app-shell--sidebar-collapsed .sidebar-region { display: block; }
   .panel-resizer { display: none; }
   .sidebar-region { position: fixed; z-index: 30; top: 0; bottom: 0; left: 0; width: 282px; visibility: hidden; transform: translateX(-102%); transition: transform .22s ease; box-shadow: 14px 0 30px rgb(10 31 48 / 20%); }
   .app-shell--sidebar-open .sidebar-region { visibility: visible; transform: translateX(0); }
@@ -264,3 +270,4 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
 .playground-toolbar > .game-course-actions, .playground-toolbar > .playground-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; min-width: 0; }
 .playground-toolbar button, .playground-toolbar a.button { margin: 0; flex-shrink: 0; }
 .playground-toolbar .playground-tools > [role="status"] { flex-basis: 100%; margin: 4px 0 0; }
+.game-control-hint { margin: 0 0 12px; color: var(--text-muted, #526b79); font-size: 12px; line-height: 1.5; }

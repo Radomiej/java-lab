@@ -174,8 +174,10 @@ export default function App() {
         ...result,
         error: result.error || diagnosticsText(result.diagnostics),
       });
-      if (activeTask.engine && report.passed && !isPlayground) {
-        const checkOutput = result.output;
+      if (activeTask.engine && (report.passed || result.validationFailure) && !isPlayground) {
+        const checkOutput = result.validationFailure
+          ? [result.output, `Testy zadania: ${result.error || 'Nie wszystkie kryteria są spełnione.'}`].filter(Boolean).join('\n')
+          : result.output;
         result = await teavmRunner.run({files,mainClass:activeTask.mainClass,mode:'game'}, {
           onStage:stage => {if (version === executionVersion.current) setRunner(current => ({...current,stage}));},
         });
@@ -266,7 +268,7 @@ export default function App() {
       }}
       onCheck={handleCheck}
       onReset={handleReset}
-      onSolution={activeTask.mode === "guided" ? handleSolution : undefined}
+      onSolution={activeTask.solutionReady !== false && Object.keys(activeTask.solutionFiles || {}).length > 0 ? handleSolution : undefined}
     />
   );
 

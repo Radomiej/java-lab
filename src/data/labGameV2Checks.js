@@ -75,7 +75,7 @@ export function courseScenario(chapter,mode) {
       else {call(action('Player','Experience','add',16));expect(state('Player','Experience','level'),3);expect(state('Player','Experience','xp'),1);expect(state('Player','Experience','pendingChoices'),2);}
       break;
     case 'waves':
-      phases=[phase(mode==='modified'?70:mode==='guided'?30:20)];expect('objects.length',mode==='modified'?9:mode==='guided'?5:4);
+      phases=[phase(mode==='modified'?70:mode==='guided'?30:20)];expect('objects.length',mode==='modified'?9:mode==='guided'?5:6);
       if(mode==='modified')expect(state('Spawner','WaveSpawner','wave'),2);
       if(mode==='independent')sourceToken='100';
       break;
@@ -130,8 +130,8 @@ function javaExpression(path) {
   if(path==='elapsed')return 'game.time.elapsed';
   if(path.startsWith('camera.'))return `game.getCameraView().${path.split('.')[1]}`;
   const [,name,kind,type,field]=path.split('.');
-  const receiver=`game.find(${JSON.stringify(name)})`;
-  if(kind==='componentState')return `${receiver}.getComponent(${type}.class).${type==='ProgressBar' && field==='progress'?'getProgress()':field}`;
+  const receiver=`object(game,${JSON.stringify(name)})`;
+  if(kind==='componentState')return `component(game,${JSON.stringify(name)},${type}.class).${type==='ProgressBar' && field==='progress'?'getProgress()':field}`;
   const transform={x:'x',y:'y',scaleX:'scale.x',scaleY:'scale.y',visualOffsetX:'visualOffset.x',visualOffsetY:'visualOffset.y'};
   return transform[kind]?`${receiver}.transform.${transform[kind]}`:`${receiver}.${kind}`;
 }
@@ -143,8 +143,8 @@ export function courseJavaTest(chapter,mode) {
     body+='game.input.clear();\n';
     for(const key of phase.keys)body+=`game.input.setKey(${JSON.stringify(key)},true);\n`;
     for(const action of phase.actions) {
-      const owner=action.object===null?'game':`game.find(${JSON.stringify(action.object)})`;
-      const receiver=action.component==='input'?`${owner}.input`:action.component?`${owner}.getComponent(${action.component}.class)`:owner;
+      const owner=action.object===null?'game':`object(game,${JSON.stringify(action.object)})`;
+      const receiver=action.component==='input'?`${owner}.input`:action.component?`component(game,${JSON.stringify(action.object)},${action.component}.class)`:owner;
       body+=`${receiver}.${action.method}(${action.args.map(javaValue).join(',')});\n`;
     }
     body+=`for(int i=0;i<${phase.steps};i++)game.step(${phase.delta});\n`;
@@ -155,9 +155,26 @@ export function courseJavaTest(chapter,mode) {
     const label = path.replace('objectsByName.','').replace('.componentState.',' → ');
     body+=`check(${condition},${JSON.stringify(label+': oczekiwano '+String(value)+', otrzymano ')}+(${expression}));\n`;
   }
+  if(chapter==='camera' && mode==='independent')body+=`
+Camera2D camera=game.find("Camera").getComponent(Camera2D.class);
+GameObject marker=game.find("Marker"),player=game.find("Player");
+double playerX=player.transform.x,playerY=player.transform.y;
+game.input.setPointer(220,100);game.step(.1);
+check(Math.abs(marker.transform.x-280)<1e-6 && Math.abs(marker.transform.y-250)<1e-6,"Ekran (220,100) powinien wskazać świat (280,250).");
+check(Math.abs(game.getCameraView().x-60)<1e-6 && Math.abs(game.getCameraView().y-150)<1e-6,"Marker nie może przesuwać kamery.");
+camera.offsetX=100;camera.offsetY=200;game.step(.1);
+check(Math.abs(marker.transform.x-320)<1e-6 && Math.abs(marker.transform.y-300)<1e-6,"Po zmianie widoku wskaźnik powinien wskazać świat (320,300).");
+Vector2 screen=camera.worldToScreen(new Vector2(marker.transform.x,marker.transform.y));
+check(Math.abs(screen.x-220)<1e-6 && Math.abs(screen.y-100)<1e-6,"worldToScreen powinno odtworzyć punkt (220,100).");
+check(player.transform.x==playerX && player.transform.y==playerY,"Marker nie może przesuwać gracza.");
+`;
   if(chapter==='canvas-ui' && mode==='modified')body+='check(GameCanvas.frame().contains("rect|80.0|90.0|40.0|30.0|#76b9f2"),"centered rectangle");check(GameCanvas.frame().contains("text|Start|80.0|140.0"),"centered text");\n';
   if(chapter==='canvas-ui' && mode==='independent')body+='check(GameCanvas.frame().contains("rect|80.0|40.0|120.0|12.0"),"progress left edge and width");check(GameCanvas.frame().contains("|left|"),"paragraph alignment");\n';
-  return `import engine.*;\npublic class JavaTest {static void check(boolean value,String label) {if(!value){System.out.println("LAB_CHECK_FAILED:"+label);throw new AssertionError(label);}} public static void main(String[] args) {GameMain game=new GameMain();try {${body}System.out.println("PASS");} finally {game.dispose();}}}\n`;
+  return `import engine.*;\npublic class JavaTest {
+static void check(boolean value,String label) {if(!value){System.out.println("LAB_CHECK_FAILED:"+label);throw new AssertionError(label);}}
+static GameObject object(Game game,String name) {GameObject value=game.find(name);check(value!=null,"Brakuje obiektu „"+name+"”. Utwórz go przed sprawdzaniem zadania. Jeśli gra ma przycisk Start, uzupełnij RunController.start().");return value;}
+static <T extends Component> T component(Game game,String name,Class<T> type) {T value=object(game,name).getComponent(type);check(value!=null,"Obiekt „"+name+"” nie ma komponentu "+type.getSimpleName()+". Dodaj go przez addComponent().");return value;}
+public static void main(String[] args) {GameMain game=new GameMain();try {${body}System.out.println("PASS");} finally {game.dispose();}}}\n`;
 }
 export function courseWebChecks(chapter,mode,id,files) {
   const {sourceToken,...scenario}=courseScenario(chapter,mode);

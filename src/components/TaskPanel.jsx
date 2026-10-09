@@ -19,6 +19,7 @@ export default function TaskPanel({ lesson, activeTask, completedTasks, onTaskCh
         ))}
       </div>
       <div className="task-prompt"><span className="prompt-label">{activeTask.mode === "guided" ? "Polecenie prowadzone" : "Zadanie samodzielne"}</span><p>{activeTask.prompt}</p><ol>{activeTask.steps.map((step) => <li key={step}>{step}</li>)}</ol>{activeTask.mode === "guided" && activeTask.hints?.[0] && <p className="task-hint"><strong>Podpowiedź:</strong> {activeTask.hints[0]}</p>}</div>
+      {activeTask.criteria?.length > 0 && <div className="task-prompt"><h3>Kryteria zaliczenia</h3><ul>{activeTask.criteria.map(criterion => <li key={criterion}>{criterion}</li>)}</ul></div>}
       <MovementHint key={`hint-${activeTask.id}`} taskId={activeTask.id} language="java" />
       {expected && <ConsoleOutput key={activeTask.id} label="Oczekiwane wyjście konsoli" output={output} revealWhitespace />}
     </section>

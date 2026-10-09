@@ -1,6 +1,6 @@
 import {prepareGameRequest} from './gameWorkspace.js';
 
-const defaultWorkerFactory = () => new Worker("/vendor/teavm/teavm.worker.js?v=game-wrapper-12", { type: "module" });
+const defaultWorkerFactory = () => new Worker("/vendor/teavm/teavm.worker.js?v=game-wrapper-13", { type: "module" });
 
 function createRunnerError(code, message) {
   const error = new Error(message);

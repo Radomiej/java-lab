@@ -4,12 +4,12 @@ export const inheritanceLessons = [
     objective: "Zobaczysz, jak klasa potomna przejmuje wspólny kod klasy bazowej.",
     theory: [
       { title: "Relacja is-a", text: "Jeśli Mage jest Character, można zapisać class Mage extends Character. Dziedziczenie opisuje wspólną kategorię.", code: "class Character {\n    String name;\n}\n\nclass Mage extends Character {\n    int mana;\n}" },
-      { title: "super uruchamia bazę", text: "Konstruktor klasy potomnej może wywołać konstruktor rodzica przez super(...).", code: "Mage(String name, int mana) {\n    super(name);\n    this.mana = mana;\n}" },
+      { title: "super wywołuje konstruktor rodzica", text: "Jeśli Character ma konstruktor Character(String name), Mage musi przekazać mu nazwę przez super(name). W przykładzie tego kursu zapisujemy to jako pierwszą instrukcję konstruktora. Następnie inicjalizujemy własne pola Maga. To nadal jeden obiekt Mage, nie osobny obiekt rodzica.", code: "Mage(String name, int mana) {\n    super(name);\n    this.mana = mana;\n}" },
     ],
     tips: ["Nie używaj dziedziczenia tylko po to, aby skrócić kod.", "Wspólne cechy powinny naprawdę należeć do klasy bazowej."],
     tasks: [{
       id: "inheritance-09-task", title: "Bohater i mag", mode: "guided",
-      prompt: "Utwórz klasę Mage dziedziczącą po Character i przekaż nazwę do klasy bazowej.",
+      prompt: "Utwórz konstruktor Mage(String name), który przekazuje nazwę do Character przez super(name). W main utwórz Maga o nazwie Luna i wypisz odziedziczone pole name.",
       steps: ["Dodaj Character z konstruktorem name.", "Dodaj Mage extends Character.", "W konstruktorze Mage użyj super(name)."],
       hints: ["Słowo extends pojawia się w deklaracji klasy, nie w konstruktorze."],
       starterFiles: { "Main.java": `class Character {
@@ -68,7 +68,7 @@ public class Main {
     tips: ["Sygnatura musi pasować: nazwa, parametry i typ zwracany.", "@Override zapisuj nad przesłanianą metodą."],
     tasks: [{
       id: "inheritance-10-task", title: "Opis postaci", mode: "guided",
-      prompt: "Dodaj metodę describe() w Character i przesłoń ją w Mage.",
+      prompt: "Character.describe() zwraca tekst Character. Przesłoń tę metodę w Mage, aby zwracała dokładnie Mage. Wywołanie new Mage().describe() w main ma wypisać Mage.",
       steps: ["Dodaj describe() zwracające Character.", "W Mage dodaj @Override.", "Zwróć opis Maga z własnej metody."],
       hints: ["Adnotacja zaczyna się od znaku @ i stoi bezpośrednio przed metodą."],
       starterFiles: { "Main.java": `class Character {
@@ -118,12 +118,12 @@ public class Main {
     objective: "Użyjesz referencji klasy bazowej do przechowywania różnych klas potomnych.",
     theory: [
       { title: "Wspólny kontrakt", text: "Referencja Character może wskazywać na Mage albo Warrior. Przy wywołaniu przesłoniętej metody Java wybierze zachowanie prawdziwego obiektu.", code: "Character hero = new Mage();\nSystem.out.println(hero.describe());" },
-      { title: "Polimorfizm zmniejsza if-y", text: "Zamiast sprawdzać wiele typów ręcznie, wywołujesz wspólną metodę. Każda klasa zna własną implementację.", code: "Character[] team = { new Mage(), new Warrior() };" },
+      { title: "Jedna tablica, różne zachowania", text: "Character[] to tablica referencji do postaci. Może przechowywać Mage i Warrior, ponieważ oba typy dziedziczą po Character. W pętli for (Character hero : team) zmienna hero wskazuje kolejno każdy obiekt. hero.describe() wybiera przesłoniętą metodę tego obiektu, bez if sprawdzającego jego typ.", code: "Character[] team = { new Mage(), new Warrior() };\nfor (Character hero : team) {\n    System.out.println(hero.describe());\n}" },
     ],
     tips: ["Typ po lewej opisuje możliwości referencji, a new po prawej konkretny obiekt.", "Wspólny kontrakt powinien być mały i czytelny."],
     tasks: [{
       id: "inheritance-11-task", title: "Drużyna bohaterów", mode: "practice",
-      prompt: "Zbuduj dwie klasy potomne i przechowaj je w tablicy Character.",
+      prompt: "Mage.describe() ma zwracać Mage, a Warrior.describe() — Warrior. Utwórz tablicę Character z Magiem i Wojownikiem w tej kolejności. Pętla ma wypisać Mage i Warrior, każdy w osobnej linii.",
       steps: ["Utwórz Character z describe().", "Dodaj Mage i Warrior z @Override.", "Utwórz Character[] team i przejdź po nim pętlą."],
       hints: ["Pętla może mieć typ Character, nawet gdy tablica zawiera potomków."],
       starterFiles: { "Main.java": `class Character {
@@ -183,7 +183,7 @@ public class Main {
     tips: ["Łap konkretny typ wyjątku zamiast samego Exception, gdy to możliwe.", "Nie używaj wyjątków jako zwykłego if-a."],
     tasks: [{
       id: "inheritance-12-task", title: "Bezpieczne punkty", mode: "guided",
-      prompt: "Napisz metodę addPoints, która odrzuca ujemną liczbę przez IllegalArgumentException.",
+      prompt: "addPoints zwraca przekazaną liczbę, jeśli jest nieujemna. Dla wartości ujemnej rzuca IllegalArgumentException z komunikatem Punkty nie mogą być ujemne. W main wywołaj addPoints(-5) w try/catch i wypisz ten komunikat, bez nieobsłużonego wyjątku.",
       steps: ["Dodaj static int addPoints(int points).", "Jeśli points < 0, rzuć IllegalArgumentException.", "W main użyj try/catch i wypisz komunikat."],
       hints: ["Rzucenie wyjątku zapiszesz jako throw new IllegalArgumentException(\"...\")."],
       starterFiles: { "Main.java": `public class Main {

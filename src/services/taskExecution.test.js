@@ -1,5 +1,9 @@
 import { expect, it } from 'vitest';
 import { buildTaskCheckRequest, evaluateTaskCheck } from './taskExecution.js';
+it('shows a Java null error without WebAssembly and browser internals',()=>{
+ const report=evaluateTaskCheck({engine:true,javaTestMainClass:'JavaTest'},{},{ok:false,error:'dereferencing a null pointer\n at lab.JavaTest::main (wasm://wasm/123:wasm-function[1]:0x0)\n at Object.eval (http://localhost/compiler.wasm-runtime.js:1)'});
+ expect(report.results[0].detail).toContain('NullPointerException');expect(report.results[0].detail).toContain('JavaTest.java');expect(report.results[0].detail).not.toMatch(/wasm|http|Object.eval/);
+});
 
 it('reports an unmet exercise criterion without presenting it as a runtime crash', () => {
   const report = evaluateTaskCheck({engine:true,javaTestMainClass:'JavaTest'}, {}, {ok:false,validationFailure:true,error:'Player → Counter.counts: oczekiwano 6, otrzymano 0'});

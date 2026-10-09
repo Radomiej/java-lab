@@ -13,7 +13,7 @@ export const objectLessons = [
     tips: ["Klasa zwykle ma nazwę w liczbie pojedynczej.", "Obiekt to konkretny egzemplarz klasy."],
     tasks: [{
       id: "objects-05-task", title: "Pierwszy quest", mode: "guided",
-      prompt: "Zdefiniuj klasę Quest z polem title i utwórz jej obiekt w main.",
+      prompt: "Zdefiniuj klasę Quest z polem String title. W main utwórz obiekt, ustaw title na Smok i wypisz quest.title w konsoli.",
       steps: ["Dodaj klasę Quest.", "Dodaj pole String title.", "Utwórz obiekt przez new Quest() i ustaw tytuł."],
       hints: ["Dwie klasy mogą znajdować się w jednym pliku, jeśli tylko Main jest publiczna."],
       starterFiles: { "Main.java": `class Quest {
@@ -47,9 +47,9 @@ public class Main {
   },
   {
     id: "objects-06", track: "objects", order: 6, title: "Konstruktor i enkapsulacja", summary: "bezpieczne tworzenie obiektu",
-    objective: "Nauczysz się wymagać poprawnych danych już podczas tworzenia obiektu.",
+    objective: "Przekażesz tytuł podczas tworzenia obiektu i udostępnisz jego odczyt bez bezpośredniego dostępu do pola.",
     theory: [
-      { title: "Konstruktor ustawia start", text: "Konstruktor ma nazwę klasy i nie ma typu zwracanego. Dzięki niemu obiekt od początku może być gotowy do użycia.", code: "Quest(String title) {\n    this.title = title;\n}" },
+      { title: "Konstruktor ustawia start", text: "Konstruktor ma nazwę klasy i nie ma typu zwracanego, nawet void. new Quest(\"Mapa\") wywołuje konstruktor z argumentem \"Mapa\". W this.title = title lewa strona oznacza pole obiektu, a prawa parametr konstruktora. Sam konstruktor nie sprawdza poprawności tytułu — taką regułę trzeba dopisać.", code: "Quest(String title) {\n    this.title = title;\n}" },
       { title: "private chroni pole", text: "Pole private nie jest zmieniane bezpośrednio z zewnątrz. Udostępniamy kontrolowane metody, np. getTitle().", code: "private String title;\nString getTitle() { return title; }" },
     ],
     tips: ["this.title oznacza pole bieżącego obiektu.", "Getter odczytuje, setter zmienia — jeśli zmiana jest potrzebna."],
@@ -102,13 +102,13 @@ public class Main {
     id: "objects-07", track: "objects", order: 7, title: "Kompozycja", summary: "obiekt zbudowany z innych obiektów",
     objective: "Zrozumiesz relację has-a i zbudujesz planer złożony z mniejszych klas.",
     theory: [
-      { title: "Kompozycja to has-a", text: "Jeśli Planner ma listę zadań, to nie dziedziczy po zadaniu. Planner posiada obiekt Task — to kompozycja.", code: "class Planner {\n    private Task task;\n\n    Planner(Task task) {\n        this.task = task;\n    }\n}" },
+      { title: "Kompozycja to has-a", text: "Planner posiada zadanie Task, ale sam nie jest zadaniem. Zapisujemy to jako pole typu Task, zamiast extends Task. W tym przykładzie Planner przechowuje jedno zadanie, nie listę. Konstruktor otrzymuje referencję do istniejącego obiektu — nie tworzy jego kopii.", code: "class Planner {\n    private Task task;\n\n    Planner(Task task) {\n        this.task = task;\n    }\n}" },
       { title: "Każda klasa ma jedną rolę", text: "Task opisuje zadanie, a Planner zarządza planem. Takie rozdzielenie ułatwia testowanie i zmianę kodu.", code: "Task task = new Task(\"Mapa\");\nPlanner planner = new Planner(task);" },
     ],
     tips: ["Kompozycję rozpoznasz po polu typu innej klasy.", "Nie upychaj całego programu w jednej klasie."],
     tasks: [{
       id: "objects-07-task", title: "Planner posiada task", mode: "guided",
-      prompt: "Zbuduj Planner, który przechowuje obiekt Task.",
+      prompt: "Zbuduj Planner, który przechowuje otrzymany obiekt Task. W main utwórz Task o nazwie Mapa, przekaż go do Plannera i wypisz Planner gotowy.",
       steps: ["Dodaj klasę Task z polem name i konstruktorem.", "Dodaj prywatne pole Task task w Planner.", "Przekaż Task do konstruktora Plannera."],
       hints: ["Typ pola to Task, a wartość powstaje przez new Task(...)."],
       starterFiles: { "Main.java": `class Task {
@@ -171,7 +171,7 @@ public class Main {
     tips: ["Nazwa metody powinna odpowiadać temu, co robi.", "Stan prywatny zmieniaj przez metody, nie przez publiczne pola."],
     tasks: [{
       id: "objects-08-task", title: "Ukończ quest", mode: "practice",
-      prompt: "Dodaj prywatny stan completed, metodę complete() oraz isCompleted().",
+      prompt: "Dodaj prywatny stan completed, początkowo false. complete() zmienia go na true, a isCompleted() zwraca bieżącą wartość. W main utwórz quest Most, ukończ go i wypisz true przez isCompleted().",
       steps: ["Dodaj private boolean completed = false.", "W complete() ustaw completed na true.", "W main wywołaj complete() i sprawdź stan."],
       hints: ["To ćwiczenie łączy wcześniejsze elementy — wróć do przykładów konstruktorów i getterów."],
       starterFiles: { "Main.java": `class Quest {

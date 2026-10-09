@@ -6,6 +6,11 @@ export function buildCourseProject(language, chapter, mode, solved = true) {
     const files={...solution.files};
     const extension=language==='java'?'java':'js';
     const entry=language==='java'?'GameMain.java':'game.js';
+    if(chapter==='camera' && mode!=='independent') {
+      files[entry]=files[entry].split('\n').filter(line=>!line.includes('.offsetX=')&&!line.includes('.offsetY=')&&!line.includes('.follow(player)')).join('\n');
+      files[entry]=files[entry].replace(/(camera\.addComponent\(new (?:GameLab\.)?Camera2D\(\)\);)/,'$1\n// TODO: Ustaw kamerę zgodnie z poleceniem; ruch gracza jest już gotowy.');
+      return {files,ready:solution.ready};
+    }
     const targets={
       scene:[entry,'onCreate'],components:[`${mode==='independent'?'Lifetime':'Counter'}.${extension}`,'onUpdate'],
       time:[`${mode==='independent'?'DirectionMover':'Mover'}.${extension}`,'onUpdate'],input:[`${mode==='independent'?'ActionCounter':'PlayerController'}.${extension}`,'onUpdate'],
@@ -165,6 +170,10 @@ public Runnable onDamage(Runnable fn) { damageListeners.add(fn);return ()->damag
       object('Ground',0,0,[`TileMap(Assets.${mode==='modified'?'SAND':'GRASS'}, ${mode==='modified'?48:32})`]);
       if(mode==='independent') { setup+=`${get('ground','TileMap')}.layer=-10;\n`; object('Path',320,180,[shape(400,32,'#d5b884')]); setup+=`${get('path','ShapeRenderer')}.layer=-5;\n`; }
       player();
+      if(mode==='modified') {
+        setup+=`${get('player','Sprite')}.texture=Assets.RANGER${java?'.key()':''};\n${get('player','Sprite')}.width=48;\n${get('player','Sprite')}.height=48;\n`;
+        object('Wall',240,100,[shape(24,120,'#70c994'),'Collider2D(24,120)']);
+      }
       if(mode==='modified') { component('FacingVisual','onUpdate() { const i=this.game.input; const x=Number(i.isKeyDown("d"))-Number(i.isKeyDown("a")); if(x) this.requireComponent(GameLab.Sprite).flipX=x<0; }','@Override public void onUpdate(double delta) { double x=(getGame().input.isKeyDown("d")?1:0)-(getGame().input.isKeyDown("a")?1:0); if(x!=0) requireComponent(Sprite.class).flipX=x<0; }'); setup+='player.addComponent(new FacingVisual());\n'; }
       if(mode==='independent') { object('Decoration',240,180,[sprite('COIN',16,16)]); setup+=`${get('decoration','Sprite')}.layer=5;\n`; }
       break;
@@ -178,8 +187,9 @@ public Runnable onDamage(Runnable fn) { damageListeners.add(fn);return ()->damag
       else { object('Wall',200,180,[shape(20,200,'#70c994'),'Collider2D(20,200)']); component('WalkRight','onUpdate() { this.requireComponent(GameLab.CharacterController2D).move(1,0,120); }','@Override public void onUpdate(double delta) { requireComponent(CharacterController2D.class).move(1,0,120); }'); setup+=`${get('player','PlayerController')}.enabled=false;\nplayer.addComponent(new WalkRight());\n`; }
       break;
     case 'camera':
+      object('Ground',0,0,['TileMap(Assets.GRASS,32)']);
       if(mode==='modified') setup+='setWorldBounds(0,0,2000,1200);\n';
-      player(mode==='modified'?400:100,mode==='modified'?300:100);
+      player(mode==='modified'?400:100,mode==='modified'?300:mode==='independent'?200:100);
       object('Camera',mode==='independent'?60:80,mode==='independent'?150:40,['Camera2D()']);
       if(mode==='modified') setup+=`${get('camera','Camera2D')}.follow(player);\n`;
       else setup+=`${get('camera','Camera2D')}.offsetX=${mode==='independent'?60:80};\n${get('camera','Camera2D')}.offsetY=${mode==='independent'?150:40};\n`;
@@ -327,7 +337,12 @@ public Runnable onDamage(Runnable fn) { damageListeners.add(fn);return ()->damag
     case 'waves': {
       health();
       player(mode==='independent'?2000:320,mode==='independent'?2000:180);
-      if(mode==='independent')setup+='setWorldBounds(0,0,4000,4000);\n';
+      if(mode==='independent') {
+        setup+='setWorldBounds(0,0,4000,4000);\n';
+        object('Ground',0,0,['TileMap(Assets.GRASS,32)']);
+        object('Camera',0,0,['Camera2D()']);
+        setup+=`${get('camera','Camera2D')}.follow(player);\n`;
+      }
       const schedule=mode==='guided'?'[1,2,3]':mode==='modified'?'[1,2,3,5.5,6,6.5,7]':'Array.from({length:120},(_,i)=>i+1)';
       const javaSchedule=mode==='guided'?'new double[]{1,2,3}':mode==='modified'?'new double[]{1,2,3,5.5,6,6.5,7}':'java.util.stream.IntStream.rangeClosed(1,120).mapToDouble(i->i).toArray()';
       component('WaveSpawner',`elapsed=0;next=0;seed=42; schedule=${schedule}; onUpdate(delta) { this.elapsed+=delta; while(this.next<this.schedule.length && this.elapsed+1e-9>=this.schedule[this.next]) { const index=this.next++; ${mode==='independent'?'if(this.game.getObjects().filter(o=>o.name==="Slime" && !o.destroyed).length>=100)continue;':''} const target=this.game.find("Player"); const radius=${mode==='independent'?'0.5*Math.hypot(this.game.getViewportWidth(),this.game.getViewportHeight())+40':'140'}; this.seed=(Math.imul(1664525,this.seed)+1013904223)>>>0;const angle=this.seed/4294967296*Math.PI*2; const enemy=this.game.createObject("Slime");enemy.setPosition(target.transform.x+Math.cos(angle)*radius,target.transform.y+Math.sin(angle)*radius);enemy.addComponent(new GameLab.Sprite(GameLab.Assets.SLIME,32,32));enemy.addComponent(new GameLab.CircleCollider2D(12));enemy.addComponent(new GameLab.CharacterController2D());enemy.addComponent(new Health(${mode==='modified'?'index<3?2:3':'2'},0));enemy.addComponent(new EnemyAI(target,${mode==='modified'?'index<3?40:60':'40'})); } }`,
@@ -341,7 +356,8 @@ public Runnable onDamage(Runnable fn) { damageListeners.add(fn);return ()->damag
       if(mode==='modified') {weapon();player();setup+='player.addComponent(new Weapon());\n';object('Enemy',200,100,[sprite('SLIME'),'CircleCollider2D(12)','Health(3,0)']);setup+=`${get('enemy','CircleCollider2D')}.layer=2;\n`;break;}
       projectile();health();component('XpOrb','constructor(value) {super();this.value=value;}','public int value;public XpOrb(int value) {this.value=value;}');
       component('LoadFixture',`elapsed=0;next=0.2;shots=0;reward=0;seed=42;onCreate() {${mode==='independent'?'for(let i=0;i<200;i++) {this.seed=(Math.imul(this.seed,1664525)+1013904223)>>>0;const enemy=this.game.createObject("Enemy");enemy.setPosition(100+this.seed/4294967296*440,100+Math.floor(i/20)*20);enemy.addComponent(new GameLab.Sprite(GameLab.Assets.SLIME,32,32));enemy.addComponent(new GameLab.CircleCollider2D(12));enemy.addComponent(new Health(2,0));}':''}} onUpdate(delta) {this.elapsed+=delta;while(this.next<=Math.min(this.elapsed,${mode==='guided'?20:60})+1e-9) {this.next+=0.2;const live=this.game.getObjects().filter(o=>o.name==="Projectile");if(live.length<300) {const shot=this.game.createObject("Projectile");shot.setPosition(20,20);shot.addComponent(new GameLab.Sprite(GameLab.Assets.FIREBALL,8,8));shot.addComponent(new ProjectileMotion(1,0,200,${mode==='guided'?1:15}));this.shots++;}${mode==='independent'?'const orbs=this.game.getObjects().filter(o=>o.getComponent(XpOrb));this.reward++;if(orbs.length>=200)orbs[0].getComponent(XpOrb).value++;else {const orb=this.game.createObject("XpOrb");orb.setPosition(50+orbs.length%20*20,100+Math.floor(orbs.length/20)*20);orb.addComponent(new GameLab.Sprite(GameLab.Assets.GEM,16,16));orb.addComponent(new XpOrb(1));}':''}}}`,
-      `public double elapsed=0,next=.2;public int shots=0,reward=0;private long seed=42;@Override public void onCreate() {${mode==='independent'?'for(int i=0;i<200;i++) {seed=(seed*1664525L+1013904223L)&0xffffffffL;GameObject enemy=getGame().createObject("Enemy");enemy.setPosition(100+seed/4294967296.0*440,100+(i/20)*20);enemy.addComponent(new Sprite(Assets.SLIME,32,32));enemy.addComponent(new CircleCollider2D(12));enemy.addComponent(new Health(2,0));}':''}} @Override public void onUpdate(double delta) {elapsed+=delta;while(next<=Math.min(elapsed,${mode==='guided'?20:60})+1e-9) {next+=.2;long live=getGame().getObjects().stream().filter(o->o.name.equals("Projectile")).count();if(live<300) {GameObject shot=getGame().createObject("Projectile");shot.setPosition(20,20);shot.addComponent(new Sprite(Assets.FIREBALL,8,8));shot.addComponent(new ProjectileMotion(1,0,200,${mode==='guided'?1:15}));shots++;}${mode==='independent'?'java.util.ArrayList<GameObject> orbs=new java.util.ArrayList<>();for(GameObject object:getGame().getObjects())if(object.hasComponent(XpOrb.class))orbs.add(object);reward++;if(orbs.size()>=200)orbs.get(0).getComponent(XpOrb.class).value++;else {GameObject orb=getGame().createObject("XpOrb");orb.setPosition(50+orbs.size()%20*20,100+(orbs.size()/20)*20);orb.addComponent(new Sprite(Assets.GEM,16,16));orb.addComponent(new XpOrb(1));}':''}}}`);object('LoadFixture',0,0,['LoadFixture()']);break;
+      `public double elapsed=0,next=.2;public int shots=0,reward=0;private long seed=42;@Override public void onCreate() {${mode==='independent'?'for(int i=0;i<200;i++) {seed=(seed*1664525L+1013904223L)&0xffffffffL;GameObject enemy=getGame().createObject("Enemy");enemy.setPosition(100+seed/4294967296.0*440,100+(i/20)*20);enemy.addComponent(new Sprite(Assets.SLIME,32,32));enemy.addComponent(new CircleCollider2D(12));enemy.addComponent(new Health(2,0));}':''}} @Override public void onUpdate(double delta) {elapsed+=delta;while(next<=Math.min(elapsed,${mode==='guided'?20:60})+1e-9) {next+=.2;long live=getGame().getObjects().stream().filter(o->o.name.equals("Projectile")).count();if(live<300) {GameObject shot=getGame().createObject("Projectile");shot.setPosition(20,20);shot.addComponent(new Sprite(Assets.FIREBALL,8,8));shot.addComponent(new ProjectileMotion(1,0,200,${mode==='guided'?1:15}));shots++;}${mode==='independent'?'java.util.ArrayList<GameObject> orbs=new java.util.ArrayList<>();for(GameObject object:getGame().getObjects())if(object.hasComponent(XpOrb.class))orbs.add(object);reward++;if(orbs.size()>=200)orbs.get(0).getComponent(XpOrb.class).value++;else {GameObject orb=getGame().createObject("XpOrb");orb.setPosition(50+orbs.size()%20*20,100+(orbs.size()/20)*20);orb.addComponent(new Sprite(Assets.GEM,16,16));orb.addComponent(new XpOrb(1));}':''}}}`);object('LoadFixture',0,0,['LoadFixture()']);draw='canvas.drawText("Test obciazenia: pociski co 0.2 s",20,55,18,"#ffffff","left","middle");';break;
+      
     case 'portability':
       if(mode==='guided') player();
       else if(mode==='modified') {health();projectile();player();setup+='player.addComponent(new Health(5,0.75));\n';object('HUD',12,12,['UITransform(200,18)','TextRenderer("HP: 5 / 5",18,"#ffffff")']);setup+=`${get('hUD','UITransform')}.anchor="TOP_LEFT";\n`;object('Enemy',200,100,[sprite('SLIME'),'CircleCollider2D(12)','Health(3,0)']);setup+=`${get('enemy','CircleCollider2D')}.layer=2;\n`;object('Projectile',100,100,[sprite('FIREBALL',8,8),'ProjectileMotion(1,0,200,2)','ProjectileHit(player,1)','Trigger2D(8,8)']);}
@@ -388,6 +404,7 @@ public Runnable onDamage(Runnable fn) { damageListeners.add(fn);return ()->damag
   }
   return {files, ready};
 }
+
 
 
 
