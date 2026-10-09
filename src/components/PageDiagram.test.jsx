@@ -50,7 +50,7 @@ test('web lessons use programming diagrams instead of game sprites', () => {
 });
 test('conditions show alternative branches rather than a sequence through both', () => {
   const pages = explanationPages(webLessons.find(l => l.id === 'php-conditions'));
-  const page = pages.find(p => p.visual.nodes?.[1].startsWith('true:'));
+  const page = pages.find(p => p.visual.nodes?.[1].startsWith('true:') && p.visual.nodes?.[2].startsWith('false:'));
   const drawing = renderToStaticMarkup(<PageDiagram page={page} />);
   expect(drawing).toContain('page-diagram-flow--decision');
   expect(drawing).not.toContain('aria-hidden="true">↓');
