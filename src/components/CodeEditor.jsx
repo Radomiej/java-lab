@@ -7,6 +7,7 @@ import { gameEngineRuntimeFiles } from "../data/gameEngineRuntime.js";
 import {createEngineDefinitionProvider, createEngineHoverProvider, resolveEngineSymbol} from './javaEngineNavigation.js';
 import {acceptEditorChange} from './editorAcceptedChange.js';
 import { EditorIcon, useEditorTabs } from '../../shared/lab-game-v2/editor/EditorUI.jsx';
+import CopyCodeButton from '../../shared/lab-game-v2/editor/CopyCodeButton.jsx';
 import {createEngineCompletionProvider,createEngineSignatureProvider} from './engineIntellisense.js';
 
 function fileIcon(fileName) {
@@ -149,6 +150,9 @@ export default function CodeEditor({
           theme: "vs-dark",
           wordWrap: "off",
           editContext: false,
+          emptySelectionClipboard: true,
+          multiCursorModifier: "alt",
+          multiCursorPaste: "spread",
         });
 
         const editorActions = [
@@ -177,7 +181,6 @@ export default function CodeEditor({
             id: "java-lab.delete-line",
             label: "Java Lab: Usuń linię",
             keybindings: [
-              monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyD,
               monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyK,
             ],
             run: (currentEditor) => triggerEditorAction(currentEditor, "editor.action.deleteLines"),
@@ -219,7 +222,7 @@ export default function CodeEditor({
             run: (currentEditor) => triggerEditorAction(currentEditor, "editor.action.copyLinesDownAction"),
           },
         ];
-        editorActionsRef.current = editorActions.map((action) => editor.addAction(action));
+        editorActionsRef.current = editorActions.map((action) => editor.addAction({ ...action, precondition: "!editorReadonly", keybindingContext: "editorTextFocus" }));
 
         const getOrCreateModel = (fileName) => {
           if (modelsRef.current.has(fileName)) return modelsRef.current.get(fileName);
@@ -333,6 +336,7 @@ export default function CodeEditor({
       <div className="editor-action-bar" role="toolbar" aria-label="Akcje edytora">
         <button className="button button--primary editor-format-icon" type="button" aria-label="▶ RUN" title="Uruchom (Ctrl+Enter)" onClick={onCheck} disabled={runner.status === "compiling"}><EditorIcon action="run" /></button>
         <div className="editor-action-bar-secondary">
+          <CopyCodeButton code={source} fileName={activeFile} />
           <button className="button button--ghost editor-format-icon" type="button"
             aria-label="Formatuj kod" title="Formatuj kod (Shift+Alt+F)" disabled={readOnly}
             onClick={() => {

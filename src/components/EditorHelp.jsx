@@ -6,8 +6,14 @@ const SHORTCUT_GROUPS = [
   {
     title: "Pisanie kodu",
     shortcuts: [
+      [["Ctrl", "C"], "Kopiuj zaznaczenie lub całą linię bez zaznaczenia"],
+      [["Ctrl", "V"], "Wklej kod ze schowka"],
+      [["Ctrl", "X"], "Wytnij zaznaczenie lub całą linię"],
+      [["Shift", "↑"], "Zaznaczaj kilka linii (także Shift + ↓)"],
+      [["Ctrl", "D"], "Zaznacz kolejne wystąpienie słowa"],
+      [["Alt", "klik"], "Dodaj kolejny kursor"],
       [["Tab"], "Wstaw dwa spacje"],
-      [["Ctrl", "D"], "Usuń całą bieżącą linię"],
+      [["Ctrl", "Shift", "K"], "Usuń całą bieżącą linię"],
       [["Ctrl", "/"], "Przełącz komentarz linii"],
     ],
   },
