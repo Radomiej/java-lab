@@ -1,5 +1,5 @@
 import GameCoursePdf from '../../shared/lab-game-v2/editor/GameCoursePdf.jsx';
-import LessonExplanation from '../../shared/lab-game-v2/editor/LessonExplanation.jsx';
+import LessonExplanation from './JavaLessonExplanation.jsx';
 
 export default function LessonOverview({ lesson }) {
   return (

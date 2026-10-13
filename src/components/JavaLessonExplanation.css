@@ -1,0 +1,12 @@
+.java-concept .concept-scene { display: flex; flex-wrap: wrap; gap: 16px; margin: 22px 0; padding: 20px; border: 1px solid #c7dcd4; border-radius: 16px; background: #f0f7f2; }
+.java-concept .concept-actor { flex: 1 1 190px; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 16px 12px; background: #fff; border: 1px solid #c7dcd4; border-radius: 12px; }
+.java-concept .concept-actor h3 { font-size: 16px; margin: 0; overflow-wrap: anywhere; }
+.java-concept .concept-hero { width: 112px; height: 112px; image-rendering: pixelated; filter: drop-shadow(0 5px 2px #164c3820); }
+.java-concept .concept-state { margin: 0; padding: 10px; border: 0; background: #edf5f7; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.6; color: #173c52; }
+.java-concept .concept-effect { margin-top: 12px; padding: 6px 12px; border-radius: 8px; background: #e5f2ee; color: #15534a; font-weight: 700; }
+.java-concept .concept-effect .concept-hero { display: block; margin: auto; width: 56px; height: 56px; }
+.java-concept .concept-result { margin-top: 16px; padding: 16px; background: #10293d; color: #f3fbff; border-radius: 10px; }
+.java-concept .concept-result > span { font-size: 12px; color: #aadbdc; }
+.java-concept .concept-result pre { margin: 8px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; font-size: 14px; }
+.java-concept .page-diagram > figcaption { display: none; }
+@media (max-width: 600px) { .java-concept .concept-scene { padding: 10px; gap: 10px; } .java-concept .concept-actor { flex-basis: 100%; } }

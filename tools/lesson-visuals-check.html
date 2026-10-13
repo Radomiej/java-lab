@@ -1,0 +1,15 @@
+<!doctype html><html lang="pl"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Przegląd infografik Java Lab</title><div id="root"></div>
+<script type="module">
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import {allLessons} from '/src/data/curriculum.js';
+import {ConceptPreview,conceptPages} from '/src/components/JavaLessonExplanation.jsx';
+import '/src/styles/app.css';
+const h=React.createElement;
+const lessons=allLessons.filter(lesson=>conceptPages(lesson));
+createRoot(document.getElementById('root')).render(h('main',{style:{maxWidth:1000,margin:'24px auto',padding:16}},
+ h('h1',null,'Przegląd infografik'),
+ h('p',null,`${lessons.length} lekcji · ${lessons.reduce((n,l)=>n+conceptPages(l).length,0)} plansz · bez zmiany projektu ucznia`),
+ h('nav',{'aria-label':'Spis lekcji'},lessons.map(l=>h('a',{href:`#${l.id}`,key:l.id,style:{display:'inline-block',margin:'4px 12px 4px 0'}},`${l.order} ${l.title}`))),
+ ...lessons.map(l=>h('section',{key:l.id,id:l.id,style:{marginTop:48}},h('h2',null,`${l.order} ${l.title}`),...conceptPages(l).map(p=>h(ConceptPreview,{key:p.title,page:p}))))));
+</script></html>
