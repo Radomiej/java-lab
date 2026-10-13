@@ -1,3 +1,5 @@
+import {studentCompletionItems} from './studentJavaApi.js';
+
 const JAVA_KEYWORDS = [
   ["class", "Definicja klasy"],
   ["public", "Dostęp publiczny"],
@@ -116,7 +118,7 @@ function contextItems(line) {
   return { items: [...SYSTEM_SHORTCUTS, ...JAVA_KEYWORDS, ...JAVA_SNIPPETS], filterWord: null };
 }
 
-export function createJavaCompletionProvider(monaco) {
+export function createJavaCompletionProvider(monaco, getSources=()=>({}), ownsModel=()=>true) {
   const completionKinds = monaco.languages.CompletionItemKind;
   const insertAsSnippet = monaco.languages.CompletionItemInsertTextRule?.InsertAsSnippet;
   const kindByType = {
@@ -131,9 +133,16 @@ export function createJavaCompletionProvider(monaco) {
     triggerCharacters: [".", " ", "@"],
 
     provideCompletionItems(model, position) {
+      if(!ownsModel(model))return {suggestions:[]};
       const line = model.getLineContent(position.lineNumber).slice(0, position.column - 1);
       const word = model.getWordUntilPosition(position);
-      const { items, filterWord } = contextItems(line);
+      const context=contextItems(line);
+      const source=model.getValue?.()||'';
+      const prefix=source.slice(0,model.getOffsetAt?.(position)??source.length).replace(/[\w$]*$/,'');
+      const projectItems=studentCompletionItems(getSources(),source,prefix);
+      const memberAccess=/\.\s*[\w$]*$/.test(line)&&!/(?:System|System\.out)\.[\w$]*$/.test(line);
+      const items=memberAccess?projectItems:[...context.items,...projectItems];
+      const filterWord=context.filterWord;
       const query = (filterWord ?? word.word ?? "").toLowerCase();
       const range = {
         startLineNumber: position.lineNumber,
@@ -149,7 +158,7 @@ export function createJavaCompletionProvider(monaco) {
             ...item,
             kind: kindByType[item.type] ?? completionKinds.Keyword,
             range,
-            ...(item.type === "snippet" && insertAsSnippet
+            ...((item.type === "snippet" || item.snippet) && insertAsSnippet
               ? { insertTextRules: insertAsSnippet }
               : {}),
           })),

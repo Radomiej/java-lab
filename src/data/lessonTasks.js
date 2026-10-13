@@ -465,8 +465,8 @@ public class Main {
     }),
     independentTask("objects-07", "independent-2", {
       title: "Bohater i ekwipunek",
-      prompt: "Zbuduj bohatera, który posiada obiekt Inventory.",
-      steps: ["Dodaj Inventory z liczbą slotów.", "Dodaj prywatne Inventory inventory w Hero.", "Przekaż ekwipunek do konstruktora Hero."],
+      prompt: "Zbuduj bohatera, który posiada przekazany obiekt Inventory. Dodaj Inventory getInventory(), zwracające ten sam ekwipunek, nie nową instancję.",
+      steps: ["Dodaj Inventory z liczbą slotów.", "Dodaj prywatne Inventory inventory w Hero.", "Przekaż ekwipunek do konstruktora Hero i udostępnij go przez getInventory()."],
       starter: `class Inventory {
     // TODO: slots i konstruktor
 }
@@ -495,6 +495,10 @@ class Hero {
 
     Hero(Inventory inventory) {
         this.inventory = inventory;
+    }
+
+    Inventory getInventory() {
+        return inventory;
     }
 }
 

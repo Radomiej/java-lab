@@ -5,12 +5,14 @@ import App from "../App.jsx";
 afterEach(() => {cleanup(); vi.restoreAllMocks(); localStorage.clear();});
 
 describe("Java Lab workspace", () => {
-  it('offers solutions for guided and independent exercises when solution files exist',()=>{
+  it('offers solutions only for guided exercises, not independent tasks',()=>{
     render(<App />);
     expect(screen.getByRole('button',{name:'Pokaż rozwiązanie'})).toBeInTheDocument();
     fireEvent.click(screen.getByRole('tab',{name:/Komunikat misji/i}));
-    fireEvent.click(screen.getByRole('button',{name:'Pokaż rozwiązanie'}));
-    expect(screen.getByRole('textbox',{name:'Kod pliku Main.java'}).textContent).not.toContain('TODO');
+    expect(screen.queryByRole('button',{name:'Pokaż rozwiązanie'})).not.toBeInTheDocument();
+    expect(screen.queryByText(/Podpowiedź:/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab',{name:/Powitaj gracza/i}));
+    expect(screen.getByRole('button',{name:'Pokaż rozwiązanie'})).toBeInTheDocument();
   });
   it('offers formatting as an accessible icon without visible button text', () => {
     render(<App />);

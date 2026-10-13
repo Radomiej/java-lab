@@ -205,6 +205,7 @@ export default function App() {
   };
 
   const handleSolution = () => {
+    if (activeTask.id !== selectedLesson.tasks[0]?.id || activeTask.mode !== 'guided') return;
     executionVersion.current++;
     teavmRunner.stopGame();
     const formattedFiles = Object.fromEntries(Object.entries(activeTask.solutionFiles).map(([name, code]) =>
@@ -268,7 +269,7 @@ export default function App() {
       }}
       onCheck={handleCheck}
       onReset={handleReset}
-      onSolution={activeTask.solutionReady !== false && Object.keys(activeTask.solutionFiles || {}).length > 0 ? handleSolution : undefined}
+      onSolution={activeTask.id === selectedLesson.tasks[0]?.id && activeTask.mode === 'guided' && activeTask.solutionReady !== false && Object.keys(activeTask.solutionFiles || {}).length > 0 ? handleSolution : undefined}
     />
   );
 

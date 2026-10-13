@@ -1,0 +1,17 @@
+<!doctype html><html lang="pl"><meta charset="utf-8"><title>Test edytora i historii</title><div id="root"></div>
+<script type="module">
+import React,{useState} from 'react';
+import {createRoot} from 'react-dom/client';
+import CodeEditor from '/src/components/CodeEditor.jsx';
+import '/src/styles/app.css';
+const h=React.createElement;
+function App() {
+ const [files,setFiles]=useState({'Main.java':'class Main {\n    void play() {\n        Hero hero = new Hero();\n        hero.\n    }\n}\n','Hero.java':'class Hero {\n    int hp = 10;\n    void walk() {}\n}\n'}),[activeFile,setActiveFile]=useState('Main.java');
+ return h('main',{style:{maxWidth:1000,margin:'24px auto'}},
+  h('h1',null,'Test edytora i historii — osobny projekt QA'),
+  h('p',null,'Ten widok nie zmienia plików ucznia. Sprawdź podpowiedzi, undo i historię.'),
+  h('button',{onClick:()=>setFiles(current=>({...current,'Hero.java':current['Hero.java'].replace('void walk() {}','void walk() {}\n    void dash() {}')}))},'Dodaj metodę z aplikacji'),
+  h(CodeEditor,{files,activeFile,taskId:'qa-editor-history',onFileChange:setActiveFile,onCodeChange:(name,value)=>setFiles(current=>({...current,[name]:value})),onCheck:()=>{},onReset:()=>{},runner:{status:'idle',output:'',error:null},engine:false}));
+}
+createRoot(document.getElementById('root')).render(h(App));
+</script></html>

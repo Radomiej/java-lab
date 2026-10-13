@@ -2,6 +2,8 @@ import { prepareJavaSources } from "./source-path.js";
 import { disposeGameRuntime, invokeGameExport } from "./game-lifecycle.js";
 import { acceptsSceneInput } from './input-transport.js';
 import { formatJavaRuntimeError } from './java-errors.js';
+import {parseAssertionOutput} from './assertion-output.js';
+import {checkClassStructure} from './class-metadata.js';
 
 const TEAVM_URLS = {
   // Official TeaVM Playground assets are vendored because the CDN does not expose
@@ -81,6 +83,7 @@ async function compileAndRun(message) {
     }
 
     const versions = classVersions(compiler);
+    const structureResults=checkClassStructure(Object.fromEntries(compiler.listOutputFiles().filter(name=>name.endsWith('.class')).map(name=>[name,compiler.getOutputFile(name)])),message.structureChecks);
     phase = "TeaVM → WebAssembly";
     self.postMessage({ command: "phase", id: message.id, phase: "Generuję WebAssembly…" });
     if (!compiler.generateWebAssembly({ outputName: "app", mainClass: message.mainClass })) {
@@ -143,7 +146,8 @@ async function compileAndRun(message) {
       phase,
       diagnostics,
       classVersions: versions,
-      output: output.join("\n"),
+      ...parseAssertionOutput(output),
+      assertionResults:[...parseAssertionOutput(output).assertionResults,...structureResults],
       error: errors.join("\n"),
       behaviorResults,
     };

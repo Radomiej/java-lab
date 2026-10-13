@@ -9,6 +9,10 @@ button:focus-visible, textarea:focus-visible { outline: 3px solid rgb(37 184 167
 h1, h2, p { margin-top: 0; }
 pre { margin: 0; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.file-history { width: min(860px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; padding: 20px; border: 1px solid #adc4d1; border-radius: 12px; background: var(--canvas); }
+.file-history::backdrop { background: rgb(8 22 35 / 65%); }
+.file-history pre { max-height: 240px; overflow: auto; padding: 12px; background: #10263a; color: #e1edf6; }
+.file-history select { max-width: 100%; }
 .eyebrow { margin: 0 0 6px; color: var(--teal-600); font-size: 10px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
 .status-dot { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: #65d6c8; vertical-align: middle; }
 .app-shell { display: grid; grid-template-columns: var(--sidebar-size, 260px) 5px minmax(0, 1fr) 5px var(--inspector-size, 380px); min-height: 100vh; }
@@ -130,8 +134,6 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
 .monaco-editor-host .monaco-editor { width: 100% !important; height: 100% !important; }
 .monaco-loading { position: absolute; inset: 0; display: grid; place-items: center; color: #b9ced8; background: #1e1e1e; font: 11px var(--mono); pointer-events: none; }
 .code-editor-fallback-wrap { display: block; }
-.line-numbers { display: grid; flex: 0 0 43px; align-content: start; justify-items: end; gap: 0; padding: 16px 10px 16px 0; color: #527188; background: #0d2539; font: 12px/1.65 var(--mono); user-select: none; }
-.line-numbers span { height: 19.8px; }
 .code-editor { display: block; min-width: 0; width: 100%; min-height: 300px; padding: 16px 15px; resize: vertical; border: 0; outline: 0; color: #d7e8f2; background: #102b42; font: 12px/1.65 var(--mono); tab-size: 2; white-space: pre; overflow: auto; }
 .code-editor:focus { box-shadow: inset 0 0 0 2px rgb(37 184 167 / 45%); }
 .editor-help { margin: 0; padding: 8px 14px; color: var(--ink-700); font-size: 11px; line-height: 1.5; }

@@ -8,6 +8,8 @@ import {createEngineDefinitionProvider, createEngineHoverProvider, resolveEngine
 import {acceptEditorChange} from './editorAcceptedChange.js';
 import { EditorIcon, useEditorTabs } from '../../shared/lab-game-v2/editor/EditorUI.jsx';
 import CopyCodeButton from '../../shared/lab-game-v2/editor/CopyCodeButton.jsx';
+import FileHistory from './FileHistory.jsx';
+import {recordFileVersion,syncModelSource} from '../services/fileHistory.js';
 import {createEngineCompletionProvider,createEngineSignatureProvider} from './engineIntellisense.js';
 
 function fileIcon(fileName) {
@@ -59,21 +61,37 @@ export default function CodeEditor({
   const modelsRef = useRef(new Map());
   const modelListenersRef = useRef(new Map());
   const filesRef = useRef(files);
+  const viewStatesRef=useRef(new Map());
+  const externalModelsRef=useRef(new Set());
   const activeFileRef = useRef(activeFile);
   const onCodeChangeRef = useRef(onCodeChange);
   const [editError, setEditError] = useState('');
+  const [historyError,setHistoryError]=useState('');
   const acceptChange = (file, value) => acceptEditorChange(() => onCodeChange(file, value), setEditError);
   const watchModel = (model, file) => {
     let accepted = model.getValue();
     let reverting = false;
-    return model.onDidChangeContent(() => {
+    let historyTimer,pendingHistory;
+    const record=(content,kind)=>{if(engine&&Object.hasOwn(gameEngineRuntimeFiles,file))return;try{recordFileVersion(workspaceKey,file,content,kind);setHistoryError('');}catch(error){setHistoryError(error.message);}};
+    const flushHistory=()=>{clearTimeout(historyTimer);if(pendingHistory){record(...pendingHistory);pendingHistory=null;}};
+    const flushRequested=event=>{if(event.detail?.workspace===workspaceKey&&event.detail?.file===file)flushHistory();};
+    window.addEventListener('java-lab-history-flush',flushRequested);
+    window.addEventListener('pagehide',flushHistory);
+    record(accepted,'initial');
+    const listener=model.onDidChangeContent(event => {
       if (reverting) return;
       const next = model.getValue();
       if (acceptEditorChange(() => onCodeChangeRef.current(file, next), setEditError, () => {
         reverting = true;
         try { model.setValue(accepted); } finally { reverting = false; }
-      })) accepted = next;
+      })) {
+        accepted = next;
+        const kind=externalModelsRef.current.has(model)?'external':event?.isUndoing?'undo':event?.isRedoing?'redo':event?.changes?.some(c=>c.text.length>80)?'paste':'typing';
+        if(kind!=='typing'){flushHistory();record(next,kind);}
+        else {pendingHistory=[next,kind];clearTimeout(historyTimer);historyTimer=setTimeout(flushHistory,800);}
+      }
     });
+    return {dispose(){flushHistory();window.removeEventListener('java-lab-history-flush',flushRequested);window.removeEventListener('pagehide',flushHistory);listener.dispose();}};
   };
   const [editorReady, setEditorReady] = useState(false);
   const [loadError, setLoadError] = useState(null);
@@ -240,7 +258,7 @@ export default function CodeEditor({
         editor.setModel(getOrCreateModel(activeFileRef.current));
         const completionProvider = monaco.languages.registerCompletionItemProvider(
           "java",
-          createJavaCompletionProvider(monaco),
+          createJavaCompletionProvider(monaco,()=>({...filesRef.current,...Object.fromEntries([...modelsRef.current].map(([name,model])=>[name,model.getValue()]))}),model=>[...modelsRef.current.values()].includes(model)),
         );
         if (engine) {
           const ownsModel=model=>[...modelsRef.current.values()].includes(model);
@@ -299,6 +317,7 @@ export default function CodeEditor({
       modelListenersRef.current.clear();
       modelsRef.current.forEach((model) => model.dispose());
       modelsRef.current.clear();
+      viewStatesRef.current.clear();
       monacoRef.current = null;
     };
   }, [workspaceKey]);
@@ -307,8 +326,11 @@ export default function CodeEditor({
     if (!editorReady || !editorRef.current || !monacoRef.current) return;
 
     const model = modelsRef.current.get(activeFile);
+    const previous=editorRef.current.getModel();
+    if(previous)viewStatesRef.current.set(previous,editorRef.current.saveViewState());
     if (model) {
       editorRef.current.setModel(model);
+      if(viewStatesRef.current.has(model))editorRef.current.restoreViewState(viewStatesRef.current.get(model));
       return;
     }
 
@@ -325,11 +347,12 @@ export default function CodeEditor({
   useEffect(() => {
     if (!editorReady) return;
 
-    const model = modelsRef.current.get(activeFile);
-    if (model && model.getValue() !== source) {
-      model.setValue(source);
+    for(const [file,model] of modelsRef.current) {
+      if(!Object.hasOwn(files,file)||model.getValue()===files[file])continue;
+      externalModelsRef.current.add(model);
+      try {syncModelSource(model,files[file]);} finally {externalModelsRef.current.delete(model);}
     }
-  }, [activeFile, editorReady, source]);
+  }, [files, editorReady]);
 
   return (
     <div className="editor-shell">
@@ -354,6 +377,7 @@ export default function CodeEditor({
           }} aria-label="Zamknij źródło API" title="Zamknij źródło API"><EditorIcon action="close" /></button>}
           {onSolution && <button className="button button--ghost" type="button" onClick={onSolution} aria-label="Pokaż rozwiązanie" title="Pokaż rozwiązanie"><EditorIcon action="solution" /></button>}
           <button className="button button--ghost" type="button" onClick={onReset} aria-label="Przywróć start" title="Przywróć start"><EditorIcon action="reset" /></button>
+          {!readOnly && <FileHistory key={`${workspaceKey}/${activeFile}`} workspace={workspaceKey} file={activeFile} onRestore={value=>acceptChange(activeFile,value)} />}
           <EditorHelp />
         </div>
       </div>
@@ -404,6 +428,7 @@ export default function CodeEditor({
         {fileError && <span role="alert">{fileError}</span>}
       </form>}
       {editError && <p role="alert" className="editor-api-notice">{editError} Zmiana nie została zapisana; edytor zachował poprzednią wersję.</p>}
+      {historyError && <p role="alert" className="editor-api-notice">Kod zapisano, ale nie wersję historii: {historyError}</p>}
       {loadError ? (
         <div className="code-editor-wrap code-editor-fallback-wrap">
           <textarea

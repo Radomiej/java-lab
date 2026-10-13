@@ -108,8 +108,8 @@ public class Main {
     tips: ["Kompozycję rozpoznasz po polu typu innej klasy.", "Nie upychaj całego programu w jednej klasie."],
     tasks: [{
       id: "objects-07-task", title: "Planner posiada task", mode: "guided",
-      prompt: "Zbuduj Planner, który przechowuje otrzymany obiekt Task. W main utwórz Task o nazwie Mapa, przekaż go do Plannera i wypisz Planner gotowy.",
-      steps: ["Dodaj klasę Task z polem name i konstruktorem.", "Dodaj prywatne pole Task task w Planner.", "Przekaż Task do konstruktora Plannera."],
+      prompt: "Zbuduj Planner, który przechowuje otrzymany obiekt Task i udostępnia go przez Task getTask(). Getter ma zwracać dokładnie przekazany obiekt, nie jego kopię. W main utwórz Task o nazwie Mapa, przekaż go do Plannera i wypisz Planner gotowy.",
+      steps: ["Dodaj klasę Task z polem name i konstruktorem.", "Dodaj prywatne pole Task task w Planner.", "Przekaż Task do konstruktora Plannera i zwróć tę samą referencję z Task getTask()."],
       hints: ["Typ pola to Task, a wartość powstaje przez new Task(...)."],
       starterFiles: { "Main.java": `class Task {
     private String name;
@@ -143,6 +143,10 @@ class Planner {
 
     Planner(Task task) {
         this.task = task;
+    }
+
+    Task getTask() {
+        return task;
     }
 }
 
