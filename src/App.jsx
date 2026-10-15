@@ -107,7 +107,8 @@ export default function App() {
     [activeTask, progress.filesByTask,isPlayground,playground.project.files],
   );
   const completedCount = progress.completedTasks.length;
-  const telemetry=useSessionTelemetry({lessonId:selectedLesson.id,lessonTitle:selectedLesson.title,taskId:activeTask.id,activeFile,files,runnerStatus:runner.status,output:runner.output.slice(-20000),passed:checkReport.total>0?checkReport.passed:null,visibility:'visible'});
+  const telemetrySnapshot={lessonId:selectedLesson.id,lessonTitle:selectedLesson.title,taskId:activeTask.id,activeFile,files,runnerStatus:runner.status,output:runner.output.slice(-20000),passed:checkReport.total>0?checkReport.passed:null,visibility:'visible'};
+  const telemetry=useSessionTelemetry(telemetrySnapshot);
 
   useEffect(() => {
     setUmamiAnalyticsEnabled(analyticsEnabled);
@@ -165,6 +166,7 @@ export default function App() {
       task_mode: activeTask.mode,
     };
     trackUmamiEvent("task_run_started", analyticsTask);
+    telemetry.capture('run_started',{...telemetrySnapshot,runnerStatus:'compiling',passed:null,output:''});
     setRunner({ ...emptyRunner, status: "compiling", stage: "Uruchamiam kod, aby sprawdzić wynik…" });
     try {
       let result = await teavmRunner.run(
@@ -188,6 +190,7 @@ export default function App() {
         if (!result.ok) report = evaluateTaskCheck(activeTask,files,{...result,error:result.error || diagnosticsText(result.diagnostics)});
       }
       trackUmamiEvent("task_run_result", { ...analyticsTask, passed: report.passed });
+      telemetry.capture('run_result',{...telemetrySnapshot,runnerStatus:result.ok===false?'error':'ready',passed:report.passed,output:(result.output||'').slice(-20000)});
       setCheckReport(report);
       if(!isPlayground)progress.markTaskComplete(activeTask.id, report.passed);
       setRunner({
@@ -201,6 +204,7 @@ export default function App() {
     } catch (error) {
       if (version !== executionVersion.current) return;
       trackUmamiEvent("task_run_result", { ...analyticsTask, passed: false, failure_stage: "runner" });
+      telemetry.capture('run_result',{...telemetrySnapshot,runnerStatus:'error',passed:false,output:String(error.message||'').slice(-20000)});
       setRunner({ ...emptyRunner, status: "error", error: error.message });
       setCheckReport({ ...emptyReport, summary: `Nie udało się uruchomić programu: ${error.message}` });
     }

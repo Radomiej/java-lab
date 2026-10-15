@@ -12,7 +12,7 @@ export default function Sidebar({ tracks, trackOrder, lessons, selectedTrack, se
   return (
     <nav className="sidebar" aria-label="Nawigacja kursu">
       <div className="sidebar-brand">
-        <span className="brand-mark" aria-hidden="true">J</span>
+        <img className="brand-mark" aria-hidden="true" alt="" src="/favicon.svg" />
         <div className="sidebar-brand-copy"><strong>Java Lab</strong><span title={telemetry?.machineId}>ID: {telemetry?.machineId || 'lokalne'}</span></div>
         <button className="sidebar-settings-button" type="button" onClick={onOpenSettings} aria-label="Wyczyść postęp">↺</button>
       </div>

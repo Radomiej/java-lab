@@ -37,7 +37,7 @@ export default function AppShell({ sidebar, main, inspector }) {
       <main className="main-region">
         <header className="mobile-header">
           <button className="icon-button" type="button" onClick={() => setSidebarOpen(true)} aria-label="Otwórz lekcje">☰</button>
-          <span className="mobile-brand"><span className="brand-mark">J</span> Java Lab</span>
+          <span className="mobile-brand"><img className="brand-mark" alt="" src="/favicon.svg" /> Java Lab</span>
           <span className="mobile-status"><span className="status-dot" /> w przeglądarce</span>
         </header>
         <div className="workspace-toolbar">
