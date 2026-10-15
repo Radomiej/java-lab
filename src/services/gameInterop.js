@@ -89,7 +89,7 @@ export function createGameInterop(canvas) {
         } else context.strokeRect(command.x-command.width/2,command.y-command.height/2,command.width,command.height);
       } finally {context.restore();}
     }
-    if (['rect','text','sprite','ninepatch','progress'].includes(command.op)) renderer.draw(context,command);
+    if (['rect','circle','text','sprite','ninepatch','progress'].includes(command.op)) renderer.draw(context,command);
 
   };
   canvas.tabIndex = 0;

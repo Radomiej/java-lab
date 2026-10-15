@@ -42,5 +42,5 @@ test('independent game tasks show acceptance criteria, not hidden implementation
 test('course PDFs are accessible directly from a game lesson', () => {
   render(<LessonOverview lesson={gameDevLessons[7]} />);
   fireEvent.click(screen.getByRole('button',{name:'Kurs GameDev · PDF'}));
-  expect(screen.getByRole('dialog',{name:'Podstawy GameDev JS'})).toBeInTheDocument();
+  expect(screen.getByRole('dialog',{name:'Start GameDev Java — program v3'})).toBeInTheDocument();
 });

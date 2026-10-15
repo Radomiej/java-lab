@@ -14,11 +14,12 @@ export default function TaskPanel({ lesson, activeTask, completedTasks, onTaskCh
         {lesson.tasks.map((task, index) => (
           <button className={`task-button${activeTask.id === task.id ? " is-active" : ""}`} type="button" role="tab" aria-selected={activeTask.id === task.id} key={task.id} onClick={() => onTaskChange(task.id)}>
             <span className={`task-index task-index--${task.mode}`}>{String(index + 1).padStart(2, "0")}</span>
-            <span className="task-button-copy"><small>{modeLabels[task.mode] || "zadanie"}</small><strong>{task.title}</strong></span>
+            <span className="task-button-copy"><small>{task.learningStage || modeLabels[task.mode] || "zadanie"}</small><strong>{task.title}</strong></span>
             {completedTasks.includes(task.id) && <span className="task-done-label">✓</span>}
           </button>
         ))}
       </div>
+      {lesson.scaffolding && <p className="task-hint">{lesson.scaffolding}</p>}
       <div className="task-prompt"><span className="prompt-label">{guided ? "Polecenie prowadzone" : "Zadanie samodzielne"}</span><p>{activeTask.prompt}</p>{guided && <ol>{activeTask.steps.map((step) => <li key={step}>{step}</li>)}</ol>}{guided && activeTask.hints?.[0] && <p className="task-hint"><strong>Podpowiedź:</strong> {activeTask.hints[0]}</p>}</div>
       {activeTask.criteria?.length > 0 && <div className="task-prompt"><h3>Kryteria zaliczenia</h3><ul>{activeTask.criteria.map(criterion => <li key={criterion}>{criterion}</li>)}</ul></div>}
       {guided && <MovementHint key={`hint-${activeTask.id}`} taskId={activeTask.id} language="java" />}

@@ -50,3 +50,9 @@ const survivorFrame=String(survivor.exports.frame());
 if(!survivorFrame.includes('sprite|player|')||!survivorFrame.includes('progress|')||!survivorFrame.includes('sprite|slime|'))throw new Error('Survivor gameplay/HUD/spawn missing: '+survivorFrame.split('\n').filter(line=>!line.startsWith('sprite|grass|')).join('\n'));
 survivor.exports.dispose();writeFileSync(new URL('../artifacts/lab-game-v2-teavm-survivor.json',import.meta.url),JSON.stringify({runtime:'actual TeaVM WebAssembly, Node host',ready:true,start:true,simulationSteps:31,player:true,hud:true,enemyWave:true},null,2)+'\n');
 print('TeaVM survivor PASS: READY, start, movement, HUD, enemy waves.');
+const shapes=await compile({'GameMain.java':`public class GameMain extends Game {
+ @Override public void onCreate(){GameObject p=createObject("Circle");p.setPosition(100,80);p.addComponent(ShapeRenderer.circle(12,"#ffd166"));p.transform.scale.set(2,3);CharacterController2D c=p.addComponent(new CharacterController2D());c.move(3,4,120);c.move(0,0,120);Vector2 d=c.getDirection();if(Math.abs(d.x-.6)>1e-6||Math.abs(d.y-.8)>1e-6)throw new AssertionError("Direction");}
+}`},'GameMain');
+await shapes.exports.main([]);shapes.exports.resize(640,360);shapes.exports.tick(0);
+if(!String(shapes.exports.frame()).includes('circle|100.0|80.0|12.0|#ffd166|0.0|2.0|3.0'))throw new Error('TeaVM circle transport');
+shapes.exports.dispose();print('TeaVM circle and persistent direction PASS.');

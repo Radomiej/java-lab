@@ -18,7 +18,7 @@ export const gameConceptScenes = {
   'pause:2': [hero('Dwa powody pauzy', 'menu: tak\nwybór ulepszenia: tak', 'WORLD stoi'), hero('Zamknięto menu', 'menu: nie\nwybór ulepszenia: tak', 'WORLD nadal stoi')],
   'upgrades:0': [hero('Awans bohatera', '1 oczekujący wybór\nświat zatrzymany', 'Wybierz: szybkość ALBO siła'), hero('Wybrano szybkość', 'prędkość: 120 → 150\n0 oczekujących wyborów', 'Wracamy do walki')],
   'upgrades:2': [hero('Mam 8 złota; cena 5', 'Wallet: 8 → 3\nobrażenia: 1 → 2', 'Kupiono'), hero('Mam 3 złota; cena 5', 'Wallet: 3 → 3\nobrażenia: 1 → 1', 'Nie kupiono — nic nie zmieniaj')],
-  'feedback:2': [hero('Trwa efekt A', 'alpha: 1 → 0\nobecnie 0.6', '', 'wizard'), hero('Nowy efekt B zastępuje A', 'alpha: 0.6 → 1\ntylko B zapisuje alpha', 'Jedna właściwość, jeden aktywny efekt', 'wizard')],
+  'feedback:2': [hero('Trwa efekt A', 'x: 0 → 100\nobecnie x=25', '', 'wizard'), hero('Nowy efekt B zastępuje A', 'x: 25 → 200\ntylko B zapisuje pozycję', 'Jedna właściwość, jeden aktywny efekt', 'wizard')],
   'composition:0': [hero('Dane rycerza', 'wygląd: knight\nHP: 8\nprędkość: 90', '', 'knight'), hero('Dane łucznika', 'wygląd: ranger\nHP: 5\nprędkość: 120', '', 'ranger'), hero('Fabryka składa obu', 'nowy Sprite\nnowy Health\nnowy kontroler', 'Te same klasy, inne dane', 'cleric')],
   'composition:2': [hero('Gracz', 'weapon → jego Weapon\ndamage = 1', '', 'ranger'), hero('Ulepszenie przez referencję', 'ten sam Weapon\ndamage: 1 → 2', 'Nie twórz drugiej broni', 'ranger')],
   'run-state:1': [hero('Koniec starej rundy', 'HP = 0\n12 wrogów\n3 aktywne timery', 'Usuń obiekty i reakcje'), hero('Nowa runda', 'nowy gracz: HP = 8\n0 starych wrogów\n0 starych timerów', 'Świeże instancje')],

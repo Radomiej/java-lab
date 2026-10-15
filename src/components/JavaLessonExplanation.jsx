@@ -57,7 +57,7 @@ export function conceptPages(lesson) {
   if (javaConceptPages[lesson.id]) return javaConceptPages[lesson.id];
   const chapter = lesson.id?.replace(/^g2d\./, '');
   if (!lesson.id?.startsWith('g2d.') || !gameExplanationPages[chapter]) return null;
-  return gameExplanationPages[chapter].map((page, index) => page.visual.kind === 'flow'
+  return gameExplanationPages[chapter].map((page, index) => page.visual.kind === 'flow' && gameConceptScenes[`${chapter}:${index}`]
     ? { ...page, actors: gameConceptScenes[`${chapter}:${index}`], visual: undefined }
     : chapter === 'health' && index === 0
       ? { ...page, text: 'Health przechowuje HP tej jednostki. damage(1) odejmuje jeden punkt: 5 → 4. Kontakt wykrywa collider; obrażenia zadaje osobny komponent.', code: undefined }

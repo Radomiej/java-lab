@@ -42,6 +42,7 @@ export default function CodeEditor({
   onSolution,
   runner,
   engine,
+  highlight,
 }) {
   const readOnly = Boolean(engine && Object.hasOwn(gameEngineRuntimeFiles, activeFile));
   const [newClassName, setNewClassName] = useState("");
@@ -354,6 +355,16 @@ export default function CodeEditor({
     }
   }, [files, editorReady]);
 
+  useEffect(()=>{
+    const editor=editorRef.current,monaco=monacoRef.current;
+    if(!editor?.createDecorationsCollection||!monaco)return;
+    const decorations=editor.createDecorationsCollection(highlight?[{
+      range:new monaco.Range(highlight.from.line,highlight.from.column,highlight.to.line,highlight.to.column),
+      options:{inlineClassName:'guided-change-code',linesDecorationsClassName:'guided-change-gutter',hoverMessage:{value:'Dodany kod uruchamia mechanikę opisaną w wyjaśnieniu zmiany.'}}
+    }]:[]);
+    if(highlight)editor.revealLineInCenter?.(highlight.from.line);
+    return ()=>decorations.clear();
+  },[highlight?.start,highlight?.end,activeFile,source,editorReady]);
   return (
     <div className="editor-shell">
       <div className="editor-action-bar" role="toolbar" aria-label="Akcje edytora">

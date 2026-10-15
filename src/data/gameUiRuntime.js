@@ -15,7 +15,7 @@ public class UITransform extends Component {
 }
 `,
  'ShapeRenderer.java': `package engine;
-public class ShapeRenderer extends Component {public double width,height;public String color,space="world";public int layer,order;public ShapeRenderer(){this(32,32,"#76b9f2");}public ShapeRenderer(double width,double height,String color){this.width=width;this.height=height;this.color=color;}}
+public class ShapeRenderer extends Component {public double width,height;public String color,space="world",shape="rect";public double radius=16;public int layer,order;public static ShapeRenderer circle(double radius,String color){if(!Double.isFinite(radius)||radius<0)throw new IllegalArgumentException("Niepoprawny promien");ShapeRenderer r=new ShapeRenderer(radius*2,radius*2,color);r.shape="circle";r.radius=radius;return r;}public ShapeRenderer(){this(32,32,"#76b9f2");}public ShapeRenderer(double width,double height,String color){this.width=width;this.height=height;this.color=color;}}
 `,
  'TextRenderer.java': `package engine;
 public class TextRenderer extends Component {

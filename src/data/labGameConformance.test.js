@@ -77,7 +77,7 @@ test('independent JDK executions of implemented conformance scenarios',()=>{
   for(const id of Object.keys(cases)){
    if(id.startsWith('C'))expect(definitions.scenarios.some(s=>s.id===id)).toBe(true);
    let output;try{output=execFileSync(javac().replace(/javac(\.exe)?$/,'java$1'),['-cp',classpath,'Conformance',id],{timeout:15000,encoding:'utf8'});}catch(error){throw new Error(id+': '+(error.stderr??error.message));}
-   if(id==='C38'){const evidence=JSON.parse(output);mkdirSync('C:/Nauka/java-lab/artifacts',{recursive:true});writeFileSync('C:/Nauka/java-lab/artifacts/lab-game-c38-jdk.json',JSON.stringify(evidence,null,2));}
+   if(id==='C38'){const evidence=JSON.parse(output);mkdirSync('artifacts',{recursive:true});writeFileSync('artifacts/lab-game-c38-jdk.json',JSON.stringify(evidence,null,2));}
   }
  } finally {rmSync(dir,{recursive:true,force:true});}
 },120000);
@@ -90,9 +90,9 @@ test('C34: actual transport predicate drops old scene packet despite reused obje
  expect(activations).toBe(0);
 });
 test('C36: packaged asset keys, aliases and actual PNG hashes match JavaScript',()=>{
- const other=JSON.parse(readFileSync('C:/Nauka/web-learning-lab/shared/lab-game-v2/assets/manifest.json','utf8'));
+ const other=JSON.parse(readFileSync(new URL('../../../web-learning-lab/shared/lab-game-v2/assets/manifest.json',import.meta.url),'utf8'));
  expect(assets.assets.map(a=>a.key)).toEqual(other.assets.map(a=>a.key));
- const hash=(repo,source)=>createHash('sha256').update(readFileSync(`C:/Nauka/${repo}/public/game-assets/${source}`)).digest('hex');
+ const hash=(repo,source)=>createHash('sha256').update(readFileSync(new URL(`../../../${repo}/public/game-assets/${source}`,import.meta.url))).digest('hex');
  for(const asset of assets.assets)expect(hash('java-lab',asset.source)).toBe(hash('web-learning-lab',asset.source));
  expect(assets.aliases.WALL).toBe('stone');expect(assets.assets.some(a=>a.key==='ghost')).toBe(true);
 });

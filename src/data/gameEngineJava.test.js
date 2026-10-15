@@ -34,7 +34,7 @@ export function runJava(files, main='EngineTests') {
 }
 
 it('shows the player inside the initial camera viewport in exercise 408.3',()=>{
-  const task=allLessons.find(lesson=>lesson.order===408).tasks[2];
+  const task=allLessons.find(lesson=>lesson.id === 'g2d.camera').tasks[2];
   const files={...gameEngineRuntimeFiles,...Object.fromEntries(Object.entries(task.starterFiles).map(([name,source])=>[name,'import engine.*;\n'+source]))};
   expect(runJava({...files,'CameraStarterTest.java':`import engine.*;
 public class CameraStarterTest { public static void main(String[] args) {
@@ -45,21 +45,21 @@ public class CameraStarterTest { public static void main(String[] args) {
 }}`},'CameraStarterTest')).toContain('VISIBLE');
 });
 it('explains the unfinished 424 start and spawns enemies in its solution',()=>{
- const task=allLessons.find(lesson=>lesson.order===424).tasks[0];
+ const task=allLessons.find(lesson=>lesson.id === 'g2d.survivor').tasks[0];
  const bundle=source=>({...gameEngineRuntimeFiles,...Object.fromEntries(Object.entries(source).map(([name,text])=>[name,'import engine.*;\n'+text]))});
  expect(runJava({...bundle(task.starterFiles),...task.javaTestFiles,'StarterError.java':`public class StarterError {public static void main(String[] args){try{JavaTest.main(args);throw new RuntimeException("Starter unexpectedly passed");}catch(AssertionError error){if(!error.getMessage().contains("Player"))throw error;System.out.println("FRIENDLY MISSING PLAYER");}}}`},'StarterError')).toContain('FRIENDLY MISSING PLAYER');
  expect(runJava({...bundle(task.solutionFiles),'SurvivorTest.java':`import engine.*;public class SurvivorTest {public static void main(String[] args){GameMain game=new GameMain();try{game.start();game.step(0);game.find("Run").getComponent(RunController.class).start();game.step(0);GameObject player=game.find("Player");double x=player.transform.x;game.input.setKey("d",true);game.step(.1);game.input.setKey("d",false);if(player.transform.x<=x)throw new AssertionError("Movement");for(int i=0;i<16;i++)game.step(.1);if(game.getObjects().stream().noneMatch(o->o.name.equals("Slime")))throw new AssertionError("No Slime");System.out.println("SURVIVOR ENEMIES PASS");}finally{game.dispose();}}}`},'SurvivorTest')).toContain('SURVIVOR ENEMIES PASS');
 });
 
 it('keeps a controllable scene in every camera starter while leaving camera work unfinished',()=>{
- for(const task of allLessons.find(lesson=>lesson.order===408).tasks){
+ for(const task of allLessons.find(lesson=>lesson.id === 'g2d.camera').tasks){
   expect(task.starterFiles['GameMain.java']).toContain('new PlayerController()');
   expect(task.starterFiles['GameMain.java']).toContain('new TileMap');
  }
 });
 
 it('rejects a hard-coded marker that passes only the first pointer position in 408.3',()=>{
-  const task=allLessons.find(lesson=>lesson.order===408).tasks[2];
+  const task=allLessons.find(lesson=>lesson.id === 'g2d.camera').tasks[2];
   const files={...gameEngineRuntimeFiles,...Object.fromEntries(Object.entries(task.solutionFiles).map(([name,source])=>[name,'import engine.*;\n'+source])),...task.javaTestFiles};
   files['CursorMarker.java']='import engine.*; public class CursorMarker extends Component { @Override public void onUpdate(double delta) {gameObject.setPosition(80,180);} }';
   expect(()=>runJava(files,'JavaTest')).toThrow();
@@ -216,7 +216,7 @@ public class FlipTests {
 },45000);
 
 it('requires work in the first guided v2 starter',()=>{
-  const task=allLessons.find(l=>l.order===401).tasks[0];
+  const task=allLessons.find(l=>l.id === 'g2d.scene').tasks[0];
   const files={...gameEngineRuntimeFiles};
   for(const [file,source] of Object.entries({...task.starterFiles,...task.javaTestFiles}))files[file]=`import engine.*;\n${source}`;
   expect(()=>runJava(files,'JavaTest')).toThrow();

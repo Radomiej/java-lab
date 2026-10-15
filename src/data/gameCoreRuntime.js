@@ -50,6 +50,8 @@ public class Trigger2D extends Collider2D {
   "CharacterController2D.java": `package engine;
 public class CharacterController2D extends Component {
     public final Vector2 velocity = new Vector2();
+    private final Vector2 direction = new Vector2(1,0);
+    public Vector2 getDirection() { return direction.copy(); }
     public boolean constrainToBounds = true;
     /** Hook silnika wykonywany po ruchu i kolizjach. */
     public void onAfterMove(double delta) {}
@@ -57,6 +59,7 @@ public class CharacterController2D extends Component {
     public void move(double x, double y, double speed) {
         if(!Double.isFinite(x)||!Double.isFinite(y)||!Double.isFinite(speed)||speed<0)throw new IllegalArgumentException("Niepoprawny ruch");
         double length = Math.sqrt(x * x + y * y);
+        if(length>0)direction.set(x/length,y/length);
         velocity.x = length == 0 ? 0 : x / length * speed;
         velocity.y = length == 0 ? 0 : y / length * speed;
     }
@@ -226,7 +229,7 @@ public class Game {
                 GameObject o=c.gameObject;boolean screen=renderSpace(c)==1;double x=o.transform.x+o.transform.visualOffset.x-(screen?0:cameraX),y=o.transform.y+o.transform.visualOffset.y-(screen?0:cameraY);
                 UITransform ui=o.getComponent(UITransform.class);if(ui!=null&&ui.enabled){Vector2 center=ui.getCenter();x=center.x;y=center.y;}
                 if(c instanceof Sprite){Sprite r=(Sprite)c;GameCanvas.drawSprite(r.texture,x,y,r.width,r.height,o.transform.rotation,o.transform.scale.x*(r.flipX?-1:1),o.transform.scale.y*(r.flipY?-1:1));}
-                else if(c instanceof ShapeRenderer){ShapeRenderer r=(ShapeRenderer)c;GameCanvas.drawShape(x,y,r.width,r.height,r.color,o.transform.rotation,o.transform.scale.x,o.transform.scale.y);}
+                else if(c instanceof ShapeRenderer){ShapeRenderer r=(ShapeRenderer)c;if("circle".equals(r.shape))GameCanvas.drawCircle(x,y,r.radius,r.color,o.transform.rotation,o.transform.scale.x,o.transform.scale.y);else GameCanvas.drawShape(x,y,r.width,r.height,r.color,o.transform.rotation,o.transform.scale.x,o.transform.scale.y);}
                 else c.onDrawUI();
             }
             if (!disposed) GameCanvas.drawDebugState(debug);
@@ -281,6 +284,7 @@ public final class GameCanvas {
     public static void drawText(String text,double x,double y,double fontSize,String color,String align,String baseline){frame.append("text|").append(text.replace("|","/").replace((char)10,' ')).append('|').append(x).append('|').append(y).append('|').append(color).append('|').append(align).append('|').append(fontSize).append('|').append(baseline).append((char)10);}
     public static void drawCenteredText(String text, double x, double y, String color) { frame.append("text|").append(text.replace("|", "/").replace((char) 10, ' ')).append('|').append(x).append('|').append(y).append('|').append(color).append("|center").append((char) 10); }
     public static void drawShape(double x,double y,double width,double height,String color,double rotation,double scaleX,double scaleY){frame.append("rect|").append(x).append('|').append(y).append('|').append(width).append('|').append(height).append('|').append(color).append('|').append(rotation).append('|').append(scaleX).append('|').append(scaleY).append((char)10);}
+    public static void drawCircle(double x,double y,double radius,String color,double rotation,double scaleX,double scaleY){if(!Double.isFinite(radius)||radius<0)throw new IllegalArgumentException("Niepoprawny promien");frame.append("circle|").append(x).append('|').append(y).append('|').append(radius).append('|').append(color).append('|').append(rotation).append('|').append(scaleX).append('|').append(scaleY).append((char)10);}
     public static String frame() { return frame.toString(); }
     public static void drawProgressBar(double x,double y,double width,double height,double progress,String border,String track,String fill){frame.append("progress|").append(x).append('|').append(y).append('|').append(width).append('|').append(height).append('|').append(progress).append('|').append(border).append('|').append(track).append('|').append(fill).append((char)10);}
     public static void drawNinePatch(String asset,double x,double y,double width,double height,double border){frame.append("ninepatch|").append(asset).append('|').append(x).append('|').append(y).append('|').append(width).append('|').append(height).append('|').append(border).append((char)10);}

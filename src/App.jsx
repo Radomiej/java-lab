@@ -224,7 +224,7 @@ export default function App() {
     const formattedFiles = Object.fromEntries(Object.entries(activeTask.solutionFiles).map(([name, code]) =>
       [name, name.endsWith('.java') ? formatJavaSource(code) : code]));
     progress.updateFiles(activeTask.id, formattedFiles);
-    setActiveFile(Object.keys(activeTask.solutionFiles)[0] || "Main.java");
+    setActiveFile(Object.entries(activeTask.starterFiles).find(([,source])=>source.includes("TODO"))?.[0] || Object.keys(activeTask.solutionFiles)[0] || "Main.java");
     setCheckReport(emptyReport);
     setRunner(emptyRunner);
   };

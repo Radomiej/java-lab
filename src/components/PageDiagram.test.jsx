@@ -33,12 +33,12 @@ test('all 72 game pages have separate concepts and examples with valid crops', (
 });
 test('scene pagination switches architecture, coordinates and collider diagrams', () => {
   render(<LessonExplanation lesson={{ id:'g2d.scene' }} />);
-  expect(screen.getByText('Transform + Sprite')).toBeInTheDocument();
+  expect(screen.getByText('Scena wyprawy — cała mapa')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', {name:'Następny krok'}));
   expect(screen.getByRole('img')).toHaveAccessibleName(/Gdzie znajduje się obiekt/);
   expect(screen.getByText('100 | 150')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', {name:'Następny krok'}));
-  expect(screen.getByText('Collider')).toBeInTheDocument();
+  expect(screen.getByText('Komponent nadaje wygląd')).toBeInTheDocument();
   expect(screen.getByRole('button', {name:'Następny krok'})).toBeDisabled();
   cleanup();
 });

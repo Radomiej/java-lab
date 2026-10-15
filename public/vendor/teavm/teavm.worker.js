@@ -177,6 +177,7 @@ function startGameRuntime(app, gameId) {
       const parts = line.split("|");
       if (parts[0] === "clear") drawCommands.push({ op: "clear", color: parts[1] });
       if (parts[0] === "rect") drawCommands.push({ op: "rect", x: Number(parts[1]), y: Number(parts[2]), width: Number(parts[3]), height: Number(parts[4]), color: parts[5],rotation:Number(parts[6]||0),scaleX:Number(parts[7]??1),scaleY:Number(parts[8]??1) });
+      if (parts[0] === "circle") drawCommands.push({op:"circle",x:Number(parts[1]),y:Number(parts[2]),radius:Number(parts[3]),color:parts[4],rotation:Number(parts[5]||0),scaleX:Number(parts[6]??1),scaleY:Number(parts[7]??1)});
       if (parts[0] === "text") drawCommands.push({ op: "text", text: parts[1], x: Number(parts[2]), y: Number(parts[3]), color: parts[4], align: parts[5] || "center",fontSize:Number(parts[6]||16),baseline:parts[7]||"middle" });
       if (parts[0] === "sprite") drawCommands.push({ op: "sprite", texture: parts[1], x: Number(parts[2]), y: Number(parts[3]), width: Number(parts[4]), height: Number(parts[5]), rotation: Number(parts[6] || 0), scaleX: Number(parts[7] ?? 1), scaleY: Number(parts[8] ?? 1) });
       if (parts[0] === "progress") drawCommands.push({op:"progress",x:Number(parts[1]),y:Number(parts[2]),width:Number(parts[3]),height:Number(parts[4]),progress:Number(parts[5]),frame:parts[6],track:parts[7],fill:parts[8]});
