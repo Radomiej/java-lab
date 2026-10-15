@@ -7,7 +7,9 @@ function isUmamiConfigured(env) {
 }
 
 function defaultAnalyticsEnabled(env) {
-  if (!isUmamiConfigured(env) || env?.VITE_ANALYTICS_ENABLED === "false") return false;
+  if (env?.VITE_ANALYTICS_ENABLED === "false") return false;
+  if (typeof location !== "undefined" && location.hostname === "java-lab-eta.vercel.app") return true;
+  if (!isUmamiConfigured(env)) return false;
   return env?.VITE_ANALYTICS_ENABLED === "true" || env?.VERCEL === "1";
 }
 

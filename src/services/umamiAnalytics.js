@@ -1,3 +1,4 @@
+import { trackLabEvent, setLabAnalyticsEnabled } from './labAnalytics.js';
 const TASK_FOCUS_MINIMUM_SECONDS = 1;
 
 export function createUmamiAnalytics({ scriptUrl, websiteId, windowRef, documentRef }) {
@@ -139,14 +140,7 @@ export function createTaskFocusTracker({ track, now = () => performance.now(), d
   };
 }
 
-const env = import.meta.env || {};
-const client = createUmamiAnalytics({
-  scriptUrl: env.VITE_UMAMI_SCRIPT_URL,
-  websiteId: env.VITE_UMAMI_WEBSITE_ID,
-  windowRef: typeof window === "undefined" ? undefined : window,
-  documentRef: typeof document === "undefined" ? undefined : document,
-});
-
-export const setUmamiAnalyticsEnabled = (enabled) => client.setEnabled(enabled);
-export const trackUmamiEvent = (name, data) => client.track(name, data);
-export const trackUmamiPageview = () => client.trackPageview();
+export const setUmamiAnalyticsEnabled = setLabAnalyticsEnabled;
+export const trackUmamiEvent = trackLabEvent;
+// The shared tracker emits the initial page view automatically once.
+export const trackUmamiPageview = () => {};

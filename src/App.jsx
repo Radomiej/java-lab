@@ -1,3 +1,4 @@
+import { trackLabEvent, setLabContext } from './services/labAnalytics.js';
 import { useEffect, useMemo, useRef, useState } from "react";
 import { allLessons, getLessonById, getLessonsForTrack, trackOrder, tracks } from "./data/curriculum.js";
 import { useCourseProgress } from "./hooks/useCourseProgress.js";
@@ -100,6 +101,11 @@ export default function App() {
   }, [activeTaskId, selectedLesson]);
 
   const activeTask = selectedLesson.tasks.find((task) => task.id === activeTaskId) || selectedLesson.tasks[0];
+  useEffect(() => {
+    setLabContext({track_id:selectedLesson.track, lesson_id:selectedLesson.id, task_id:activeTask.id});
+    trackLabEvent('task_open');
+  }, [selectedLesson.track, selectedLesson.id, activeTask.id]);
+  useEffect(() => { trackLabEvent('lesson_open', {lesson_id:selectedLesson.id,track_id:selectedLesson.track}); }, [selectedLesson.id,selectedLesson.track]);
   const files = useMemo(
     () => isPlayground ? playground.project.files : activeTask.engine
       ? {...activeTask.starterFiles, ...gameEditorFiles(progress.filesByTask[activeTask.id] || {})}
@@ -132,6 +138,7 @@ export default function App() {
   }, [analyticsEnabled, taskFocusTracker, selectedLesson.track, selectedLesson.order, activeTask.id]);
 
   const changeTrack = (trackId) => {
+    trackLabEvent('topic_change',{track_id:trackId});
     executionVersion.current++;
     teavmRunner.stopGame();
     const firstLesson = getLessonsForTrack(trackId).find((lesson) => visibleLessons.includes(lesson));
