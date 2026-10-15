@@ -16,6 +16,7 @@ import { gameEngineRuntimeFiles } from "./data/gameEngineRuntime.js";
 import {gameEditorFiles} from './services/gameWorkspace.js';
 import { formatJavaSource } from './components/javaEditorCommands.js';
 import { createTaskFocusTracker, setUmamiAnalyticsEnabled, trackUmamiEvent, trackUmamiPageview } from "./services/umamiAnalytics.js";
+import {useSessionTelemetry} from './hooks/useSessionTelemetry.js';
 
 const emptyReport = { passed: false, score: 0, total: 0, results: [], summary: "Uruchom sprawdzanie, aby zobaczyć wyniki." };
 const emptyRunner = { status: "idle", output: "", error: null, stage: "", diagnostics: [], classVersions: [] };
@@ -106,6 +107,7 @@ export default function App() {
     [activeTask, progress.filesByTask,isPlayground,playground.project.files],
   );
   const completedCount = progress.completedTasks.length;
+  const telemetry=useSessionTelemetry({lessonId:selectedLesson.id,lessonTitle:selectedLesson.title,taskId:activeTask.id,activeFile,files,runnerStatus:runner.status,output:runner.output.slice(-20000),passed:checkReport.total>0?checkReport.passed:null,visibility:'visible'});
 
   useEffect(() => {
     setUmamiAnalyticsEnabled(analyticsEnabled);
@@ -227,6 +229,7 @@ export default function App() {
 
   const sidebar = (
     <Sidebar
+      telemetry={telemetry}
       tracks={visibleTracks}
       trackOrder={visibleTrackOrder}
       lessons={visibleLessons}

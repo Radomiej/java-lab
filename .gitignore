@@ -7,3 +7,4 @@ tools/teavm-javac-java17/
 !.env.example
 
 .env.local
+.vercel

@@ -273,3 +273,6 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
 .playground-toolbar button, .playground-toolbar a.button { margin: 0; flex-shrink: 0; }
 .playground-toolbar .playground-tools > [role="status"] { flex-basis: 100%; margin: 4px 0 0; }
 .game-control-hint { margin: 0 0 12px; color: var(--text-muted, #526b79); font-size: 12px; line-height: 1.5; }
+/* Session sharing remains an unobtrusive status, never a blocking overlay. */
+.telemetry-status { margin: 0 16px 12px; font-size: 11px; line-height: 1.5; color: var(--text-muted, #667085); overflow-wrap: anywhere; }
+.sidebar-brand-copy span { overflow-wrap: anywhere; }

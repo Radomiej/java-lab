@@ -2,7 +2,7 @@ function lessonIsComplete(lesson, completedTasks) {
   return lesson.tasks.length > 0 && lesson.tasks.every((task) => completedTasks.includes(task.id));
 }
 
-export default function Sidebar({ tracks, trackOrder, lessons, selectedTrack, selectedLessonId, completedTasks, completedCount, onTrackChange, onLessonChange, onOpenSettings }) {
+export default function Sidebar({ tracks, trackOrder, lessons, selectedTrack, selectedLessonId, completedTasks, completedCount, onTrackChange, onLessonChange, onOpenSettings, telemetry }) {
   const track = tracks[selectedTrack] || tracks[trackOrder[0]];
   const trackLessons = lessons.filter((lesson) => lesson.track === selectedTrack);
   const totalTasks = lessons.reduce((sum, lesson) => sum + lesson.tasks.filter(task=>task.mode!=='playground').length, 0);
@@ -13,9 +13,11 @@ export default function Sidebar({ tracks, trackOrder, lessons, selectedTrack, se
     <nav className="sidebar" aria-label="Nawigacja kursu">
       <div className="sidebar-brand">
         <span className="brand-mark" aria-hidden="true">J</span>
-        <div className="sidebar-brand-copy"><strong>Java Lab</strong><span>Ucz się przez budowanie</span></div>
+        <div className="sidebar-brand-copy"><strong>Java Lab</strong><span title={telemetry?.machineId}>ID: {telemetry?.machineId || 'lokalne'}</span></div>
         <button className="sidebar-settings-button" type="button" onClick={onOpenSettings} aria-label="Wyczyść postęp">↺</button>
       </div>
+
+      {telemetry?.status !== 'disabled' && telemetry && <p className="telemetry-status" role="status">Praca w tym laboratorium jest udostępniana nauczycielowi. {({online:'Połączono',connecting:'Łączenie…',offline:'Brak połączenia — możesz pracować dalej',too_large:'Projekt za duży do synchronizacji'})[telemetry.status]}</p>}
 
       <div className="sidebar-progress" aria-label="Postęp kursu">
         <div className="progress-heading"><span>Twój postęp</span><strong>{completedCount}</strong></div>
