@@ -113,7 +113,7 @@ export default function App() {
     [activeTask, progress.filesByTask,isPlayground,playground.project.files],
   );
   const completedCount = progress.completedTasks.length;
-  const telemetrySnapshot={lessonId:selectedLesson.id,lessonTitle:selectedLesson.title,taskId:activeTask.id,activeFile,files,runnerStatus:runner.status,output:runner.output.slice(-20000),passed:checkReport.total>0?checkReport.passed:null,visibility:'visible'};
+  const telemetrySnapshot={lessonNumber:selectedLesson.order,taskTitle:activeTask.title||'',progress:{completed:completedCount,total:visibleLessons.reduce((n,lesson)=>n+lesson.tasks.filter(task=>task.mode!=='playground').length,0)},lessonId:selectedLesson.id,lessonTitle:selectedLesson.title,taskId:activeTask.id,activeFile,files,runnerStatus:runner.status,output:runner.output.slice(-20000),passed:checkReport.total>0?checkReport.passed:null,visibility:'visible'};
   const telemetry=useSessionTelemetry(telemetrySnapshot);
 
   useEffect(() => {

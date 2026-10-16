@@ -11,3 +11,10 @@ test('rejects invalid IDs, sequence, prototype keys and UTF8 oversized content',
 });
 test('session tokens bind identity, expire and reject tampering',()=>{const event=sample(),secret='a'.repeat(40),token=issueToken(event,secret,1000);expect(verifyToken(token,secret,1001).sessionId).toBe(event.sessionId);expect(()=>verifyToken(token+'x',secret,1001)).toThrow();expect(()=>verifyToken(token,secret,3601001)).toThrow();});
 test('publisher requires routing and persistent messages without leaking broker errors',async()=>{let body;const env={RABBITMQ_HTTP_URL:'https://rabbit.test',RABBITMQ_USERNAME:'u',RABBITMQ_PASSWORD:'p'};const publish=createRabbitPublisher({env,fetchImpl:async(url,options)=>{body=JSON.parse(options.body);return {ok:true,json:async()=>({routed:true})};}});await publish(sample());expect(body.properties.delivery_mode).toBe(2);expect(body.routing_key).toBe('java-lab.activity');await expect(createRabbitPublisher({env,fetchImpl:async()=>({ok:true,json:async()=>({routed:false})})})(sample())).rejects.toThrow();});
+
+test('preserves bounded progress and lesson metadata, accepts legacy events without it',()=>{
+ const raw=sample();const enriched={...raw,snapshot:{...raw.snapshot,lessonNumber:101,taskTitle:'Zmienne',progress:{completed:3,total:20}}};
+ expect(validateEvent(enriched).snapshot).toMatchObject({lessonNumber:101,taskTitle:'Zmienne',progress:{completed:3,total:20}});
+ expect(validateEvent(raw).snapshot.progress).toBeNull();
+ for(const progress of [{completed:21,total:20},{completed:-1,total:20},{completed:'3',total:20}])expect(()=>validateEvent({...enriched,snapshot:{...enriched.snapshot,progress}})).toThrow();
+});
