@@ -1,7 +1,7 @@
 {
   "name": "java-lab",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "dev:telemetry": "node --env-file-if-exists=.env.local server/telemetry/devServer.js",

@@ -1,0 +1,3 @@
+// @vitest-environment node
+import {test,expect,vi} from 'vitest';import {createTaskFocusTracker} from './umamiAnalytics.js';
+test('completed session duration includes full minutes, separately from periodic minute events',()=>{let now=0;const track=vi.fn(),documentRef=new EventTarget();documentRef.visibilityState='visible';const tracker=createTaskFocusTracker({track,now:()=>now,documentRef});tracker.attach();tracker.setTask({trackId:'java',lessonNumber:102,taskId:'two'});now=125000;tracker.detach();expect(track.mock.calls.filter(([name])=>name==='task_focus_minute')).toHaveLength(2);expect(track).toHaveBeenCalledWith('task_focus_session',expect.objectContaining({duration_seconds:125,duration_bucket:'1_5m'}));});

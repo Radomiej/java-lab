@@ -1,7 +1,9 @@
+import {isFeatureEnabled} from '../config/featureFlags.js';
+import {CLIENT_VERSION} from './clientVersion.js';
 // Production only. Do not pass editor content, SQL, prompts, credentials or raw errors.
 const config = {domain: 'java-lab-eta.vercel.app', websiteId: '4b479aa8-360b-40f5-9376-4ac07836a8c7'};
-const allowed = new Set(['track_id','lesson_id','lesson_number','task_id','mode','action','passed','total','error_count','failure_stage','duration_seconds','duration_bucket','resource','kind','length_bucket']);
-let enabled = true;
+const allowed = new Set(['client_version','execution_ok','task_mode','track_id','lesson_id','lesson_number','task_id','mode','action','passed','total','error_count','failure_stage','duration_seconds','duration_bucket','resource','kind','length_bucket']);
+let enabled = isFeatureEnabled('analytics.enabled');
 let started = false;
 let context = {};
 const recentEvents = new Map();
@@ -9,8 +11,8 @@ const queue = [];
 const production = () => typeof location !== 'undefined' && location.hostname === config.domain && navigator.doNotTrack !== '1' && import.meta.env.VITE_ANALYTICS_ENABLED !== 'false';
 function deliver(name,data) { try { Promise.resolve(window.umami.track(name,data)).catch(() => {}); } catch {} }
 export function trackLabEvent(name,data={}) {
- if (!enabled || !production()) return;
- const safe=Object.fromEntries(Object.entries({...context,...data}).filter(([key,value])=>allowed.has(key)&&['string','number','boolean'].includes(typeof value)).map(([key,value])=>[key,typeof value==='string'?value.slice(0,80):value]));
+ if (!enabled || !production() || typeof name!=='string' || !name || name.length>50) return;
+ const safe=Object.fromEntries(Object.entries({...context,...data,client_version:CLIENT_VERSION}).filter(([key,value])=>allowed.has(key)&&['string','number','boolean'].includes(typeof value)&&(typeof value!=='number'||Number.isFinite(value))).map(([key,value])=>[key,typeof value==='string'?value.slice(0,80):value]));
  const key=JSON.stringify([name,safe]);
  if(Date.now()-(recentEvents.get(key)||0)<500)return;
  recentEvents.set(key,Date.now());
@@ -19,9 +21,9 @@ export function trackLabEvent(name,data={}) {
  else {queue.push([name,safe]);if(queue.length>50)queue.shift();}
 }
 export function setLabContext(value) {context=value;}
-export function setLabAnalyticsEnabled(value) {enabled=Boolean(value);if(!enabled)queue.length=0;}
+export function setLabAnalyticsEnabled(value) {enabled=Boolean(value);if(!enabled)queue.length=0;else startLabAnalytics();}
 export function startLabAnalytics() {
- if(started||!production())return;
+ if(started||!enabled||!production())return;
  started=true;
  const script=document.createElement('script');script.defer=true;
  script.src='https://mws03-52051.wykr.es/script.js';
@@ -29,6 +31,7 @@ export function startLabAnalytics() {
  script.dataset.excludeSearch='true';script.dataset.excludeHash='true';script.dataset.doNotTrack='true';
  script.addEventListener('load',()=>{if(enabled && typeof window.umami?.track==='function')queue.splice(0).forEach(([name,data])=>deliver(name,data));},{once:true});
  script.addEventListener('error',()=>{queue.length=0;},{once:true});document.head.append(script);
+ trackLabEvent('client_loaded');
  let errors=0;
  const error=kind=>{if(++errors<=10)trackLabEvent('technical_error',{kind});};
  window.addEventListener('error',()=>error('uncaught_error'));

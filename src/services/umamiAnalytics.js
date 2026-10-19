@@ -81,6 +81,7 @@ export function createTaskFocusTracker({ track, now = () => performance.now(), d
   let currentTask = null;
   let segmentStartedAt = null;
   let accumulatedMilliseconds = 0;
+  let totalMilliseconds = 0;
   let attached = false;
 
   const isVisible = () => documentRef?.visibilityState !== "hidden";
@@ -89,7 +90,9 @@ export function createTaskFocusTracker({ track, now = () => performance.now(), d
   };
   const accrueSegment = () => {
     if (!currentTask || segmentStartedAt === null) return;
-    accumulatedMilliseconds += Math.max(0, now() - segmentStartedAt);
+    const elapsed=Math.max(0,now()-segmentStartedAt);
+    accumulatedMilliseconds += elapsed;
+    totalMilliseconds += elapsed;
     segmentStartedAt = null;
     while (accumulatedMilliseconds >= 60_000) {
       track("task_focus_minute", { ...currentTask, duration_seconds: 60 });
@@ -98,7 +101,7 @@ export function createTaskFocusTracker({ track, now = () => performance.now(), d
   };
   const finishTask = () => {
     accrueSegment();
-    const durationSeconds = Math.floor(accumulatedMilliseconds / 1000);
+    const durationSeconds = Math.floor(totalMilliseconds / 1000);
     if (currentTask && durationSeconds >= TASK_FOCUS_MINIMUM_SECONDS) {
       track("task_focus_session", {
         ...currentTask,
@@ -109,6 +112,7 @@ export function createTaskFocusTracker({ track, now = () => performance.now(), d
       });
     }
     accumulatedMilliseconds = 0;
+    totalMilliseconds = 0;
     currentTask = null;
   };
   const onVisibilityChange = () => {

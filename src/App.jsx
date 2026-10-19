@@ -1,3 +1,5 @@
+import {createCourseRoutes} from './services/courseRoutes.js';
+import {useCourseRoute} from './hooks/useCourseRoute.js';
 import { trackLabEvent, setLabContext } from './services/labAnalytics.js';
 import { useEffect, useMemo, useRef, useState } from "react";
 import { allLessons, getLessonById, getLessonsForTrack, trackOrder, tracks } from "./data/curriculum.js";
@@ -102,7 +104,7 @@ export default function App() {
 
   const activeTask = selectedLesson.tasks.find((task) => task.id === activeTaskId) || selectedLesson.tasks[0];
   useEffect(() => {
-    setLabContext({track_id:selectedLesson.track, lesson_id:selectedLesson.id, task_id:activeTask.id});
+    setLabContext({track_id:selectedLesson.track, lesson_id:selectedLesson.id, lesson_number:selectedLesson.order, task_id:activeTask.id});
     trackLabEvent('task_open');
   }, [selectedLesson.track, selectedLesson.id, activeTask.id]);
   useEffect(() => { trackLabEvent('lesson_open', {lesson_id:selectedLesson.id,track_id:selectedLesson.track}); }, [selectedLesson.id,selectedLesson.track]);
@@ -162,6 +164,16 @@ export default function App() {
     setCheckReport(emptyReport);
     setRunner(emptyRunner);
   };
+
+  const courseRoutes=useMemo(()=>createCourseRoutes(visibleLessons),[visibleLessons]);
+  useCourseRoute(courseRoutes,JSON.stringify([selectedLesson.track,selectedLesson.id,activeTask.id]),target=>{
+    executionVersion.current++;
+    teavmRunner.stopGame();
+    progress.selectLesson(target.lesson.id);
+    setActiveTaskId(target.task.id);
+    setActiveFile(target.lesson.track==='game-dev'?'GameMain.java':'Main.java');
+    setCheckReport(emptyReport);setRunner(emptyRunner);
+  });
 
   const handleCheck = async () => {
     const version = ++executionVersion.current;

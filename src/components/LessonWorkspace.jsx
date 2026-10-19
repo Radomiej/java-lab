@@ -1,3 +1,4 @@
+import CopyLessonLink from './CopyLessonLink.jsx';
 import {useState,useEffect} from 'react';
 import GuidedChange from '../../shared/lab-game-v2/editor/GuidedChange.jsx';
 import {changedRange} from '../../shared/lab-game-v2/editor/guidedChanges.js';
@@ -15,6 +16,7 @@ export default function LessonWorkspace({ lesson, activeTask, activeFile, files,
   return (
     <div className="lesson-workspace">
       <LessonOverview lesson={lesson} />
+      <CopyLessonLink />
       <TaskPanel lesson={lesson} activeTask={activeTask} completedTasks={completedTasks} onTaskChange={onTaskChange} />
       {showChange && <GuidedChange starter={activeTask.starterFiles} solution={activeTask.solutionFiles} explanation={activeTask.solutionExplanation} />}
       <section className="editor-section" aria-labelledby="editor-title">
