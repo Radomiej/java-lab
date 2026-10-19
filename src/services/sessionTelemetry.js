@@ -1,6 +1,6 @@
 import {getInstallationId,newId} from './installationId.js';
 import {validateEvent,MAX_EVENT_BYTES} from '../../shared/telemetry/schema.js';
-export function createSessionTelemetry({fetchImpl=(...args)=>fetch(...args),getSnapshot,onStatus=()=>{},documentRef=globalThis.document,enabled=false,machineId=getInstallationId(),appId='java-lab'}={}) {
+export function createSessionTelemetry({fetchImpl=(...args)=>fetch(...args),getSnapshot,onStatus=()=>{},documentRef=globalThis.document,enabled=false,machineId=getInstallationId(),appId='java-lab',getStudentName=()=>''}={}) {
   const sessionId=newId();let sequence=0,queue=[],running=false,busy=false,token=null,expiresAt=0,retry=null,heartbeat=null,sampling=null,lastSample='',backoff=2000,controller;
   const status=s=>{try{onStatus(s);}catch{}};
   const request=async(url,body,headers={})=>{
@@ -23,7 +23,7 @@ export function createSessionTelemetry({fetchImpl=(...args)=>fetch(...args),getS
     if(!running)return;
     try{
       const snapshot={...(override||getSnapshot()),visibility:documentRef?.visibilityState==='hidden'?'hidden':'visible'};
-      const raw={version:1,eventId:newId(),machineId,sessionId,appId,sequence:++sequence,type,sentAt:Date.now(),snapshot};
+      const raw={version:1,eventId:newId(),machineId,sessionId,appId,studentName:getStudentName(),sequence:++sequence,type,sentAt:Date.now(),snapshot};
       if(new TextEncoder().encode(JSON.stringify(raw)).length>MAX_EVENT_BYTES){status('too_large');return;}
       const event=validateEvent(raw);
       // Keep the in-flight event immutable for idempotent retries; coalesce all unsent snapshots.

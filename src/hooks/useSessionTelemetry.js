@@ -7,12 +7,15 @@ export function useSessionTelemetry(snapshot){
   const previous=useRef(null);
   const [machineId]=useState(()=>getInstallationId());
   const [status,setStatus]=useState('disabled');
+  const [studentName,setName]=useState(()=>{try{return (localStorage.getItem('lab-student-name-v1')||'').slice(0,80);}catch{return '';}});
+  const nameRef=useRef(studentName);nameRef.current=studentName;
+  const setStudentName=value=>{const name=value.slice(0,80);setName(name);try{localStorage.setItem('lab-student-name-v1',name);}catch{}};
   useEffect(()=>{
-    const sender=createSessionTelemetry({machineId,enabled:import.meta.env.VITE_TELEMETRY_ENABLED==='true',getSnapshot:()=>latest.current,onStatus:setStatus});
+    const sender=createSessionTelemetry({machineId,enabled:import.meta.env.VITE_TELEMETRY_ENABLED==='true',getStudentName:()=>nameRef.current,getSnapshot:()=>latest.current,onStatus:setStatus});
     client.current=sender;sender.start();
     return ()=>{client.current=null;sender.stop();};
   },[machineId]);
   useEffect(()=>{const old=previous.current;if(old&&(old.lessonId!==snapshot.lessonId||old.taskId!==snapshot.taskId)){client.current?.changed('task_left',old);client.current?.changed('snapshot',snapshot);}previous.current=snapshot;});
   const capture=useCallback((type,value)=>client.current?.changed(type,value),[]);
-  return {machineId,status,capture};
+  return {machineId,status,capture,studentName,setStudentName};
 }

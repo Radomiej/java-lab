@@ -1,3 +1,4 @@
+import StudentIdentity from './StudentIdentity.jsx';
 function lessonIsComplete(lesson, completedTasks) {
   return lesson.tasks.length > 0 && lesson.tasks.every((task) => completedTasks.includes(task.id));
 }
@@ -13,11 +14,11 @@ export default function Sidebar({ tracks, trackOrder, lessons, selectedTrack, se
     <nav className="sidebar" aria-label="Nawigacja kursu">
       <div className="sidebar-brand">
         <img className="brand-mark" aria-hidden="true" alt="" src="/favicon.svg" />
-        <div className="sidebar-brand-copy"><strong>Java Lab</strong><span title={telemetry?.machineId}>ID: {telemetry?.machineId || 'lokalne'}</span></div>
+        <div className="sidebar-brand-copy"><strong>Java Lab</strong><span title={telemetry?.machineId}>ID: {telemetry?.machineId?.slice(-6)||'—'}</span><span>{telemetry?.studentName||'Bez nazwy'}</span></div>
         <button className="sidebar-settings-button" type="button" onClick={onOpenSettings} aria-label="Wyczyść postęp">↺</button>
       </div>
 
-      {telemetry?.status !== 'disabled' && telemetry && <p className="telemetry-status" role="status">Praca w tym laboratorium jest udostępniana nauczycielowi. {({online:'Połączono',connecting:'Łączenie…',offline:'Brak połączenia — możesz pracować dalej',too_large:'Projekt za duży do synchronizacji'})[telemetry.status]}</p>}
+      <StudentIdentity telemetry={telemetry}/>
 
       <div className="sidebar-progress" aria-label="Postęp kursu">
         <div className="progress-heading"><span>Twój postęp</span><strong>{completedCount}</strong></div>
