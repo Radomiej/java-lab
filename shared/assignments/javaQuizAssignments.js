@@ -3,7 +3,7 @@ import {createLessonQuiz} from '../../src/data/lessonQuiz.js';
 export function generateJavaQuiz(descriptor) {
   const lesson=javaQuizLessons.find(item=>'java-quiz-'+item.id===descriptor.templateId);
   if(!lesson)throw Error('Nieznana lekcja quizu.');
-  const questions=createLessonQuiz(lesson);
+  const questions=createLessonQuiz(lesson,{revision:descriptor.index});
   const key=Object.fromEntries(questions.map(question=>[question.id,String(question.correct)]));
   const publicQuestions=questions.map(({correct,explanation,choices,...question})=>({...question,prompt:question.title+': '+question.prompt,options:choices.map((text,index)=>({id:String(index),text}))}));
   return {...descriptor,id:`${descriptor.templateId}-${descriptor.seed}-${descriptor.index}`,title:`Quiz · ${lesson.title}`,

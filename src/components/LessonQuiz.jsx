@@ -2,6 +2,7 @@ import {useEffect,useRef,useState} from 'react';
 import {createSubmissionClient} from '../services/assignmentSubmissions.js';
 import {getInstallationId} from '../services/installationId.js';
 import {createLessonQuiz} from '../data/lessonQuiz.js';
+import {lessonQuizRevision} from '../data/gameIntroPages.js';
 import CodeExample from '../../shared/lab-game-v2/editor/CodeExample.jsx';
 export default function LessonQuiz({lesson, onContinue}) {
   const [answers, setAnswers] = useState({});
@@ -17,7 +18,7 @@ export default function LessonQuiz({lesson, onContinue}) {
   async function submit(){
     setSending(true);setError('');
     try{
-      const descriptor={generatorVersion:'1',templateId:'java-quiz-'+lesson.id,seed:getInstallationId(),difficulty:'standard',index:0};
+      const descriptor={generatorVersion:'1',templateId:'java-quiz-'+lesson.id,seed:getInstallationId(),difficulty:'standard',index:lessonQuizRevision(lesson)};
       const id=await client.current.submit({assignment:descriptor,studentId,files:{'answer.json':JSON.stringify({answers:Object.fromEntries(Object.entries(answers).map(([id,value])=>[id,String(value)]))})}});
       setSubmissionId(id);await client.current.flush();
     }catch(failure){setError(failure.message);}finally{setSending(false);}

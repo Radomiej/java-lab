@@ -6,6 +6,8 @@ import { assetManifest } from '../../shared/lab-game-v2/assets/Assets.js';
 import { gameExplanationPages } from '../../shared/lab-game-v2/editor/lessonVisuals.js';
 import PageDiagram from '../../shared/lab-game-v2/editor/PageDiagram.jsx';
 import { gameConceptScenes } from '../data/gameConceptScenes.js';
+import { gameIntroPages } from '../data/gameIntroPages.js';
+import GameIntroDiagram from './GameIntroDiagram.jsx';
 import './JavaLessonExplanation.css';
 import ConsoleOutput from './ConsoleOutput.jsx';
 
@@ -25,14 +27,15 @@ function Pages({ pages, lessonId }) {
     <article className="explanation-copy" aria-live="polite">
       <h2>{page.title}</h2><p>{page.text}</p>
       {index === 0 && javaConceptPages[lessonId] && <figure className="java-course-infographic"><a href={`${import.meta.env.BASE_URL}course-assets/java-concepts/${lessonId}.png`} target="_blank" rel="noreferrer" aria-label={`Otwórz infografikę: ${page.title}`}><img src={`${import.meta.env.BASE_URL}course-assets/java-concepts/${lessonId}.png`} alt={page.title} loading="lazy" /></a></figure>}
-      {index === 0 && javaConceptPages[lessonId] ? null : page.actors ? <div className="concept-scene" aria-label={page.title}>
+      {page.introDiagram ? <GameIntroDiagram kind={page.introDiagram} title={page.title}/> : index === 0 && javaConceptPages[lessonId] ? null : page.actors ? <div className="concept-scene" aria-label={page.title}>
         {page.actors.map((actor, number) => <div className="concept-actor" key={number}>
           <h3>{actor.name}</h3><Hero kind={actor.sprite} />
           <pre className="concept-state">{actor.state}</pre>
           {actor.effect && <span className="concept-effect">{['Miecz', 'Czar'].includes(actor.effect) && <Hero kind={actor.effect === 'Miecz' ? 'slash' : 'magic-burst'} />}{actor.effect}</span>}
         </div>)}
       </div> : <PageDiagram page={page} />}
-      {page.code && <CodeExample code={typeof page.code === 'object' ? page.code.java : page.code} />}
+      {page.setupCode&&<><p className="game-intro-code-context">GameMain.onCreate(): dodaj do przygotowanego Player</p><CodeExample code={page.setupCode}/></>}
+      {page.code && <>{page.codeContext&&<p className="game-intro-code-context">{page.codeContext}</p>}<CodeExample code={typeof page.code === 'object' ? page.code.java : page.code} /></>}
       {page.result && (page.result.endsWith('\n')
         ? <ConsoleOutput key={page.title} label="Wyjście tego przykładu" output={page.result} />
         : <div className="concept-result"><span>Efekt tego przykładu</span><pre>{page.result}</pre></div>)}
@@ -55,6 +58,9 @@ export default function JavaLessonExplanation({ lesson }) {
 }
 
 export function conceptPages(lesson) {
+  if (gameIntroPages[lesson.id]) return lesson.id === 'g2d.input'
+    ? [...gameIntroPages[lesson.id], ...gameExplanationPages.input.slice(1)]
+    : gameIntroPages[lesson.id];
   if (javaConceptPages[lesson.id]) return javaConceptPages[lesson.id];
   const chapter = lesson.id?.replace(/^g2d\./, '');
   if (!lesson.id?.startsWith('g2d.') || !gameExplanationPages[chapter]) return null;

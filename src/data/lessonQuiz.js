@@ -1,12 +1,15 @@
 import { javaConceptPages } from './javaConceptPages.js';
 import { gameExplanationPages } from '../../shared/lab-game-v2/editor/lessonVisuals.js';
+import {gameIntroPages,lessonQuizRevision} from './gameIntroPages.js';
 
-export function lessonQuizPages(lesson) {
+export function lessonQuizPages(lesson,{revision=lessonQuizRevision(lesson)}={}) {
+  if(revision===1&&gameIntroPages[lesson.id])return gameIntroPages[lesson.id];
   return javaConceptPages[lesson.id] || gameExplanationPages[lesson.id.replace(/^g2d\./, '')] || [];
 }
-export function createLessonQuiz(lesson) {
-  const pages = lessonQuizPages(lesson);
-  return pages.slice(0, 3).map((page, index) => {
+export function createLessonQuiz(lesson,{revision=lessonQuizRevision(lesson)}={}) {
+  const pages = lessonQuizPages(lesson,{revision});
+  const quizPages=lesson.id==='g2d.scene'&&revision===1?[pages[2],pages[3],pages[5]]:pages.slice(0,3);
+  return quizPages.map((page, index) => {
     const answer = page.result || page.text;
     const other = Object.values({...javaConceptPages, ...gameExplanationPages}).flat()
       .map(item => item.result || item.text).filter(text => text && text !== answer);

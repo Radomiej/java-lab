@@ -1,0 +1,125 @@
+{
+  "date": "2026-10-20",
+  "sceneMobile": [
+    {
+      "figure": true,
+      "overflow": false,
+      "title": "Gra działa w pętli"
+    },
+    {
+      "figure": true,
+      "overflow": false,
+      "title": "Game jest gospodarzem sceny"
+    },
+    {
+      "figure": true,
+      "overflow": false,
+      "title": "GameObject to jeden obiekt w scenie"
+    },
+    {
+      "figure": true,
+      "overflow": false,
+      "title": "Transform odpowiada: gdzie jest obiekt?"
+    },
+    {
+      "figure": true,
+      "overflow": false,
+      "title": "Zmień tylko X i porównaj wynik"
+    },
+    {
+      "figure": true,
+      "overflow": false,
+      "title": "Renderer sprawia, że obiekt widać"
+    },
+    {
+      "figure": true,
+      "overflow": false,
+      "title": "Wybierz renderer do rodzaju obrazu"
+    },
+    {
+      "figure": true,
+      "overflow": false,
+      "title": "Skala zmienia rozmiar rysunku"
+    },
+    {
+      "figure": true,
+      "overflow": false,
+      "title": "Obrót dotyczy grafiki wokół pozycji obiektu"
+    },
+    {
+      "figure": true,
+      "overflow": false,
+      "title": "Komponent ma własne dane i jedną rolę"
+    },
+    {
+      "figure": true,
+      "overflow": false,
+      "title": "Dwa obiekty to dwa niezależne zestawy danych"
+    }
+  ],
+  "inputDesktop": [
+    {
+      "overflow": false,
+      "title": "Własny komponent opisuje zachowanie"
+    },
+    {
+      "overflow": false,
+      "title": "Podłącz zachowanie do konkretnego obiektu"
+    },
+    {
+      "overflow": false,
+      "title": "delta mówi, ile czasu minęło"
+    },
+    {
+      "overflow": false,
+      "title": "Klawisz decyduje, czy wykonać ruch"
+    },
+    {
+      "overflow": false,
+      "title": "Kontroler gracza a komponent ruchu"
+    },
+    {
+      "overflow": false,
+      "title": "Przytrzymanie czy nowe naciśnięcie?"
+    },
+    {
+      "overflow": false,
+      "title": "Kierunek zostaje po zatrzymaniu"
+    }
+  ],
+  "inputMobile": [
+    {
+      "overflow": false,
+      "title": "Własny komponent opisuje zachowanie"
+    },
+    {
+      "overflow": false,
+      "title": "Podłącz zachowanie do konkretnego obiektu"
+    },
+    {
+      "overflow": false,
+      "title": "delta mówi, ile czasu minęło"
+    },
+    {
+      "overflow": false,
+      "title": "Klawisz decyduje, czy wykonać ruch"
+    },
+    {
+      "overflow": false,
+      "title": "Kontroler gracza a komponent ruchu"
+    },
+    {
+      "overflow": false,
+      "title": "Przytrzymanie czy nowe naciśnięcie?"
+    },
+    {
+      "overflow": false,
+      "title": "Kierunek zostaje po zatrzymaniu"
+    }
+  ],
+  "interactiveX": {
+    "before": 100,
+    "after": 220,
+    "y": 150
+  }
+}
