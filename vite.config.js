@@ -11,6 +11,8 @@ export default defineConfig({
   server: {
     proxy: {
       "/api/telemetry": "http://127.0.0.1:5185",
+      "/api/assignments": "http://127.0.0.1:5185",
+      "/api/submissions": "http://127.0.0.1:5185",
       "/api/ai": "http://127.0.0.1:5184",
     },
   },

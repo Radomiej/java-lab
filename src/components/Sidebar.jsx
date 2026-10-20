@@ -1,4 +1,5 @@
 import StudentIdentity from './StudentIdentity.jsx';
+const clientVersion=typeof __LAB_CLIENT_VERSION__==='string'?__LAB_CLIENT_VERSION__:'dev';
 function lessonIsComplete(lesson, completedTasks) {
   return lesson.tasks.length > 0 && lesson.tasks.every((task) => completedTasks.includes(task.id));
 }
@@ -58,7 +59,7 @@ export default function Sidebar({ tracks, trackOrder, lessons, selectedTrack, se
       </details>
       </div>
 
-      <div className="sidebar-footer"><span>{lessons.length} lekcji</span><span className="offline-badge"><span className="status-dot" /> lokalnie</span></div>
+      <div className="sidebar-footer"><span>{lessons.length} lekcji</span><span className="offline-badge"><span className="status-dot" /> lokalnie</span><small className="sidebar-version" title={`Wersja laba: ${clientVersion}`}>v{clientVersion}</small></div>
     </nav>
   );
 }

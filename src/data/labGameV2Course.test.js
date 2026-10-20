@@ -34,7 +34,7 @@ test('all source contracts are exact and each ready Java example compiles agains
   for(const [index,lesson] of gameDevLessons.entries()) {
    expect(lesson.id).toBe(courseManifest.chapters[index].id);
    for(const [taskIndex,task] of lesson.tasks.entries()) {
-    const source=courseManifest.chapters[index].tasks[taskIndex];for(const key of ['id','title','mode','prompt','objective','criteria'])expect(task[key]).toEqual(source[key]);
+    const source=courseManifest.chapters[index].tasks[taskIndex];/* Editorial Java criteria are covered by gameDevStudentCopy.test.js. */ for(const key of ['id','title','mode','prompt','objective'])expect(task[key]).toEqual(source[key]);
     if(!task.solutionReady)continue;
     const folder=join(dir,task.id);mkdirSync(folder,{recursive:true});
     const files={...Object.fromEntries(Object.entries(task.solutionFiles).map(([name,text])=>[name,'import engine.*;\n'+text])),...task.javaTestFiles};

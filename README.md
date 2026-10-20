@@ -233,6 +233,18 @@ No extra npm dependencies or private API keys. Deploy this local change to activ
 No tests were added or run for this change. Visual behavior is unchanged; no visual QA was run.
 
 
+## GameDev Java: PDF i stabilność runtime
+
+Java Lab używa lokalnego komponentu src/components/GameCoursePdf.jsx i trzech materiałów kurs-gamedev-java*.pdf (8,5,7 stron). Wspólny komponent i PDF-y JS dla Web Lab pozostają osobne. Źródło: scripts/build-java-courses.py, ilustracje docs/course-assets. Generator wymaga ReportLab, Pillow i fontów Arial/Consolas; renderer podglądów scripts/render-java-course-previews.py przyjmuje --pdftoppm. Kontrola 17 przykładów: node scripts/check-java-course-code.mjs używa vendored kompilatora TeaVM i aktualnych klas silnika. Raporty są w docs/java-course-*.json.
+
+Kryteria dla ucznia są redagowane w src/data/gameDevStudentCopy.js: podają pozycję, szerokość i wysokość zamiast wyliczonych krawędzi grafiki. Testy zachowania pozostają osobne.
+
+Nowy runner jawnie negocjuje potwierdzenia klatek: worker ma najwyżej jedną klatkę w locie i czeka na ACK po synchronicznym rysowaniu. Starsze klienty korzystają z trybu zgodności. Stdout/stderr mają limit20tys.znaków, logi gry są scalane i ograniczone do4tys.na poziom na klatkę. Asercje Java są przechowywane osobno, żeby nadmiar zwykłego tekstu nie ukrywał wyników sprawdzania. Usunięto potwierdzone ryzyka przeciążenia; zgłoszona awaria białej karty Chrome nie została odtworzona i jej przyczyna nie jest jeszcze potwierdzona.
+
+
+Statystyki edycji: snapshot.editingActivity zawiera liczbę znaków wpisanych ręcznie, znaków wklejonych, liczbę i największy rozmiar wklejenia, akcje usuwania oraz tempo w znakach/min z ostatnich 60 sekund (na początku okno ma minimum 10 sekund). Liczniki dotyczą jednej sesji/karty i resetują się po jej ponownym otwarciu. Obejmują tylko edytory kodu; pola nazwy i wyszukiwania są pomijane. Dodatkowe metryki zawierają liczby i znaczniki czasu, bez treści schowka ani rejestru klawiszy. Autouzupełnianie, formatowanie i cofanie nie są liczone jako ręczne pisanie. Metryki są orientacyjne i raportowane przez klienta, nie służą do automatycznego ustalania autorstwa. Aktualizacja przez heartbeat co 15 s i zapisy/Play; stare sesje bez pomiaru mają editingActivity=null.
+
+
 ### Client version and event review (2026-10-19)
 
 All custom events include `client_version` (`package.json` version + deployment commit). `client_loaded` is sent once per page load, alongside the tracker's single automatic pageview. Existing production domain, website ID, `VITE_ANALYTICS_ENABLED=false`, and Do Not Track remain in effect. Java also respects `analytics.enabled` before loading the tracker.
@@ -244,3 +256,7 @@ Only controlled metadata is forwarded: no code, SQL, output, student names, inst
 
 ### Window focus telemetry
 Teacher session snapshots include optional `focused` status. Window focus/blur and document visibility changes send a heartbeat immediately; older clients remain compatible. Presence is independent of the 45-second connection timeout. Focus is sent only to the existing teacher backend, not Umami.
+
+## Nauka, quiz i samodzielna praca
+
+Każda z 36 lekcji kursu ma teraz etapy Nauka → Quiz → Zadanie: 97 stron z ilustracjami, 36 quizów i 108 zadań. Dwanaście nowych spokojnych infografik wyjaśnia fundamenty i OOP. Quizy oraz kod można oddać do nauczyciela przez trwały outbox; oznaczenie „✓ Wysłano” wymaga potwierdzenia serwera. Szczegóły, zakres testów i podglądy: [raport modułów](docs/java-learning-modules-update.md).

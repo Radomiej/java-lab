@@ -1,0 +1,351 @@
+[
+  {
+    "id": "fundamentals-01",
+    "title": "Pierwszy program Javy",
+    "hash": "#/fundamentals/101-pierwszy-program-javy/1-powitaj-gracza",
+    "pages": [
+      "Kod mówi konsoli, co wypisać",
+      "print zostaje w wierszu, println go kończy"
+    ]
+  },
+  {
+    "id": "fundamentals-02",
+    "title": "Zmienne i typy danych",
+    "hash": "#/fundamentals/102-zmienne-i-typy-danych/1-karta-postaci",
+    "pages": [
+      "Zmienna przechowuje aktualną wartość",
+      "Typ określa, jakie dane pasują",
+      "double zachowuje część ułamkową"
+    ]
+  },
+  {
+    "id": "fundamentals-03",
+    "title": "Warunki i pętle",
+    "hash": "#/fundamentals/103-warunki-i-petle/1-trzy-rundy-treningu",
+    "pages": [
+      "if wybiera jedną drogę",
+      "Pętla powtarza instrukcję"
+    ]
+  },
+  {
+    "id": "fundamentals-04",
+    "title": "Metody i odpowiedzialność",
+    "hash": "#/fundamentals/104-metody-i-odpowiedzialnosc/1-policz-nagrode",
+    "pages": [
+      "Metoda przyjmuje dane i zwraca wynik",
+      "static należy do klasy, zwykła metoda do obiektu"
+    ]
+  },
+  {
+    "id": "objects-05",
+    "title": "Klasa i obiekt",
+    "hash": "#/objects/201-klasa-i-obiekt/1-pierwszy-quest",
+    "pages": [
+      "Klasa to przepis; new tworzy obiekt",
+      "Referencja nie kopiuje bohatera"
+    ]
+  },
+  {
+    "id": "objects-06",
+    "title": "Konstruktor i enkapsulacja",
+    "hash": "#/objects/202-konstruktor-i-enkapsulacja/1-quest-z-konstruktorem",
+    "pages": [
+      "Konstruktor ustawia stan na start",
+      "private chroni dane; metoda pilnuje reguły"
+    ]
+  },
+  {
+    "id": "objects-07",
+    "title": "Kompozycja",
+    "hash": "#/objects/203-kompozycja/1-planner-posiada-task",
+    "pages": [
+      "Kompozycja: bohater ma plecak",
+      "Metoda może zlecić pracę innemu obiektowi"
+    ]
+  },
+  {
+    "id": "objects-08",
+    "title": "Obiekt gotowy do testowania",
+    "hash": "#/objects/204-obiekt-gotowy-do-testowania/1-ukoncz-quest",
+    "pages": [
+      "Test sprawdza skutek, nie napis w konsoli",
+      "Sprawdź też granicę"
+    ]
+  },
+  {
+    "id": "inheritance-09",
+    "title": "Dziedziczenie przez extends",
+    "hash": "#/inheritance/301-dziedziczenie-przez-extends/1-bohater-i-mag",
+    "pages": [
+      "Mag jest postacią — i ma coś więcej",
+      "super przekazuje dane konstruktorowi rodzica"
+    ]
+  },
+  {
+    "id": "inheritance-10",
+    "title": "Overriding",
+    "hash": "#/inheritance/302-overriding/1-opis-postaci",
+    "pages": [
+      "Ta sama metoda, własny atak",
+      "super używa wersji rodzica"
+    ]
+  },
+  {
+    "id": "inheritance-11",
+    "title": "Polimorfizm",
+    "hash": "#/inheritance/303-polimorfizm/1-druzyna-bohaterow",
+    "pages": [
+      "Jedna komenda, dwa różne ataki",
+      "Typ zmiennej to dostępne przyciski"
+    ]
+  },
+  {
+    "id": "inheritance-12",
+    "title": "Wyjątki i bezpieczny program",
+    "hash": "#/inheritance/304-wyjatki-i-bezpieczny-program/1-bezpieczne-punkty",
+    "pages": [
+      "Wyjątek przerywa błędną operację",
+      "catch obsługuje konkretny błąd"
+    ]
+  },
+  {
+    "id": "g2d.scene",
+    "title": "Scena, obiekty i komponenty",
+    "hash": "#/game-dev/401-scena-obiekty-i-komponenty/1-pierwszy-obiekt",
+    "pages": [
+      "Z czego składa się scena?",
+      "Gdzie znajduje się obiekt?",
+      "Komponenty definiują obiekt"
+    ]
+  },
+  {
+    "id": "g2d.input",
+    "title": "Sterowanie i kierunek postaci",
+    "hash": "#/game-dev/402-sterowanie-i-kierunek-postaci/1-ruch-wasd-i-strzalkami",
+    "pages": [
+      "Od klawisza do ruchu",
+      "Przytrzymanie czy nowe naciśnięcie?",
+      "Kierunek zostaje po zatrzymaniu"
+    ]
+  },
+  {
+    "id": "g2d.collisions",
+    "title": "Collidery, przeszkody i granice świata",
+    "hash": "#/game-dev/403-collidery-przeszkody-i-granice-swiata/1-sciana-zatrzymuje-gracza",
+    "pages": [
+      "Obraz i fizyczny kształt",
+      "Ruch zatrzymuje się przy ścianie",
+      "Ruch wzdłuż przeszkody"
+    ]
+  },
+  {
+    "id": "g2d.enemy-ai",
+    "title": "Pierwszy przeciwnik i pościg",
+    "hash": "#/game-dev/404-pierwszy-przeciwnik-i-poscig/1-poscig-za-graczem",
+    "pages": [
+      "Wektor od przeciwnika do celu",
+      "Stała prędkość pościgu",
+      "Decyzja i wykonanie ruchu"
+    ]
+  },
+  {
+    "id": "g2d.projectiles",
+    "title": "Pociski, HP i pierwsza pętla walki",
+    "hash": "#/game-dev/405-pociski-hp-i-pierwsza-petla-walki/1-prawdziwy-lot-pocisku",
+    "pages": [
+      "Pocisk i HP tworzą walkę",
+      "Pocisk: wygląd, lot i trafienie",
+      "Jedno trafienie zużywa pocisk"
+    ]
+  },
+  {
+    "id": "g2d.components",
+    "title": "Własna klasa komponentu i cykl życia",
+    "hash": "#/game-dev/406-wlasna-klasa-komponentu-i-cykl-zycia/1-licznik-aktualizacji",
+    "pages": [
+      "Właściciel i zachowanie",
+      "Osobny stan każdej instancji",
+      "Cykl życia komponentu"
+    ]
+  },
+  {
+    "id": "g2d.time",
+    "title": "Czas, wektory i stała prędkość",
+    "hash": "#/game-dev/407-czas-wektory-i-stala-predkosc/1-80-pikseli-na-sekunde",
+    "pages": [
+      "Prędkość razy czas",
+      "Dlaczego normalizujemy przekątną?",
+      "Brak kierunku oznacza brak ruchu"
+    ]
+  },
+  {
+    "id": "g2d.graphics",
+    "title": "Sprite, kafelki, odbicie i warstwy",
+    "hash": "#/game-dev/408-sprite-kafelki-odbicie-i-warstwy/1-laka-pod-postacia",
+    "pages": [
+      "Warstwy układają obraz",
+      "flipX: porównaj obie strony",
+      "Odbicie nie zmienia collidera"
+    ]
+  },
+  {
+    "id": "g2d.waves",
+    "title": "Fale, konfiguracja i powtarzalny spawn",
+    "hash": "#/game-dev/409-fale-konfiguracja-i-powtarzalny-spawn/1-trzy-pojawienia-w-czasie",
+    "pages": [
+      "Spawn według harmonogramu",
+      "Dane fali i powtarzalność",
+      "Limit żywych jednostek"
+    ]
+  },
+  {
+    "id": "g2d.health",
+    "title": "Health, obrażenia i nietykalność gracza",
+    "hash": "#/game-dev/410-health-obrazenia-i-nietykalnosc-gracza/1-zdrowie-z-kontrolowanymi-metodami",
+    "pages": [
+      "Trafienie odejmuje HP",
+      "Nietykalność odrzuca kolejny cios",
+      "Śmierć uruchamia się raz"
+    ]
+  },
+  {
+    "id": "g2d.weapons",
+    "title": "Weapon, cooldown i automatyczny atak",
+    "hash": "#/game-dev/411-weapon-cooldown-i-automatyczny-atak/1-bron-uruchamiana-spacja",
+    "pages": [
+      "Najpierw wybierz poprawny cel",
+      "Cooldown na osi czasu",
+      "Broń tworzy pocisk"
+    ]
+  },
+  {
+    "id": "g2d.triggers",
+    "title": "Triggery, monety i własny Wallet",
+    "hash": "#/game-dev/412-triggery-monety-i-wlasny-wallet/1-zbierz-jedna-monete",
+    "pages": [
+      "Trigger nie blokuje przejścia",
+      "Nagroda zmienia stan Wallet",
+      "Jedna moneta, jedna nagroda"
+    ]
+  },
+  {
+    "id": "g2d.loot-xp",
+    "title": "Śmierć przeciwnika, łup i doświadczenie",
+    "hash": "#/game-dev/413-smierc-przeciwnika-lup-i-doswiadczenie/1-przeciwnik-zostawia-lup",
+    "pages": [
+      "Od śmierci do zebrania",
+      "Nadwyżka XP pozostaje",
+      "Duża nagroda może dać kilka awansów"
+    ]
+  },
+  {
+    "id": "g2d.enemy-tactics",
+    "title": "AI: wykrywanie, flankowanie i ucieczka",
+    "hash": "#/game-dev/414-ai-wykrywanie-flankowanie-i-ucieczka/1-zasieg-wykrywania",
+    "pages": [
+      "Wróg widzi gracza w zasięgu",
+      "Podejście z boku",
+      "Ucieczka"
+    ]
+  },
+  {
+    "id": "g2d.camera",
+    "title": "Kamera i przestrzenie współrzędnych",
+    "hash": "#/game-dev/415-kamera-i-przestrzenie-wspolrzednych/1-przesuniety-widok",
+    "pages": [
+      "Świat i ekran",
+      "Śledzenie gracza i stały HUD",
+      "Kliknięcie ekranu na mapie świata"
+    ]
+  },
+  {
+    "id": "g2d.canvas-ui",
+    "title": "Canvas, ręczne rysowanie i HUD",
+    "hash": "#/game-dev/416-canvas-reczne-rysowanie-i-hud/1-hud-w-rogu-ekranu",
+    "pages": [
+      "Świat i interfejs",
+      "Jawne rozmiary figur",
+      "Pasek pokazuje proporcję"
+    ]
+  },
+  {
+    "id": "g2d.ui-flow",
+    "title": "Pauza i działające menu",
+    "hash": "#/game-dev/417-pauza-i-dzialajace-menu/1-przyciski-wyboru",
+    "pages": [
+      "Naciśnij, a potem zwolnij",
+      "Focus wskazuje jedną opcję",
+      "Paski i rozciągane przyciski"
+    ]
+  },
+  {
+    "id": "g2d.upgrades",
+    "title": "Wybór ulepszenia i własne reguły zakupów",
+    "hash": "#/game-dev/418-wybor-ulepszenia-i-wlasne-reguly-zakupow/1-awans-daje-wybor",
+    "pages": [
+      "Awans otwiera wybór",
+      "Parametr przed i po wyborze",
+      "Zakup jest warunkowy"
+    ]
+  },
+  {
+    "id": "g2d.feedback",
+    "title": "Feedback trafienia, tweeny i floating text",
+    "hash": "#/game-dev/419-feedback-trafienia-tweeny-i-floating-text/1-liniowy-lot-dekoracji",
+    "pages": [
+      "Liczba obrażeń nad celem",
+      "Shake ma początek i koniec",
+      "Nowy efekt tej samej właściwości"
+    ]
+  },
+  {
+    "id": "g2d.projectile-types",
+    "title": "Pociski naprowadzane i przebijające",
+    "hash": "#/game-dev/420-pociski-naprowadzane-i-przebijajace/1-pocisk-naprowadzany",
+    "pages": [
+      "Pocisk naprowadzany",
+      "Przebicie",
+      "Sweep przy dużej prędkości"
+    ]
+  },
+  {
+    "id": "g2d.composition",
+    "title": "Kompozycja, fabryki i wyposażenie",
+    "hash": "#/game-dev/421-kompozycja-fabryki-i-wyposazenie/1-fabryka-przeciwnikow",
+    "pages": [
+      "Fabryka składa jednostkę",
+      "Wspólne klasy, osobne instancje",
+      "Referencja prowadzi do komponentu"
+    ]
+  },
+  {
+    "id": "g2d.run-state",
+    "title": "Start, przegrana, zwycięstwo i restart",
+    "hash": "#/game-dev/422-start-przegrana-zwyciestwo-i-restart/1-ekran-startowy",
+    "pages": [
+      "Stan całej rundy",
+      "Restart tworzy świeży przebieg",
+      "Jednoczesna śmierć i zwycięstwo"
+    ]
+  },
+  {
+    "id": "g2d.performance",
+    "title": "Wydajność, testowanie i zapis projektu",
+    "hash": "#/game-dev/423-wydajnosc-testowanie-i-zapis-projektu/1-pociski-nie-zostaja-na-zawsze",
+    "pages": [
+      "Sprawdzaj pobliskich kandydatów",
+      "Sprzątanie ogranicza liczbę obiektów",
+      "Optymalizacja zachowuje nagrody"
+    ]
+  },
+  {
+    "id": "g2d.survivor",
+    "title": "Projekt końcowy: Łąka przetrwania",
+    "hash": "#/game-dev/424-projekt-koncowy-laka-przetrwania/1-dzialajacy-rdzen-survivor",
+    "pages": [
+      "Jedna pętla rozgrywki",
+      "Rozwój przerywa walkę na wybór",
+      "Sprawdź cały przebieg gry"
+    ]
+  }
+]

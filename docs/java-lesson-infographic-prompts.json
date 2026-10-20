@@ -1,0 +1,82 @@
+{
+  "mode": "built-in image_gen",
+  "assets": [
+    {
+      "id": "fundamentals-01",
+      "title": "Program wykonuje instrukcje po kolei",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Program wykonuje instrukcje po kolei\". Explain exactly this concept in 3 simple connected panels: Main.java → main → konsola. Dwie linie wyniku: Start, Gotowy. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/fundamentals-01.png",
+      "finalEditPrompt": "Change the two example messages throughout the illustration to match the exact lesson code. Everywhere replace Start with Start wyprawy, and Gotowy with HP: 8. Java lines must be System.out.println(\"Start wyprawy\"); and System.out.println(\"HP: 8\");. Console must show two lines Start wyprawy and HP: 8. Keep all layout, correct Java class/method syntax, arrows and style."
+    },
+    {
+      "id": "fundamentals-02",
+      "title": "Zmienna zmienia wartość",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Zmienna zmienia wartość\". Explain exactly this concept in 3 simple connected panels: int gold = 7; następnie gold = gold + 3; Ta sama podpisana komórka gold: 7 → 10. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/fundamentals-02.png"
+    },
+    {
+      "id": "fundamentals-03",
+      "title": "Warunek wybiera drogę",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Warunek wybiera drogę\". Explain exactly this concept in 3 simple connected panels: boolean hasKey = false; if (hasKey) otwarte, else zamknięte. Wyróżnij tylko drogę false → Zamknięte. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/fundamentals-03.png"
+    },
+    {
+      "id": "fundamentals-04",
+      "title": "Metoda zwraca wynik",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Metoda zwraca wynik\". Explain exactly this concept in 3 simple connected panels: collect(7, 3) → return gold + reward → 10 przypisane do total. Return nie wypisuje. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/fundamentals-04.png",
+      "finalEditPrompt": "Change only the method declaration in middle panel to static int collect(int gold, int reward) { so it can be called from static main. Preserve every other detail."
+    },
+    {
+      "id": "objects-05",
+      "title": "Jedna klasa, dwa obiekty",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Jedna klasa, dwa obiekty\". Explain exactly this concept in 3 simple connected panels: Klasa Hero jako prosty schemat. new Hero() dwa osobne obiekty ada hp=3, bob hp=8. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/objects-05.png",
+      "finalEditPrompt": "Correct the code so displayed hp values follow from execution: first panel class Hero { int hp = 8; }. Middle panel exact lines Hero ada = new Hero(); Hero bob = new Hero(); ada.hp = 3;. Preserve diagram showing ada hp3 and bob hp8."
+    },
+    {
+      "id": "objects-06",
+      "title": "Konstruktor ustawia pola",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Konstruktor ustawia pola\". Explain exactly this concept in 3 simple connected panels: new Hero(\"Iga\", 8) → parametry name i hp → this.name=\"Iga\", this.hp=8 w nowym obiekcie. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/objects-06.png"
+    },
+    {
+      "id": "objects-07",
+      "title": "Kompozycja łączy odpowiedzialności",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Kompozycja łączy odpowiedzialności\". Explain exactly this concept in 3 simple connected panels: Hero ma referencję bag → Inventory. hero.collect() → bag.addCoin() → coins 0 → 1. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/objects-07.png",
+      "finalEditPrompt": "Fix the null reference bug: in BOTH Hero class snippets change private Inventory bag; to private Inventory bag = new Inventory();. Preserve all other content and diagram."
+    },
+    {
+      "id": "objects-08",
+      "title": "Test sprawdza rzeczywisty stan",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Test sprawdza rzeczywisty stan\". Explain exactly this concept in 3 simple connected panels: Przygotuj hp=8 → damage(3) → sprawdź getHp()==5. Prosta zielona kontrolka wyniku. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/objects-08.png",
+      "finalEditPrompt": "Use the actual course Hero example, no disabled-by-default Java assert. First code Hero hero = new Hero(\"Iga\", 8);. Middle code hero.damage(3);. Third code if (hero.getHp() != 5) { throw new AssertionError(\"HP\"); }. Label object boxes hero instead of c. Keep three-panel calm style, same hp8 to hp5 and passed icon."
+    },
+    {
+      "id": "inheritance-09",
+      "title": "Dziedziczenie rozszerza klasę",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Dziedziczenie rozszerza klasę\". Explain exactly this concept in 3 simple connected panels: Character pole name. Mage extends Character ma name oraz mana. Jeden obiekt Mage: name Ewa, mana 12. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/inheritance-09.png"
+    },
+    {
+      "id": "inheritance-10",
+      "title": "Przesłanianie zmienia zachowanie",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Przesłanianie zmienia zachowanie\". Explain exactly this concept in 3 simple connected panels: Character.attack() zwraca Miecz. Mage extends Character przesłania attack() i zwraca Czar. Dwie podpisane karty metod. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/inheritance-10.png"
+    },
+    {
+      "id": "inheritance-11",
+      "title": "Typ obiektu wybiera metodę",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Typ obiektu wybiera metodę\". Explain exactly this concept in 3 simple connected panels: Character hero = new Mage(); hero.attack() → Mage.attack() → Czar. Typ zmiennej Character, obiekt Mage wyraźnie rozróżnione. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/inheritance-11.png"
+    },
+    {
+      "id": "inheritance-12",
+      "title": "Wyjątek prowadzi do obsługi błędu",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Wyjątek prowadzi do obsługi błędu\". Explain exactly this concept in 3 simple connected panels: buy(-4) → throw IllegalArgumentException → pasujący catch → komunikat Zła cena → dalszy program. Nie wykonuje Kupiono. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/inheritance-12.png"
+    }
+  ]
+}

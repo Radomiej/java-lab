@@ -1,0 +1,584 @@
+[
+  {
+    "id": "fundamentals-01",
+    "step": 1,
+    "heading": "Kod mówi konsoli, co wypisać",
+    "visual": true
+  },
+  {
+    "id": "fundamentals-01",
+    "step": 2,
+    "heading": "print zostaje w wierszu, println go kończy",
+    "visual": true
+  },
+  {
+    "id": "fundamentals-02",
+    "step": 1,
+    "heading": "Zmienna przechowuje aktualną wartość",
+    "visual": true
+  },
+  {
+    "id": "fundamentals-02",
+    "step": 2,
+    "heading": "Typ określa, jakie dane pasują",
+    "visual": true
+  },
+  {
+    "id": "fundamentals-02",
+    "step": 3,
+    "heading": "double zachowuje część ułamkową",
+    "visual": true
+  },
+  {
+    "id": "fundamentals-03",
+    "step": 1,
+    "heading": "if wybiera jedną drogę",
+    "visual": true
+  },
+  {
+    "id": "fundamentals-03",
+    "step": 2,
+    "heading": "Pętla powtarza instrukcję",
+    "visual": true
+  },
+  {
+    "id": "fundamentals-04",
+    "step": 1,
+    "heading": "Metoda przyjmuje dane i zwraca wynik",
+    "visual": true
+  },
+  {
+    "id": "fundamentals-04",
+    "step": 2,
+    "heading": "static należy do klasy, zwykła metoda do obiektu",
+    "visual": true
+  },
+  {
+    "id": "objects-05",
+    "step": 1,
+    "heading": "Klasa to przepis; new tworzy obiekt",
+    "visual": true
+  },
+  {
+    "id": "objects-05",
+    "step": 2,
+    "heading": "Referencja nie kopiuje bohatera",
+    "visual": true
+  },
+  {
+    "id": "objects-06",
+    "step": 1,
+    "heading": "Konstruktor ustawia stan na start",
+    "visual": true
+  },
+  {
+    "id": "objects-06",
+    "step": 2,
+    "heading": "private chroni dane; metoda pilnuje reguły",
+    "visual": true
+  },
+  {
+    "id": "objects-07",
+    "step": 1,
+    "heading": "Kompozycja: bohater ma plecak",
+    "visual": true
+  },
+  {
+    "id": "objects-07",
+    "step": 2,
+    "heading": "Metoda może zlecić pracę innemu obiektowi",
+    "visual": true
+  },
+  {
+    "id": "objects-08",
+    "step": 1,
+    "heading": "Test sprawdza skutek, nie napis w konsoli",
+    "visual": true
+  },
+  {
+    "id": "objects-08",
+    "step": 2,
+    "heading": "Sprawdź też granicę",
+    "visual": true
+  },
+  {
+    "id": "inheritance-09",
+    "step": 1,
+    "heading": "Mag jest postacią — i ma coś więcej",
+    "visual": true
+  },
+  {
+    "id": "inheritance-09",
+    "step": 2,
+    "heading": "super przekazuje dane konstruktorowi rodzica",
+    "visual": true
+  },
+  {
+    "id": "inheritance-10",
+    "step": 1,
+    "heading": "Ta sama metoda, własny atak",
+    "visual": true
+  },
+  {
+    "id": "inheritance-10",
+    "step": 2,
+    "heading": "super używa wersji rodzica",
+    "visual": true
+  },
+  {
+    "id": "inheritance-11",
+    "step": 1,
+    "heading": "Jedna komenda, dwa różne ataki",
+    "visual": true
+  },
+  {
+    "id": "inheritance-11",
+    "step": 2,
+    "heading": "Typ zmiennej to dostępne przyciski",
+    "visual": true
+  },
+  {
+    "id": "inheritance-12",
+    "step": 1,
+    "heading": "Wyjątek przerywa błędną operację",
+    "visual": true
+  },
+  {
+    "id": "inheritance-12",
+    "step": 2,
+    "heading": "catch obsługuje konkretny błąd",
+    "visual": true
+  },
+  {
+    "id": "g2d.scene",
+    "step": 1,
+    "heading": "Z czego składa się scena?",
+    "visual": true
+  },
+  {
+    "id": "g2d.scene",
+    "step": 2,
+    "heading": "Gdzie znajduje się obiekt?",
+    "visual": true
+  },
+  {
+    "id": "g2d.scene",
+    "step": 3,
+    "heading": "Komponenty definiują obiekt",
+    "visual": true
+  },
+  {
+    "id": "g2d.input",
+    "step": 1,
+    "heading": "Od klawisza do ruchu",
+    "visual": true
+  },
+  {
+    "id": "g2d.input",
+    "step": 2,
+    "heading": "Przytrzymanie czy nowe naciśnięcie?",
+    "visual": true
+  },
+  {
+    "id": "g2d.input",
+    "step": 3,
+    "heading": "Kierunek zostaje po zatrzymaniu",
+    "visual": true
+  },
+  {
+    "id": "g2d.collisions",
+    "step": 1,
+    "heading": "Obraz i fizyczny kształt",
+    "visual": true
+  },
+  {
+    "id": "g2d.collisions",
+    "step": 2,
+    "heading": "Ruch zatrzymuje się przy ścianie",
+    "visual": true
+  },
+  {
+    "id": "g2d.collisions",
+    "step": 3,
+    "heading": "Ruch wzdłuż przeszkody",
+    "visual": true
+  },
+  {
+    "id": "g2d.enemy-ai",
+    "step": 1,
+    "heading": "Wektor od przeciwnika do celu",
+    "visual": true
+  },
+  {
+    "id": "g2d.enemy-ai",
+    "step": 2,
+    "heading": "Stała prędkość pościgu",
+    "visual": true
+  },
+  {
+    "id": "g2d.enemy-ai",
+    "step": 3,
+    "heading": "Decyzja i wykonanie ruchu",
+    "visual": true
+  },
+  {
+    "id": "g2d.projectiles",
+    "step": 1,
+    "heading": "Pocisk i HP tworzą walkę",
+    "visual": true
+  },
+  {
+    "id": "g2d.projectiles",
+    "step": 2,
+    "heading": "Pocisk: wygląd, lot i trafienie",
+    "visual": true
+  },
+  {
+    "id": "g2d.projectiles",
+    "step": 3,
+    "heading": "Jedno trafienie zużywa pocisk",
+    "visual": true
+  },
+  {
+    "id": "g2d.components",
+    "step": 1,
+    "heading": "Właściciel i zachowanie",
+    "visual": true
+  },
+  {
+    "id": "g2d.components",
+    "step": 2,
+    "heading": "Osobny stan każdej instancji",
+    "visual": true
+  },
+  {
+    "id": "g2d.components",
+    "step": 3,
+    "heading": "Cykl życia komponentu",
+    "visual": true
+  },
+  {
+    "id": "g2d.time",
+    "step": 1,
+    "heading": "Prędkość razy czas",
+    "visual": true
+  },
+  {
+    "id": "g2d.time",
+    "step": 2,
+    "heading": "Dlaczego normalizujemy przekątną?",
+    "visual": true
+  },
+  {
+    "id": "g2d.time",
+    "step": 3,
+    "heading": "Brak kierunku oznacza brak ruchu",
+    "visual": true
+  },
+  {
+    "id": "g2d.graphics",
+    "step": 1,
+    "heading": "Warstwy układają obraz",
+    "visual": true
+  },
+  {
+    "id": "g2d.graphics",
+    "step": 2,
+    "heading": "flipX: porównaj obie strony",
+    "visual": true
+  },
+  {
+    "id": "g2d.graphics",
+    "step": 3,
+    "heading": "Odbicie nie zmienia collidera",
+    "visual": true
+  },
+  {
+    "id": "g2d.waves",
+    "step": 1,
+    "heading": "Spawn według harmonogramu",
+    "visual": true
+  },
+  {
+    "id": "g2d.waves",
+    "step": 2,
+    "heading": "Dane fali i powtarzalność",
+    "visual": true
+  },
+  {
+    "id": "g2d.waves",
+    "step": 3,
+    "heading": "Limit żywych jednostek",
+    "visual": true
+  },
+  {
+    "id": "g2d.health",
+    "step": 1,
+    "heading": "Trafienie odejmuje HP",
+    "visual": true
+  },
+  {
+    "id": "g2d.health",
+    "step": 2,
+    "heading": "Nietykalność odrzuca kolejny cios",
+    "visual": true
+  },
+  {
+    "id": "g2d.health",
+    "step": 3,
+    "heading": "Śmierć uruchamia się raz",
+    "visual": true
+  },
+  {
+    "id": "g2d.weapons",
+    "step": 1,
+    "heading": "Najpierw wybierz poprawny cel",
+    "visual": true
+  },
+  {
+    "id": "g2d.weapons",
+    "step": 2,
+    "heading": "Cooldown na osi czasu",
+    "visual": true
+  },
+  {
+    "id": "g2d.weapons",
+    "step": 3,
+    "heading": "Broń tworzy pocisk",
+    "visual": true
+  },
+  {
+    "id": "g2d.triggers",
+    "step": 1,
+    "heading": "Trigger nie blokuje przejścia",
+    "visual": true
+  },
+  {
+    "id": "g2d.triggers",
+    "step": 2,
+    "heading": "Nagroda zmienia stan Wallet",
+    "visual": true
+  },
+  {
+    "id": "g2d.triggers",
+    "step": 3,
+    "heading": "Jedna moneta, jedna nagroda",
+    "visual": true
+  },
+  {
+    "id": "g2d.loot-xp",
+    "step": 1,
+    "heading": "Od śmierci do zebrania",
+    "visual": true
+  },
+  {
+    "id": "g2d.loot-xp",
+    "step": 2,
+    "heading": "Nadwyżka XP pozostaje",
+    "visual": true
+  },
+  {
+    "id": "g2d.loot-xp",
+    "step": 3,
+    "heading": "Duża nagroda może dać kilka awansów",
+    "visual": true
+  },
+  {
+    "id": "g2d.enemy-tactics",
+    "step": 1,
+    "heading": "Wróg widzi gracza w zasięgu",
+    "visual": true
+  },
+  {
+    "id": "g2d.enemy-tactics",
+    "step": 2,
+    "heading": "Podejście z boku",
+    "visual": true
+  },
+  {
+    "id": "g2d.enemy-tactics",
+    "step": 3,
+    "heading": "Ucieczka",
+    "visual": true
+  },
+  {
+    "id": "g2d.camera",
+    "step": 1,
+    "heading": "Świat i ekran",
+    "visual": true
+  },
+  {
+    "id": "g2d.camera",
+    "step": 2,
+    "heading": "Śledzenie gracza i stały HUD",
+    "visual": true
+  },
+  {
+    "id": "g2d.camera",
+    "step": 3,
+    "heading": "Kliknięcie ekranu na mapie świata",
+    "visual": true
+  },
+  {
+    "id": "g2d.canvas-ui",
+    "step": 1,
+    "heading": "Świat i interfejs",
+    "visual": true
+  },
+  {
+    "id": "g2d.canvas-ui",
+    "step": 2,
+    "heading": "Jawne rozmiary figur",
+    "visual": true
+  },
+  {
+    "id": "g2d.canvas-ui",
+    "step": 3,
+    "heading": "Pasek pokazuje proporcję",
+    "visual": true
+  },
+  {
+    "id": "g2d.ui-flow",
+    "step": 1,
+    "heading": "Naciśnij, a potem zwolnij",
+    "visual": true
+  },
+  {
+    "id": "g2d.ui-flow",
+    "step": 2,
+    "heading": "Focus wskazuje jedną opcję",
+    "visual": true
+  },
+  {
+    "id": "g2d.ui-flow",
+    "step": 3,
+    "heading": "Paski i rozciągane przyciski",
+    "visual": true
+  },
+  {
+    "id": "g2d.upgrades",
+    "step": 1,
+    "heading": "Awans otwiera wybór",
+    "visual": true
+  },
+  {
+    "id": "g2d.upgrades",
+    "step": 2,
+    "heading": "Parametr przed i po wyborze",
+    "visual": true
+  },
+  {
+    "id": "g2d.upgrades",
+    "step": 3,
+    "heading": "Zakup jest warunkowy",
+    "visual": true
+  },
+  {
+    "id": "g2d.feedback",
+    "step": 1,
+    "heading": "Liczba obrażeń nad celem",
+    "visual": true
+  },
+  {
+    "id": "g2d.feedback",
+    "step": 2,
+    "heading": "Shake ma początek i koniec",
+    "visual": true
+  },
+  {
+    "id": "g2d.feedback",
+    "step": 3,
+    "heading": "Nowy efekt tej samej właściwości",
+    "visual": true
+  },
+  {
+    "id": "g2d.projectile-types",
+    "step": 1,
+    "heading": "Pocisk naprowadzany",
+    "visual": true
+  },
+  {
+    "id": "g2d.projectile-types",
+    "step": 2,
+    "heading": "Przebicie",
+    "visual": true
+  },
+  {
+    "id": "g2d.projectile-types",
+    "step": 3,
+    "heading": "Sweep przy dużej prędkości",
+    "visual": true
+  },
+  {
+    "id": "g2d.composition",
+    "step": 1,
+    "heading": "Fabryka składa jednostkę",
+    "visual": true
+  },
+  {
+    "id": "g2d.composition",
+    "step": 2,
+    "heading": "Wspólne klasy, osobne instancje",
+    "visual": true
+  },
+  {
+    "id": "g2d.composition",
+    "step": 3,
+    "heading": "Referencja prowadzi do komponentu",
+    "visual": true
+  },
+  {
+    "id": "g2d.run-state",
+    "step": 1,
+    "heading": "Stan całej rundy",
+    "visual": true
+  },
+  {
+    "id": "g2d.run-state",
+    "step": 2,
+    "heading": "Restart tworzy świeży przebieg",
+    "visual": true
+  },
+  {
+    "id": "g2d.run-state",
+    "step": 3,
+    "heading": "Jednoczesna śmierć i zwycięstwo",
+    "visual": true
+  },
+  {
+    "id": "g2d.performance",
+    "step": 1,
+    "heading": "Sprawdzaj pobliskich kandydatów",
+    "visual": true
+  },
+  {
+    "id": "g2d.performance",
+    "step": 2,
+    "heading": "Sprzątanie ogranicza liczbę obiektów",
+    "visual": true
+  },
+  {
+    "id": "g2d.performance",
+    "step": 3,
+    "heading": "Optymalizacja zachowuje nagrody",
+    "visual": true
+  },
+  {
+    "id": "g2d.survivor",
+    "step": 1,
+    "heading": "Jedna pętla rozgrywki",
+    "visual": true
+  },
+  {
+    "id": "g2d.survivor",
+    "step": 2,
+    "heading": "Rozwój przerywa walkę na wybór",
+    "visual": true
+  },
+  {
+    "id": "g2d.survivor",
+    "step": 3,
+    "heading": "Sprawdź cały przebieg gry",
+    "visual": true
+  }
+]

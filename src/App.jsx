@@ -1,7 +1,7 @@
 import {createCourseRoutes} from './services/courseRoutes.js';
 import {useCourseRoute} from './hooks/useCourseRoute.js';
 import { trackLabEvent, setLabContext } from './services/labAnalytics.js';
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { allLessons, getLessonById, getLessonsForTrack, trackOrder, tracks } from "./data/curriculum.js";
 import { useCourseProgress } from "./hooks/useCourseProgress.js";
 import { buildTaskCheckRequest, evaluateTaskCheck } from "./services/taskExecution.js";
@@ -51,12 +51,19 @@ export default function App() {
   const playground=useGamePlayground();
   const isPlayground=selectedLesson.track==='playground';
   const [activeTaskId, setActiveTaskId] = useState(selectedLesson.tasks[0]?.id);
+  const [previewOpen,setPreviewOpen]=useState(false);
+  useEffect(()=>setPreviewOpen(false),[selectedLesson.id]);
+  const [learningStage,setLearningStage]=useState('learn');
   const [activeFile, setActiveFile] = useState("Main.java");
   const [checkReport, setCheckReport] = useState(emptyReport);
   const [runner, setRunner] = useState(emptyRunner);
   const teavmRunner = useMemo(() => createTeaVMRunner(), []);
   const taskFocusTracker = useMemo(() => createTaskFocusTracker({ track: trackUmamiEvent }), []);
   const executionVersion = useRef(0);
+  const handleStageChange=useCallback(next=>{
+    setLearningStage(next);
+    if(next!=='task'){executionVersion.current++;teavmRunner.stopGame();setPreviewOpen(false);setRunner(emptyRunner);}
+  },[teavmRunner]);
   const previousGameDev = useRef({ enabled: gameDevEnabled, track: selectedLesson.track });
 
   useEffect(() => {
@@ -176,6 +183,7 @@ export default function App() {
   });
 
   const handleCheck = async () => {
+    setPreviewOpen(true);
     const version = ++executionVersion.current;
     const analyticsTask = {
       track_id: selectedLesson.track,
@@ -270,6 +278,10 @@ export default function App() {
   const main = isPlayground ? <PlaygroundWorkspace project={playground.project} activeFile={Object.hasOwn(files,activeFile)||Object.hasOwn(gameEngineRuntimeFiles,activeFile)?activeFile:'GameMain.java'} onFileChange={setActiveFile} runner={runner} onRun={handleCheck} onCodeChange={(name,value)=>{if(Object.hasOwn(gameEngineRuntimeFiles,name))return;stopForEdit();playground.setFiles({[name]:value});}} onDeleteFile={name=>{stopForEdit();playground.deleteFile(name);setActiveFile('GameMain.java');}} onImport={project=>{stopForEdit();playground.replaceProject(project);setActiveFile('GameMain.java');}} onReset={()=>{if(window.confirm('Przywrócić początkowy projekt gry?')){stopForEdit();playground.resetProject();setActiveFile('GameMain.java');}}}/> : (
     <LessonWorkspace
       lesson={selectedLesson}
+      onNextLesson={visibleLessons[visibleLessons.indexOf(selectedLesson)+1] ? ()=>changeLesson(visibleLessons[visibleLessons.indexOf(selectedLesson)+1].id) : undefined}
+      onStageChange={handleStageChange}
+      previewOpen={previewOpen}
+      onPreviewToggle={()=>setPreviewOpen(open=>!open)}
       activeTask={activeTask}
       activeFile={Object.hasOwn(files, activeFile) || (activeTask.engine && Object.hasOwn(gameEngineRuntimeFiles, activeFile)) ? activeFile : Object.keys(files)[0]}
       files={files}
@@ -299,7 +311,7 @@ export default function App() {
     />
   );
 
-  const inspector = activeTask.engine ? <GamePreview runner={runner} /> : null;
+  const inspector = activeTask.engine && (isPlayground || learningStage==='task') && previewOpen ? <GamePreview runner={runner} /> : null;
 
   return <><AppShell sidebar={sidebar} main={main} inspector={inspector} />{isPlayground&&gameDevEnabled&&<GameTutor key={playground.revision} project={playground.project} projectRevision={playground.revision} onApply={(proposal,snapshot)=>{if(snapshot.revision!==playground.revision)throw new Error('Projekt został zastąpiony. Poproś o nową propozycję.');const next=applyTutorProposal(playground.project,snapshot.project,proposal);stopForEdit();if(proposal.operation==='delete')playground.deleteFile(proposal.path);else playground.setFiles(next.files);setActiveFile(proposal.operation==='delete'?'GameMain.java':proposal.path);}}/>}</>;
 }

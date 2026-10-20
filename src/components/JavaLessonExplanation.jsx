@@ -17,14 +17,15 @@ function Hero({ kind }) {
   </svg>;
 }
 
-function Pages({ pages }) {
+function Pages({ pages, lessonId }) {
   const [index, setIndex] = useState(0);
   const page = pages[index];
   return <section className="lesson-explanation java-concept" aria-label="Wyjaśnienie zagadnienia">
     <header className="explanation-header"><span>ZOBACZ, JAK TO DZIAŁA</span><span>{index + 1} / {pages.length}</span></header>
     <article className="explanation-copy" aria-live="polite">
       <h2>{page.title}</h2><p>{page.text}</p>
-      {page.actors ? <div className="concept-scene" aria-label={page.title}>
+      {index === 0 && javaConceptPages[lessonId] && <figure className="java-course-infographic"><a href={`${import.meta.env.BASE_URL}course-assets/java-concepts/${lessonId}.png`} target="_blank" rel="noreferrer" aria-label={`Otwórz infografikę: ${page.title}`}><img src={`${import.meta.env.BASE_URL}course-assets/java-concepts/${lessonId}.png`} alt={page.title} loading="lazy" /></a></figure>}
+      {index === 0 && javaConceptPages[lessonId] ? null : page.actors ? <div className="concept-scene" aria-label={page.title}>
         {page.actors.map((actor, number) => <div className="concept-actor" key={number}>
           <h3>{actor.name}</h3><Hero kind={actor.sprite} />
           <pre className="concept-state">{actor.state}</pre>
@@ -50,7 +51,7 @@ export function ConceptPreview({ page }) {
 
 export default function JavaLessonExplanation({ lesson }) {
   const pages = conceptPages(lesson);
-  return pages ? <Pages key={lesson.id} pages={pages} /> : <SharedExplanation lesson={lesson} language="java" />;
+  return pages ? <Pages key={lesson.id} pages={pages} lessonId={lesson.id} /> : <SharedExplanation lesson={lesson} language="java" />;
 }
 
 export function conceptPages(lesson) {
