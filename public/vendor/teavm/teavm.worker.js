@@ -1,3 +1,4 @@
+import { createOutputCapture, createFrameGate, FRAME_OUTPUT_LIMIT } from './runtime-limits.js';
 import { prepareJavaSources } from "./source-path.js";
 import { disposeGameRuntime, invokeGameExport } from "./game-lifecycle.js";
 import { acceptsSceneInput } from './input-transport.js';
@@ -94,11 +95,21 @@ async function compileAndRun(message) {
     self.postMessage({ command: "phase", id: message.id, phase: message.mode === "game" ? "Uruchamiam pętlę gry…" : "Uruchamiam main()…" });
     const generatedWasm = compiler.getWebAssemblyOutputFile("app.wasm");
     if (!generatedWasm || generatedWasm.length === 0) throw new Error("TeaVM nie wygenerował app.wasm.");
-    const output = [];
-    const errors = [];
+    const output = createOutputCapture();
+    const errors = createOutputCapture();
+    const assertionLines = new Map();
+    let failedCriterion;
     const previousLog = console.log;
     const previousError = console.error;
-    console.log = (...parts) => output.push(parts.map(String).join(" "));
+    console.log = (...parts) => {
+      const line = parts.map(String).join(" ");
+      if (line.startsWith('LAB_CHECK_FAILED:')) failedCriterion ??= line.slice(0, 4000);
+      if (/^__JAVA_LAB_CHECK__[\w-]+\t(?:PASS|FAIL)\t[^\r\n]*$/.test(line)) {
+        const key = line.split('\t', 1)[0];
+        if (!assertionLines.has(key) && assertionLines.size >= 256) throw new Error('Przekroczono limit asercji Java (256).');
+        assertionLines.set(key, line.slice(0, 4000));
+      } else output.push(line);
+    };
     console.error = (...parts) => errors.push(parts.map(String).join(" "));
     const behaviorResults = [];
     try {
@@ -125,13 +136,12 @@ async function compileAndRun(message) {
       const app = await load(generatedWasm);
       const mainResult = app.exports.main([]);
       if (message.mode !== "game") await mainResult;
-      else startGameRuntime(app, message.id);
+      else startGameRuntime(app, message.id, message.frameAcknowledgements === true);
     } catch (error) {
-      const failedCriterion = output.find(line => line.startsWith('LAB_CHECK_FAILED:'));
       if (message.mainClass.endsWith('JavaTest') && failedCriterion) {
         return { command: 'result', id: message.id, ok: false, validationFailure: true,
           phase: 'sprawdzanie zadania', diagnostics, classVersions: versions,
-          output: output.filter(line => !line.startsWith('LAB_CHECK_FAILED:')).join('\n'),
+          output: output.text,
           error: failedCriterion.slice('LAB_CHECK_FAILED:'.length) };
       }
       throw error;
@@ -146,9 +156,9 @@ async function compileAndRun(message) {
       phase,
       diagnostics,
       classVersions: versions,
-      ...parseAssertionOutput(output),
-      assertionResults:[...parseAssertionOutput(output).assertionResults,...structureResults],
-      error: errors.join("\n"),
+      output: output.text,
+      assertionResults:[...parseAssertionOutput([...assertionLines.values()]).assertionResults,...structureResults],
+      error: errors.text,
       behaviorResults,
     };
   } finally {
@@ -157,15 +167,16 @@ async function compileAndRun(message) {
   }
 }
 
-function startGameRuntime(app, gameId) {
+function startGameRuntime(app, gameId, frameAcknowledgements = false) {
   const tick = app.exports.tick;
   const frame = app.exports.frame;
   if (typeof tick !== "function" || typeof frame !== "function") {
     throw new Error("TeaVM nie wyeksportował tick() i frame() dla trybu gry.");
   }
+  const frameGate = createFrameGate();
   let previousTime = performance.now();
   app.exports.resize?.(gameSize.width, gameSize.height);
-  const drawFrame = () => {
+  const drawFrame = (frameId) => {
     const now = performance.now();
     const delta = Math.min(0.1, Math.max(0, (now - previousTime) / 1000));
     previousTime = now;
@@ -185,20 +196,26 @@ function startGameRuntime(app, gameId) {
       if (parts[0] === "collider") drawCommands.push({op:"collider",shape:parts[1],x:Number(parts[2]),y:Number(parts[3]),width:Number(parts[4]),height:Number(parts[5]),trigger:parts[6]==="true"});
       if (parts[0] === "debug") drawCommands.push({op:"debug",enabled:parts[1]==="true"});
     }
-    self.postMessage({ command: "game-draw", gameId, op: "frame", commands: drawCommands });
+    self.postMessage({ command: "game-draw", gameId, frameId, op: "frame", commands: drawCommands });
   };
   const emitFrame = () => {
+    const frameId = frameAcknowledgements ? frameGate.begin() : undefined;
+    if (frameAcknowledgements && frameId === undefined) return;
     const previousLog = console.log;
     const previousError = console.error;
-    const forward = (level, parts) => self.postMessage({
-      command: "game-output", gameId, level, output: parts.map(String).join(" "),
-    });
-    console.log = (...parts) => forward("log", parts);
-    console.error = (...parts) => forward("error", parts);
-    try { drawFrame(); }
-    finally { console.log = previousLog; console.error = previousError; }
+    const logs = createOutputCapture(FRAME_OUTPUT_LIMIT);
+    const errors = createOutputCapture(FRAME_OUTPUT_LIMIT);
+    console.log = (...parts) => logs.push(parts.map(String).join(" "));
+    console.error = (...parts) => errors.push(parts.map(String).join(" "));
+    try { drawFrame(frameId); }
+    finally {
+      console.log = previousLog; console.error = previousError;
+      for (const [level, capture] of [["log", logs], ["error", errors]]) {
+        if (capture.text) self.postMessage({ command: "game-output", gameId, level, output: capture.text });
+      }
+    }
   };
-  gameRuntime = { app, gameId, emitFrame, interval: null };
+  gameRuntime = { app, gameId, emitFrame, frameGate, interval: null };
   self.postMessage({ command: "game-draw", gameId, op: "clear", color: "#0b2033" });
   try { emitFrame(); }
   catch (error) { stopGameRuntime(); throw error; }
@@ -218,9 +235,10 @@ function stopGameRuntime() {
   gameKeys.clear();
   if (!previousRuntime) return;
   const previousLog = console.log, previousError = console.error;
-  const forward = (level, parts) => self.postMessage({ command: "game-output", gameId: previousRuntime.gameId, level, output: parts.map(String).join(" ") });
-  console.log = (...parts) => forward("log", parts);
-  console.error = (...parts) => forward("error", parts);
+  const logs = createOutputCapture(FRAME_OUTPUT_LIMIT);
+  const errors = createOutputCapture(FRAME_OUTPUT_LIMIT);
+  console.log = (...parts) => logs.push(parts.map(String).join(" "));
+  console.error = (...parts) => errors.push(parts.map(String).join(" "));
   let ok = true;
   try { disposeGameRuntime(previousRuntime); }
   catch (error) {
@@ -228,6 +246,9 @@ function stopGameRuntime() {
     self.postMessage({ command: "game-error", gameId: previousRuntime.gameId, error: formatJavaRuntimeError(error) });
   } finally {
     console.log = previousLog; console.error = previousError;
+    for (const [level, capture] of [["log", logs], ["error", errors]]) {
+      if (capture.text) self.postMessage({ command: "game-output", gameId: previousRuntime.gameId, level, output: capture.text });
+    }
     self.postMessage({ command: "game-stopped", gameId: previousRuntime.gameId, ok });
   }
 }
@@ -237,6 +258,10 @@ initialize()
   .catch((error) => self.postMessage({ command: "init-error", error: error instanceof Error ? error.message : String(error) }));
 
 self.addEventListener("message", async ({ data }) => {
+  if (data?.command === 'game-frame-ack') {
+    if (gameRuntime?.gameId === data.gameId) gameRuntime.frameGate.acknowledge(data.frameId);
+    return;
+  }
   if (data?.command === "game-debug") {
     invokeGameExport(gameRuntime,"setDebug",[Boolean(data.enabled)],stopGameRuntime,event=>self.postMessage(event));
     return;

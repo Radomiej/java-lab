@@ -1,5 +1,8 @@
 import GameCoursePdf from './GameCoursePdf.jsx';
 import LessonExplanation from './JavaLessonExplanation.jsx';
+import './LessonOverview.css';
+
+const pdfInformation = 'Materiały zawierają przykłady Java zgodne z silnikiem Java Lab: klasy, komponenty, kamerę, HUD i animacje.';
 
 export default function LessonOverview({ lesson, headingOnly = false, learningOnly = false }) {
   return (
@@ -7,7 +10,7 @@ export default function LessonOverview({ lesson, headingOnly = false, learningOn
       {!learningOnly && <><div className="breadcrumb"><span>Kurs Java · {lesson.track === "game-dev" ? "Game Dev" : lesson.track === "inheritance" ? "OOP II" : lesson.track === "objects" ? "OOP I" : "Fundamenty"} · Lekcja {lesson.order}</span></div>
       <div className="lesson-heading-row"><h1 id="lesson-title"><span aria-hidden="true">▤ </span>{lesson.title}</h1></div>
       </>}
-      {!headingOnly && <>{lesson.track === 'game-dev' && <><GameCoursePdf /><details className="course-material-note"><summary>O materiałach PDF</summary><p>Materiały zawierają przykłady Java zgodne z silnikiem Java Lab: klasy, komponenty, kamerę, HUD i animacje.</p></details></>}
+      {!headingOnly && <>{lesson.track === 'game-dev' && <div className="course-material-actions"><GameCoursePdf /><details className="course-material-note" onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary').focus(); } }}><summary aria-label="O materiałach PDF" title={pdfInformation}>?</summary><p>{pdfInformation}</p></details></div>}
       <LessonExplanation lesson={lesson} language="java" /></>}
     </section>
   );

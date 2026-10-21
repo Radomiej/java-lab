@@ -1,6 +1,22 @@
-import { test, expect } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { test, expect, afterEach } from 'vitest';
+import { fireEvent, render, screen, cleanup } from '@testing-library/react';
 import GameCoursePdf, { gameCoursePdfUrl } from './GameCoursePdf.jsx';
+import LessonOverview from './LessonOverview.jsx';
+afterEach(cleanup);
+
+test('shows PDF information behind a compact accessible question mark', () => {
+  render(<LessonOverview lesson={{id:'g2d.scene',track:'game-dev',title:'Scena',order:401}} />);
+  const help = screen.getByText('?');
+  expect(help.tagName).toBe('SUMMARY');
+  expect(help).toHaveAttribute('aria-label', 'O materiałach PDF');
+  expect(help).toHaveAttribute('title', expect.stringContaining('przykłady Java'));
+  expect(help.closest('details')).not.toHaveAttribute('open');
+  fireEvent.click(help);
+  expect(help.closest('details')).toHaveAttribute('open');
+  fireEvent.keyDown(help, { key: 'Escape' });
+  expect(help.closest('details')).not.toHaveAttribute('open');
+  expect(help).toHaveFocus();
+});
 
 test('opens PDF preview with download and restores focus after Escape', () => {
   render(<GameCoursePdf />);

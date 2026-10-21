@@ -1,0 +1,17 @@
+[
+  {
+    "file": "kurs-gamedev-java.pdf",
+    "title": "GameDev Java — współrzędne, cykl życia i komponenty",
+    "pages": 8
+  },
+  {
+    "file": "kurs-gamedev-java-kamera-ui.pdf",
+    "title": "GameDev Java — kamera, viewport i HUD",
+    "pages": 5
+  },
+  {
+    "file": "kurs-gamedev-java-tweeny.pdf",
+    "title": "GameDev Java — tweeny, PingPong i FadeOut",
+    "pages": 7
+  }
+]

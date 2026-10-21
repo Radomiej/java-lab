@@ -1,0 +1,21 @@
+{
+  "position": [
+    160,
+    80
+  ],
+  "events": [
+    "create",
+    "update",
+    "update",
+    "update",
+    "update",
+    "update"
+  ],
+  "geometry": [
+    160,
+    80,
+    40,
+    20
+  ],
+  "runtime": "actual TeaVM WebAssembly, Node host"
+}

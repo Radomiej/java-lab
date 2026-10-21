@@ -1,0 +1,9 @@
+{
+  "runtime": "actual TeaVM WebAssembly, Node host",
+  "ready": true,
+  "start": true,
+  "simulationSteps": 31,
+  "player": true,
+  "hud": true,
+  "enemyWave": true
+}

@@ -1,0 +1,9 @@
+.course-material-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.course-material-actions .game-course-actions { margin: 0; }
+.course-material-note { position: relative; }
+.course-material-note > summary { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid #c3d5df; border-radius: 50%; background: white; color: #23465c; cursor: pointer; font-weight: 700; list-style: none; }
+.course-material-note > summary::-webkit-details-marker { display: none; }
+.course-material-note > summary:focus-visible { outline: 3px solid #008c95; outline-offset: 3px; }
+.course-material-note[open] > summary { background: #e6f3f3; }
+.course-material-note > p { position: absolute; top: calc(100% + 8px); left: 0; z-index: 50; width: min(320px, 70vw); margin: 0; padding: 12px 16px; border: 1px solid #c3d5df; border-radius: 10px; background: #fff; color: #23465c; box-shadow: 0 8px 24px #132f4826; font-size: 14px; line-height: 1.6; }
+@media (max-width: 600px) { .course-material-note > p { left: auto; right: 0; } }

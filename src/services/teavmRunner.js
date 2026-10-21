@@ -1,6 +1,6 @@
 import {prepareGameRequest} from './gameWorkspace.js';
 
-const defaultWorkerFactory = () => new Worker("/vendor/teavm/teavm.worker.js?v=game-wrapper-13", { type: "module" });
+const defaultWorkerFactory = () => new Worker("/vendor/teavm/teavm.worker.js?v=game-wrapper-14", { type: "module" });
 
 function createRunnerError(code, message) {
   const error = new Error(message);
@@ -60,6 +60,9 @@ export function createTeaVMRunner({ workerFactory = defaultWorkerFactory, timeou
       lastGameFrame = Date.now();
       activeGameRequest?.onGameCommand?.(data);
       window.dispatchEvent(new CustomEvent("java-lab-game-draw", { detail: data }));
+      if (data.op === 'frame' && Number.isInteger(data.frameId) && activeGameRequest?.id === data.gameId) {
+        worker?.postMessage({ command: 'game-frame-ack', gameId: data.gameId, frameId: data.frameId });
+      }
       return;
     }
     if (data.command === "game-error") {
@@ -166,7 +169,7 @@ export function createTeaVMRunner({ workerFactory = defaultWorkerFactory, timeou
           resetWorker();
         }, timeout);
         pending.set(id, { resolve, reject, timeoutId, onStage, onGameCommand });
-        worker.postMessage({ command: "compile-and-run", id, ...payload });
+        worker.postMessage({ command: "compile-and-run", id, ...payload, frameAcknowledgements: true });
         const canvas = document.querySelector(".game-canvas");
         if (canvas) worker.postMessage({ command: "game-resize", width: canvas.clientWidth, height: canvas.clientHeight });
       });

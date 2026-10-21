@@ -1,0 +1,22 @@
+{
+  "origin": "https://java-lab-eta.vercel.app",
+  "version": "0.1.2",
+  "commit": "daab836",
+  "time": "2026-10-20T11:16:53.766Z",
+  "results": [
+    {
+      "submissionId": "6db2bce7-119c-44a8-acf8-8802f17a2440",
+      "templateId": "java-quiz-fundamentals-01",
+      "status": 202,
+      "labAdminArchived": true,
+      "exactFilesAndTeacherKey": true
+    },
+    {
+      "submissionId": "7ec45aef-6617-4d31-b6d3-90eeecc0ee23",
+      "templateId": "java-course-fundamentals-01",
+      "status": 202,
+      "labAdminArchived": true,
+      "exactFilesAndTeacherKey": true
+    }
+  ]
+}

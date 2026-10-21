@@ -158,3 +158,30 @@ describe("TeaVM browser runner", () => {
     expect(worker.terminate).toHaveBeenCalledTimes(1);
   });
 });
+
+it('acknowledges the frame only after synchronous rendering and ignores old games',async()=>{
+  const worker=createWorkerHarness(),runner=createTeaVMRunner({workerFactory:()=>worker});
+  await runner.run({files:{},mainClass:'Main',mode:'game'});
+  const ack={command:'game-frame-ack',gameId:1,frameId:7};
+  const draw=()=>expect(worker.postMessage).not.toHaveBeenCalledWith(ack);
+  window.addEventListener('java-lab-game-draw',draw);
+  try {
+    worker.emit({command:'game-draw',gameId:1,frameId:7,op:'frame',commands:[]});
+    expect(worker.postMessage).toHaveBeenCalledWith(ack);
+    worker.postMessage.mockClear();
+    worker.emit({command:'game-draw',gameId:0,frameId:8,op:'frame',commands:[]});
+    expect(worker.postMessage).not.toHaveBeenCalled();
+  }finally{window.removeEventListener('java-lab-game-draw',draw);runner.dispose();}
+});
+
+it('opts into ACK transport while remaining compatible with a legacy worker',async()=>{
+  // This harness ignores unknown compile request fields, as the old worker does.
+  const worker=createWorkerHarness(),runner=createTeaVMRunner({workerFactory:()=>worker});
+  try {
+    await expect(runner.run({files:{},mainClass:'Main',mode:'game'})).resolves.toMatchObject({ok:true});
+    expect(worker.postMessage).toHaveBeenCalledWith(expect.objectContaining({command:'compile-and-run',frameAcknowledgements:true}));
+    worker.postMessage.mockClear();
+    worker.emit({command:'game-draw',gameId:1,op:'frame',commands:[]});
+    expect(worker.postMessage).not.toHaveBeenCalled();
+  } finally {runner.dispose();}
+});

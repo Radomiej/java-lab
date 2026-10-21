@@ -1,0 +1,362 @@
+[
+  {
+    "lesson": 401,
+    "task": "g2d.scene.guided",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 401,
+    "task": "g2d.scene.modified",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 401,
+    "task": "g2d.scene.independent",
+    "visibleCommands": 3
+  },
+  {
+    "lesson": 402,
+    "task": "g2d.input.guided",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 402,
+    "task": "g2d.input.modified",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 402,
+    "task": "g2d.input.independent",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 403,
+    "task": "g2d.collisions.guided",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 403,
+    "task": "g2d.collisions.modified",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 403,
+    "task": "g2d.collisions.independent",
+    "visibleCommands": 3
+  },
+  {
+    "lesson": 404,
+    "task": "g2d.enemy-ai.guided",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 404,
+    "task": "g2d.enemy-ai.modified",
+    "visibleCommands": 3
+  },
+  {
+    "lesson": 404,
+    "task": "g2d.enemy-ai.independent",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 405,
+    "task": "g2d.projectiles.guided",
+    "visibleCommands": 7
+  },
+  {
+    "lesson": 405,
+    "task": "g2d.projectiles.modified",
+    "visibleCommands": 7
+  },
+  {
+    "lesson": 405,
+    "task": "g2d.projectiles.independent",
+    "visibleCommands": 9
+  },
+  {
+    "lesson": 406,
+    "task": "g2d.components.guided",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 406,
+    "task": "g2d.components.modified",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 406,
+    "task": "g2d.components.independent",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 407,
+    "task": "g2d.time.guided",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 407,
+    "task": "g2d.time.modified",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 407,
+    "task": "g2d.time.independent",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 408,
+    "task": "g2d.graphics.guided",
+    "visibleCommands": 221
+  },
+  {
+    "lesson": 408,
+    "task": "g2d.graphics.modified",
+    "visibleCommands": 106
+  },
+  {
+    "lesson": 408,
+    "task": "g2d.graphics.independent",
+    "visibleCommands": 223
+  },
+  {
+    "lesson": 409,
+    "task": "g2d.waves.guided",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 409,
+    "task": "g2d.waves.modified",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 409,
+    "task": "g2d.waves.independent",
+    "visibleCommands": 232
+  },
+  {
+    "lesson": 410,
+    "task": "g2d.health.guided",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 410,
+    "task": "g2d.health.modified",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 410,
+    "task": "g2d.health.independent",
+    "visibleCommands": 4
+  },
+  {
+    "lesson": 411,
+    "task": "g2d.weapons.guided",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 411,
+    "task": "g2d.weapons.modified",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 411,
+    "task": "g2d.weapons.independent",
+    "visibleCommands": 3
+  },
+  {
+    "lesson": 412,
+    "task": "g2d.triggers.guided",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 412,
+    "task": "g2d.triggers.modified",
+    "visibleCommands": 4
+  },
+  {
+    "lesson": 412,
+    "task": "g2d.triggers.independent",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 413,
+    "task": "g2d.loot-xp.guided",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 413,
+    "task": "g2d.loot-xp.modified",
+    "visibleCommands": 3
+  },
+  {
+    "lesson": 413,
+    "task": "g2d.loot-xp.independent",
+    "visibleCommands": 3
+  },
+  {
+    "lesson": 414,
+    "task": "g2d.enemy-tactics.guided",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 414,
+    "task": "g2d.enemy-tactics.modified",
+    "visibleCommands": 3
+  },
+  {
+    "lesson": 414,
+    "task": "g2d.enemy-tactics.independent",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 415,
+    "task": "g2d.camera.guided",
+    "visibleCommands": 253
+  },
+  {
+    "lesson": 415,
+    "task": "g2d.camera.modified",
+    "visibleCommands": 232
+  },
+  {
+    "lesson": 415,
+    "task": "g2d.camera.independent",
+    "visibleCommands": 221
+  },
+  {
+    "lesson": 416,
+    "task": "g2d.canvas-ui.guided",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 416,
+    "task": "g2d.canvas-ui.modified",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 416,
+    "task": "g2d.canvas-ui.independent",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 417,
+    "task": "g2d.ui-flow.guided",
+    "visibleCommands": 8
+  },
+  {
+    "lesson": 417,
+    "task": "g2d.ui-flow.modified",
+    "visibleCommands": 11
+  },
+  {
+    "lesson": 417,
+    "task": "g2d.ui-flow.independent",
+    "visibleCommands": 11
+  },
+  {
+    "lesson": 418,
+    "task": "g2d.upgrades.guided",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 418,
+    "task": "g2d.upgrades.modified",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 418,
+    "task": "g2d.upgrades.independent",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 419,
+    "task": "g2d.feedback.guided",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 419,
+    "task": "g2d.feedback.modified",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 419,
+    "task": "g2d.feedback.independent",
+    "visibleCommands": 3
+  },
+  {
+    "lesson": 420,
+    "task": "g2d.projectile-types.guided",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 420,
+    "task": "g2d.projectile-types.modified",
+    "visibleCommands": 3
+  },
+  {
+    "lesson": 420,
+    "task": "g2d.projectile-types.independent",
+    "visibleCommands": 9
+  },
+  {
+    "lesson": 421,
+    "task": "g2d.composition.guided",
+    "visibleCommands": 3
+  },
+  {
+    "lesson": 421,
+    "task": "g2d.composition.modified",
+    "visibleCommands": 4
+  },
+  {
+    "lesson": 421,
+    "task": "g2d.composition.independent",
+    "visibleCommands": 3
+  },
+  {
+    "lesson": 422,
+    "task": "g2d.run-state.guided",
+    "visibleCommands": 224
+  },
+  {
+    "lesson": 422,
+    "task": "g2d.run-state.modified",
+    "visibleCommands": 224
+  },
+  {
+    "lesson": 422,
+    "task": "g2d.run-state.independent",
+    "visibleCommands": 224
+  },
+  {
+    "lesson": 423,
+    "task": "g2d.performance.guided",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 423,
+    "task": "g2d.performance.modified",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 423,
+    "task": "g2d.performance.independent",
+    "visibleCommands": 202
+  },
+  {
+    "lesson": 424,
+    "task": "g2d.survivor.guided",
+    "visibleCommands": 224
+  },
+  {
+    "lesson": 424,
+    "task": "g2d.survivor.modified",
+    "visibleCommands": 224
+  },
+  {
+    "lesson": 424,
+    "task": "g2d.survivor.independent",
+    "visibleCommands": 225
+  }
+]

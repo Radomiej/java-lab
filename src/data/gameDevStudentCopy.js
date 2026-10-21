@@ -2,6 +2,7 @@ const readableCriteria={
  'g2d.scene.guided':[
  'Istnieje jeden aktywny obiekt Player z własnym Transform i komponentem ShapeRenderer.',
  'Player znajduje się w pozycji (80, 90). Prostokąt ma szerokość 40 px, wysokość 30 px i kolor #76b9f2.',
+ 'Na mapie prostokąt sięga w poziomie od x = 60 do x = 100, a w pionie od y = 75 do y = 105. To jego krawędzie; środek obiektu nadal jest w (80, 90).',
  'Po 20 aktualizacjach nadal istnieje jeden Player, a jego pozycja nie zmienia się.'
  ],
  'g2d.scene.modified':[
@@ -20,6 +21,9 @@ const readableCriteria={
  ]
 };
 const replacements=new Map([
+ ['Na granicach świata środek koła pozostaje w x=12..628,y=12..348.','Środek koła na mapie może przesuwać się w poziomie od x = 12 do x = 628, a w pionie od y = 12 do y = 348. Dzięki marginesowi 12 px koło nie wychodzi poza granice świata.'],
+ ['Wizualny offset na każdej osi mieści się w -8..8 i nie jest stale zerowy w środku efektu.','Podczas wstrząsu sama grafika przesuwa się na każdej osi o wartość od −8 do 8 px względem swojej zwykłej pozycji. W trakcie efektu widać drganie, nie tylko nieruchomy obraz.'],
+ ['Obraz prostokąta obejmuje x=60..100 i y=75..105; pozycja obiektu pozostaje (80,90).','Na mapie prostokąt sięga w poziomie od x = 60 do x = 100, a w pionie od y = 75 do y = 105. To jego krawędzie; środek obiektu nadal jest w (80, 90).'],
  ['Ścieżka zajmuje x=120..520,y=164..196 i nie tworzy przeszkody bez collidera.','Ścieżka ma środek w (320, 180), szerokość 400 px i wysokość 32 px. Bez collidera nie blokuje ruchu.'],
  ['Prostokąt ma granice x=60..100,y=75..105, a tekst środek (80,140).','Prostokąt ma pozycję (80, 90), szerokość 40 px i wysokość 30 px. Tekst jest wyśrodkowany w (80, 140).'],
  ['Prostokąt środka (80,90),40×30 ma granice x=60..100,y=75..105.','Prostokąt ma środek w (80, 90), szerokość 40 px i wysokość 30 px.'],

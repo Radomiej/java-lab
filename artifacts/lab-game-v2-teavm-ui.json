@@ -1,0 +1,8 @@
+{
+  "runtime": "actual TeaVM WebAssembly, Node host",
+  "sprite": true,
+  "ninePatch": true,
+  "initialProgress": 50,
+  "afterMouseRelease": 60,
+  "afterClearInput": 60
+}

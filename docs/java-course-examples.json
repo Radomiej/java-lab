@@ -1,0 +1,121 @@
+[
+  {
+    "document": "kurs-gamedev-java.pdf",
+    "page": 2,
+    "kind": "create",
+    "code": "GameObject player = createObject(\"Player\");\nplayer.setPosition(160, 100);\nplayer.addComponent(new ShapeRenderer(32, 32, \"#008f95\"));",
+    "context": ""
+  },
+  {
+    "document": "kurs-gamedev-java.pdf",
+    "page": 3,
+    "kind": "class",
+    "code": "import engine.*;\npublic class GameMain extends Game {\n    @Override public void onCreate() {\n        // Utwórz obiekty i dodaj komponenty.\n    }\n    @Override public void onUpdate(double delta) {\n        // Aktualizuj stan gry.\n    }\n}",
+    "context": ""
+  },
+  {
+    "document": "kurs-gamedev-java.pdf",
+    "page": 5,
+    "kind": "class-player",
+    "code": "import engine.*;\n\npublic class GameMain extends Game {\n    @Override public void onCreate() {\n        GameObject player = createObject(\"Player\");\n        player.setPosition(160, 100);\n        player.addComponent(\n            new ShapeRenderer(32, 32, \"#008f95\")\n        );\n        player.addComponent(new CharacterController2D());\n        player.addComponent(new PlayerMove());\n    }\n    @Override public void onUpdate(double delta) {}\n}",
+    "context": ""
+  },
+  {
+    "document": "kurs-gamedev-java.pdf",
+    "page": 6,
+    "kind": "class",
+    "code": "import engine.*;\n\npublic class PlayerMove extends Component {\n    @Override public void onUpdate(double delta) {\n        CharacterController2D controller =\n            getComponent(CharacterController2D.class);\n        InputManager input = getGame().input;\n        double x = 0;\n        double y = 0;\n        if (input.isKeyDown(\"a\")) x -= 1;\n        if (input.isKeyDown(\"d\")) x += 1;\n        if (input.isKeyDown(\"w\")) y -= 1;\n        if (input.isKeyDown(\"s\")) y += 1;\n        controller.move(x, y, 120);\n    }\n}",
+    "context": ""
+  },
+  {
+    "document": "kurs-gamedev-java.pdf",
+    "page": 7,
+    "kind": "class",
+    "code": "import engine.*;\npublic class AutoMove extends Component {\n    @Override public void onUpdate(double delta) {\n        transform.x += 90 * delta;\n    }\n}",
+    "context": ""
+  },
+  {
+    "document": "kurs-gamedev-java.pdf",
+    "page": 7,
+    "kind": "create",
+    "code": "GameObject marker = createObject(\"Marker\");\nmarker.setPosition(320, 180);\nmarker.addComponent(new ShapeRenderer(24, 24, \"#ff8c28\"));",
+    "context": ""
+  },
+  {
+    "document": "kurs-gamedev-java-kamera-ui.pdf",
+    "page": 2,
+    "kind": "create",
+    "code": "GameObject cameraObject = createObject(\"Camera\");\nCamera2D camera = cameraObject.addComponent(new Camera2D());\ncamera.follow(player);\nCharacterController2D controller =\n    player.getComponent(CharacterController2D.class);\ncontroller.constrainToBounds = false;",
+    "context": "GameObject player = createObject(\"Player\");\nplayer.addComponent(new CharacterController2D());"
+  },
+  {
+    "document": "kurs-gamedev-java-kamera-ui.pdf",
+    "page": 2,
+    "kind": "create",
+    "code": "Vector2 world = new Vector2(700, 300);\nVector2 screen = camera.worldToScreen(world);\n// Dla przykładu powyżej: screen = (520, 180).",
+    "context": "GameObject target = createObject(\"Player\");\nCamera2D camera = createObject(\"Camera\").addComponent(new Camera2D());\ncamera.follow(target);"
+  },
+  {
+    "document": "kurs-gamedev-java-kamera-ui.pdf",
+    "page": 3,
+    "kind": "create",
+    "code": "camera.stopFollowing();\ncamera.offsetX = 180;\ncamera.offsetY = 120;\n// Powrót do śledzenia bez dodatkowego przesunięcia:\ncamera.offsetX = 0;\ncamera.offsetY = 0;\ncamera.follow(player);\ncamera.shake(4, 0.2);",
+    "context": "GameObject player = createObject(\"Player\");\nCamera2D camera = createObject(\"Camera\").addComponent(new Camera2D());"
+  },
+  {
+    "document": "kurs-gamedev-java-kamera-ui.pdf",
+    "page": 3,
+    "kind": "create",
+    "code": "GameObject ground = createObject(\"Ground\");\nground.addComponent(new TileMap(Assets.GRASS, 32));\nGameObject marker = createObject(\"Marker\");\nmarker.setPosition(700, 300);\nmarker.addComponent(new Sprite(Assets.CHEST, 32, 32));",
+    "context": ""
+  },
+  {
+    "document": "kurs-gamedev-java-kamera-ui.pdf",
+    "page": 4,
+    "kind": "class",
+    "code": "import engine.*;\npublic class GameMain extends Game {\n    private int points = 0;\n    private TextRenderer score;\n    @Override public void onCreate() {\n        GameObject hud = createObject(\"HUD\");\n        hud.setPosition(12, 24);\n        score = hud.addComponent(\n            new TextRenderer(\"Punkty: 0\", 18, \"#ffffff\")\n        );\n        score.space = \"screen\";\n        score.align = \"left\";\n        score.baseline = \"alphabetic\";\n    }\n    @Override public void onUpdate(double delta) {\n        if (input.isKeyPressed(\"Space\")) points++;\n        score.text = \"Punkty: \" + points;\n    }\n}",
+    "context": ""
+  },
+  {
+    "document": "kurs-gamedev-java-tweeny.pdf",
+    "page": 3,
+    "kind": "create",
+    "code": "GameObject object = createObject(\"Animated\");\nobject.addComponent(new Sprite(Assets.CHEST, 32, 32));\nTween movement = Tweens.position(object, 300, 100, 1);\nmovement.easing = \"linear\";\nTween pulse = Tweens.scale(object, 1.3, 1.3, 0.3);\npulse.easing = \"smooth\";\nTweens.rotation(object, Math.PI / 2, 0.5);\nTweens.shake(object, 6, 0.2);",
+    "context": ""
+  },
+  {
+    "document": "kurs-gamedev-java-tweeny.pdf",
+    "page": 3,
+    "kind": "create",
+    "code": "Tween movement = Tweens.position(object, 300, 100, 1);\nmovement.onComplete(() -> System.out.println(\"Cel osiągnięty\"));\n// Jeżeli chcesz przerwać animację:\nmovement.cancel();",
+    "context": "GameObject object = createObject(\"Animated\");"
+  },
+  {
+    "document": "kurs-gamedev-java-tweeny.pdf",
+    "page": 4,
+    "kind": "class",
+    "code": "import engine.*;\npublic class PingPong extends Component {\n    private double a, b;\n    private boolean toB = true;\n    private Tween tween;\n    @Override public void onCreate() {\n        a = transform.x; b = a + 200; startLeg();\n    }\n    private void startLeg() {\n        double target = toB ? b : a;\n        tween = Tweens.position(gameObject, target, transform.y, 1);\n        tween.easing = \"linear\";\n    }\n    @Override public void onUpdate(double delta) {\n        if (!tween.completed) return;\n        toB = !toB; startLeg();\n    }\n}",
+    "context": ""
+  },
+  {
+    "document": "kurs-gamedev-java-tweeny.pdf",
+    "page": 5,
+    "kind": "class",
+    "code": "import engine.*;\npublic class FadeOut extends Component {\n    private double elapsed = 0;\n    private double duration = 1;\n    private ShapeRenderer renderer;\n    @Override public void onCreate() {\n        renderer = getComponent(ShapeRenderer.class);\n        if (renderer == null)\n            throw new IllegalStateException(\"Brak ShapeRenderer\");\n    }\n    @Override public void onUpdate(double delta) {\n        elapsed = Math.min(duration, elapsed + delta);\n        double t = elapsed / duration;\n        double opacity = 1 - t;\n        renderer.color = \"rgba(255, 140, 40, \" + opacity + \")\";\n        if (t >= 1) setEnabled(false);\n    }\n}",
+    "context": ""
+  },
+  {
+    "document": "kurs-gamedev-java-tweeny.pdf",
+    "page": 6,
+    "kind": "class",
+    "code": "import engine.*;\npublic class Pulse extends Component {\n    private double elapsed = 0;\n    @Override public void onUpdate(double delta) {\n        elapsed += delta;\n        double cycle = elapsed / 2;\n        double wave = (1 - Math.cos(cycle * Math.PI * 2)) / 2;\n        double scale = 1 + 0.2 * wave;\n        transform.scale.x = scale;\n        transform.scale.y = scale;\n    }\n}",
+    "context": ""
+  },
+  {
+    "document": "kurs-gamedev-java-tweeny.pdf",
+    "page": 7,
+    "kind": "update",
+    "code": "if (input.isKeyPressed(\"Space\")) {\n    Tweens.shake(chest, 6, 0.2);\n}",
+    "context": "private GameObject chest;"
+  }
+]
