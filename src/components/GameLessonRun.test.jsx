@@ -26,6 +26,7 @@ test('RUN starts a compilable game even when exercise assertions fail, without a
   vi.stubGlobal('Worker',WorkerFixture);
   render(<App />);
   fireEvent.click(screen.getByRole('tab',{name:/Game Dev w Javie/i}));
+  fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
   fireEvent.click(screen.getByRole('button',{name:/RUN/}));
   await waitFor(()=>expect(screen.getByText('Gra gotowa')).toBeInTheDocument());
   expect(screen.getAllByText(/Marker.x: oczekiwano 80/).length).toBeGreaterThan(0);

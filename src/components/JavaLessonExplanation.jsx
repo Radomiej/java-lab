@@ -19,7 +19,7 @@ function Hero({ kind }) {
   </svg>;
 }
 
-function Pages({ pages, lessonId }) {
+function Pages({ pages, lessonId, tips = [] }) {
   const [index, setIndex] = useState(0);
   const page = pages[index];
   return <section className="lesson-explanation java-concept" aria-label="Wyjaśnienie zagadnienia">
@@ -33,7 +33,7 @@ function Pages({ pages, lessonId }) {
           <pre className="concept-state">{actor.state}</pre>
           {actor.effect && <span className="concept-effect">{['Miecz', 'Czar'].includes(actor.effect) && <Hero kind={actor.effect === 'Miecz' ? 'slash' : 'magic-burst'} />}{actor.effect}</span>}
         </div>)}
-      </div> : <PageDiagram page={page} />}
+      </div> : page.visual ? <PageDiagram page={page} /> : null}
       {page.setupCode&&<><p className="game-intro-code-context">GameMain.onCreate(): dodaj do przygotowanego Player</p><CodeExample code={page.setupCode}/></>}
       {page.code && <>{page.codeContext&&<p className="game-intro-code-context">{page.codeContext}</p>}<CodeExample code={typeof page.code === 'object' ? page.code.java : page.code} /></>}
       {page.result && (page.result.endsWith('\n')
@@ -45,6 +45,7 @@ function Pages({ pages, lessonId }) {
       <div className="explanation-pages">{pages.map((item, number) => <button type="button" key={item.title} aria-label={`Krok ${number + 1}`} title={item.title} aria-current={index === number ? 'step' : undefined} onClick={() => setIndex(number)}>{number + 1}</button>)}</div>
       <button type="button" aria-label="Następny krok" title="Następny krok" disabled={index === pages.length - 1} onClick={() => setIndex(index + 1)}>→</button>
     </nav>
+    {tips.length > 0 && <aside className="tips-row"><strong>Zapamiętaj</strong><span>{tips.join(' ')}</span></aside>}
   </section>;
 }
 
@@ -54,7 +55,7 @@ export function ConceptPreview({ page }) {
 
 export default function JavaLessonExplanation({ lesson }) {
   const pages = conceptPages(lesson);
-  return pages ? <Pages key={lesson.id} pages={pages} lessonId={lesson.id} /> : <SharedExplanation lesson={lesson} language="java" />;
+  return pages ? <Pages key={lesson.id} pages={pages} lessonId={lesson.id} tips={lesson.tips} /> : <SharedExplanation lesson={lesson} language="java" />;
 }
 
 export function conceptPages(lesson) {

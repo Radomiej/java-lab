@@ -1,10 +1,19 @@
 // @vitest-environment node
 import {test,expect} from 'vitest';
-import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
-import {tmpdir} from 'node:os';
+import {existsSync,mkdtempSync,mkdirSync,readdirSync,writeFileSync,rmSync} from 'node:fs';
+import {homedir,tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {gameEngineRuntimeFiles} from './gameEngineRuntime.js';
+function javaBin(name) {
+  if (process.env.JAVA_HOME) return join(process.env.JAVA_HOME,'bin',name);
+  const jdks = join(homedir(),'.jdks');
+  if (existsSync(jdks)) for (const dir of readdirSync(jdks)) {
+    const candidate=join(jdks,dir,'bin',`${name}${process.platform==='win32'?'.exe':''}`);
+    if (existsSync(candidate)) return candidate;
+  }
+  return name;
+}
 test('Java circle emits centered geometry while legacy rectangles and collider sizes stay independent',()=>{
  const dir=mkdtempSync(join(tmpdir(),'lab-circle-'));try{
  const files={...gameEngineRuntimeFiles,'CircleTest.java':`import engine.*;
@@ -22,8 +31,7 @@ public class CircleTest {public static void main(String[] args){
  g.dispose();System.out.print("CIRCLE PASS");}}
 `};
  const paths=Object.entries(files).map(([name,source])=>{const pkg=source.match(/package\s+([\w.]+);/)?.[1];const folder=pkg?join(dir,...pkg.split('.')):dir;mkdirSync(folder,{recursive:true});const p=join(folder,name);writeFileSync(p,source);return p;});
- const javac=process.env.JAVA_HOME?join(process.env.JAVA_HOME,'bin/javac'):'javac';
- execFileSync(javac,['--release','21','-d',dir,...paths],{timeout:30000});
- expect(execFileSync(javac.replace(/javac$/,'java'),['-cp',dir,'CircleTest'],{encoding:'utf8'})).toContain('CIRCLE PASS');
+ execFileSync(javaBin('javac'),['--release','21','-d',dir,...paths],{timeout:120000});
+ expect(execFileSync(javaBin('java'),['-cp',dir,'CircleTest'],{encoding:'utf8'})).toContain('CIRCLE PASS');
  }finally{rmSync(dir,{recursive:true,force:true});}
 });

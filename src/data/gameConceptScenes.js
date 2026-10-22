@@ -14,8 +14,6 @@ export const gameConceptScenes = {
   'loot-xp:0': [hero('Pokonany wróg', 'HP = 0\norb: 2 XP', 'Łup zostaje w miejscu wroga', 'rogue'), hero('Gracz zbiera orb', 'Experience: 1 → 3 XP', 'Orb znika', 'knight')],
   'loot-xp:2': [hero('Nagroda +12 XP', 'XP: 0 → 12\npróg: 5', '', 'wizard'), hero('Awans pierwszy', '12 − 5 = 7 XP\nnowy próg: 6', '+1 poziom', 'wizard'), hero('Awans drugi', '7 − 6 = 1 XP\nnowy próg: 7', '1 < 7: koniec pętli', 'wizard')],
   'waves:1': [hero('Plan fali', 'seed: 42\n2 jednostki\nspawn: 1 s i 2 s', '', 'rogue'), hero('Powtórzenie tego planu', 'ten sam seed + te same dane\n→ te same losowania', 'Łatwiej odtworzyć błąd', 'ranger')],
-  'pause:1': [hero('Świat zatrzymany', 'gracz: stoi\npocisk: stoi\nspawn: czeka', 'WORLD nie odlicza czasu'), hero('Menu nadal działa', 'kursor → przycisk Wznów', 'UI odbiera wejście', 'cleric')],
-  'pause:2': [hero('Dwa powody pauzy', 'menu: tak\nwybór ulepszenia: tak', 'WORLD stoi'), hero('Zamknięto menu', 'menu: nie\nwybór ulepszenia: tak', 'WORLD nadal stoi')],
   'upgrades:0': [hero('Awans bohatera', '1 oczekujący wybór\nświat zatrzymany', 'Wybierz: szybkość ALBO siła'), hero('Wybrano szybkość', 'prędkość: 120 → 150\n0 oczekujących wyborów', 'Wracamy do walki')],
   'upgrades:2': [hero('Mam 8 złota; cena 5', 'Wallet: 8 → 3\nobrażenia: 1 → 2', 'Kupiono'), hero('Mam 3 złota; cena 5', 'Wallet: 3 → 3\nobrażenia: 1 → 1', 'Nie kupiono — nic nie zmieniaj')],
   'feedback:2': [hero('Trwa efekt A', 'x: 0 → 100\nobecnie x=25', '', 'wizard'), hero('Nowy efekt B zastępuje A', 'x: 25 → 200\ntylko B zapisuje pozycję', 'Jedna właściwość, jeden aktywny efekt', 'wizard')],
@@ -23,9 +21,6 @@ export const gameConceptScenes = {
   'composition:2': [hero('Gracz', 'weapon → jego Weapon\ndamage = 1', '', 'ranger'), hero('Ulepszenie przez referencję', 'ten sam Weapon\ndamage: 1 → 2', 'Nie twórz drugiej broni', 'ranger')],
   'run-state:1': [hero('Koniec starej rundy', 'HP = 0\n12 wrogów\n3 aktywne timery', 'Usuń obiekty i reakcje'), hero('Nowa runda', 'nowy gracz: HP = 8\n0 starych wrogów\n0 starych timerów', 'Świeże instancje')],
   'run-state:2': [hero('Ta sama klatka', 'gracz umiera\nostatni wróg umiera', 'Dwa warunki naraz'), hero('Przykładowa reguła gry', 'śmierć ma pierwszeństwo\nwynik: LOST', 'Zakończ rundę tylko raz')],
-  'portability:0': [hero('Projekt przed eksportem', 'GameMain.java\nPlayerController.java\nEnemy.java', 'Wszystkie pliki, nie tylko Main'), hero('Paczka projektu', 'język: java\nwersja API\npliki i ich treść', 'JSON przechowuje projekt', 'cleric')],
-  'portability:1': [hero('Import z błędnym formatem', 'brak wersji / plików', 'Odrzuć; zachowaj własny projekt'), hero('Import poprawny', 'format i język zgodne', 'Dopiero teraz odtwórz pliki', 'cleric')],
-  'portability:2': [hero('Scenariusz w Javie', 'HP = 8\ncios = 3\nwynik: HP = 5', '', 'knight'), hero('Ten sam scenariusz w JS', 'HP = 8\ncios = 3\nwynik: HP = 5', 'Porównaj zachowanie, nie składnię', 'ranger')],
   'survivor:0': [hero('Najpierw ruch i wróg', 'unikaj jednego przeciwnika', 'Sprawdź sterowanie'), hero('Potem walka i łup', 'strzał → trafienie → orb XP', 'Sprawdź trafienia', 'ranger'), hero('Na końcu rozwój', 'XP → awans → ulepszenie', 'Sprawdź powrót do walki', 'wizard')],
   'survivor:2': [hero('Próba całej rundy', 'start → ruch → walka\nprzegrana → restart', 'Nowa runda ma świeże HP'), hero('Próba eksportu', 'zapisz → importuj → uruchom', 'Sterowanie i gra nadal działają', 'cleric')],
 };

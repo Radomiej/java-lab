@@ -116,7 +116,7 @@ Lista klas i pól, cykl klatki, ograniczenia kolizji oraz diagramy Mermaid:
 Game Dev obejmuje ruch/odbicie, trawę, monety/HUD, AI, pociski, tweeny,
 skrzynki (407) i wybór ulepszeń (408). Każda lekcja ma trzy zadania,
 w tym dwa samodzielne bez podpowiedzi. `Sprite.flipX` odbija lewo/prawo,
-a `Sprite.flipY` góra/dół. Kierunek strzału jest zapisany osobno w `PlayerController.facing`.
+a `Sprite.flipY` góra/dół. Kierunek strzału daje `CharacterController2D.getDirection()` — pamięta ostatni niezerowy kierunek ruchu.
 
 Kontrola krawędzi trawy i odbić grafiki w Pythonie, bez dodatkowych bibliotek:
 `python tools/check-game-art.py`. Opcja `--preview PATH.png` zapisuje podgląd kafelków i sprite’ów.

@@ -154,7 +154,7 @@ classDiagram
 }
 ```
 
-Pozycja jest środkiem sprite'a, w pikselach CSS. Dodatnie Y biegnie w dół. `flipX` odbija lewo/prawo względem osi Y, a `flipY` góra/dół względem osi X. Oba można łączyć; mnożą odpowiednią skalę renderowania przez -1, nie zmieniając collidera. Postacie i AI w kursie pozostają pionowo. `PlayerController.facing` zapamiętuje kierunek ruchu, a `Weapon` używa go do strzelania również po zatrzymaniu.
+Pozycja jest środkiem sprite'a, w pikselach CSS. Dodatnie Y biegnie w dół. `flipX` odbija lewo/prawo względem osi Y, a `flipY` góra/dół względem osi X. Oba można łączyć; mnożą odpowiednią skalę renderowania przez -1, nie zmieniając collidera. Postacie i AI w kursie pozostają pionowo. `CharacterController2D.getDirection()` zapamiętuje ostatni niezerowy kierunek ruchu, a `Weapon` używa go do strzelania również po zatrzymaniu.
 
 Obrót `rotation.z` pozostaje dostępny w radianach; dodatni obrót jest zgodny z ruchem wskazówek zegara. Renderer uwzględnia `scale.x/y`, także wartości ujemne. `rotation.x/y` i `scale.z` nie są używane w renderowaniu 2D.
 
@@ -224,7 +224,7 @@ Testy deweloperskie gameEngineJava.test.js wymagają istniejącego JDK 21+ (JAVA
 | `Chest` | `gold = 20` | trigger przyznaje nagrodę tylko graczowi i usuwa skrzynkę; w 408 otwiera menu |
 | `WalletHUD` | brak | wyświetla `GameMain.points` |
 | `UpgradeMenu` | `opened`, `selections`, `speedBonus = 30` | `open()` zatrzymuje ruch i walkę; `select(1..3)` zmienia statystykę, zamyka menu i przywraca wcześniej aktywne komponenty |
-| `Weapon` | `cooldown`, `remaining`, `bulletSpeed`, `bulletLifetime`, `damage = 1` | tworzy pocisk w kierunku `PlayerController.facing`; przekazuje obrażenia do `Hit` |
+| `Weapon` | `cooldown`, `remaining`, `bulletSpeed`, `bulletLifetime`, `damage = 1` | tworzy pocisk w kierunku `CharacterController2D.getDirection()`; przekazuje obrażenia do `Hit` |
 | `Hit` | `damage = 1` | odejmuje HP, niszczy pokonanego wroga |
 
 ```mermaid

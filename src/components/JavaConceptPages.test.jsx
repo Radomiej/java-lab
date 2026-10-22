@@ -18,17 +18,17 @@ describe('concrete Java teaching illustrations', () => {
   });
   it('shows runtime dispatch with two actual heroes and different outcomes', () => {
     render(<JavaLessonExplanation lesson={{ id: 'inheritance-11' }} />);
-    expect(screen.getByText('Character → Warrior')).toBeInTheDocument();
-    expect(screen.getByText('Character → Mage')).toBeInTheDocument();
-    expect(screen.getByText('Miecz')).toBeInTheDocument();
-    expect(screen.getByText('Czar')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Jedna komenda, dwa różne ataki' })).toBeInTheDocument();
+    expect(screen.getByText(/Miecz\s*Czar/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Następny krok' }));
     expect(screen.getByText('Typ zmiennej to dostępne przyciski')).toBeInTheDocument();
+    expect(screen.getByText('Typ zmiennej: Character')).toBeInTheDocument();
+    expect(screen.getByText('Obiekt: Mage')).toBeInTheDocument();
   });
   it('replaces every generic game keyword chain with a concrete scene', () => {
     for (const chapter of Object.keys(gameExplanationPages)) {
       for (const page of conceptPages({ id: `g2d.${chapter}` })) {
-        expect(page.actors?.length || page.visual?.kind).toBeTruthy();
+        expect(page.actors?.length || page.visual?.kind || page.introDiagram).toBeTruthy();
         expect(page.visual?.kind).not.toBe('flow');
       }
     }

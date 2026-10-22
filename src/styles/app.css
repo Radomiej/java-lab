@@ -83,12 +83,7 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
 .lesson-heading-row h1 { max-width: 690px; margin: 0; color: var(--ink-900); font-size: clamp(25px, 3vw, 38px); letter-spacing: -.04em; line-height: 1.08; }
 .lesson-summary { max-width: 680px; margin: 11px 0 0; color: var(--ink-700); font-size: 14px; line-height: 1.55; }
 .lesson-tag { flex: 0 0 auto; padding: 7px 10px; border: 1px solid #bce9e0; border-radius: 999px; color: var(--teal-600); background: var(--teal-soft); font-size: 10px; font-weight: 800; }
-.theory-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: 23px; }
-.theory-block { min-width: 0; }
-.theory-block + .theory-block { padding-left: 22px; border-left: 1px solid var(--line); }
-.theory-block h2, .task-panel h2, .editor-section h2, .feedback-panel h2, .runtime-console h2, .preview-card h2 { margin: 0; color: var(--ink-900); font-size: 16px; letter-spacing: -.015em; }
-.theory-block p { margin: 9px 0 11px; color: var(--ink-700); font-size: 12px; line-height: 1.6; }
-.theory-block pre { padding: 11px 12px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; color: #36576c; background: #f8fbfc; font: 10px/1.6 var(--mono); white-space: pre; }
+.task-panel h2, .editor-section h2, .feedback-panel h2, .runtime-console h2, .preview-card h2 { margin: 0; color: var(--ink-900); font-size: 16px; letter-spacing: -.015em; }
 .tips-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; padding: 11px 13px; border: 1px solid #f1d994; border-radius: 9px; color: #765d1c; background: var(--yellow-soft); font-size: 11px; line-height: 1.45; }
 .tips-row strong { color: #916c10; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; }
 .tips-row span { padding-left: 8px; border-left: 1px solid #e7c96e; }
@@ -243,8 +238,6 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
   .mobile-header { margin-right: -14px; margin-left: -14px; padding-right: 14px; padding-left: 14px; }
   .lesson-heading-row { display: block; }
   .lesson-tag { display: inline-flex; margin-top: 13px; }
-  .theory-list { grid-template-columns: 1fr; gap: 18px; }
-  .theory-block + .theory-block { padding-top: 18px; padding-left: 0; border-top: 1px solid var(--line); border-left: 0; }
   .tips-row { align-items: flex-start; flex-direction: column; }
   .tips-row span { padding-left: 0; border-left: 0; }
   .task-list { grid-template-columns: 1fr; }

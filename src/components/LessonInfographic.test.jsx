@@ -1,10 +1,12 @@
 import { test, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import LessonInfographic, { lessonDiagrams } from '../../shared/lab-game-v2/editor/LessonInfographic.jsx';
+import { courseManifest } from '../../shared/lab-game-v2/course/manifest.js';
 import { assetManifest } from '../../shared/lab-game-v2/assets/Assets.js';
 
 test('all 24 game lessons have diagrams with existing sprite assets', () => {
   expect(Object.keys(lessonDiagrams)).toHaveLength(24);
+  for (const chapter of courseManifest.chapters) expect(lessonDiagrams[chapter.id.slice(4)], chapter.id).toBeTruthy();
   for (const [asset, title, rule, code, effect] of Object.values(lessonDiagrams)) {
     expect(assetManifest.assets.some(item => item.key === asset)).toBe(true);
     for (const value of [title, rule, code, effect]) expect(value.length).toBeGreaterThan(5);
