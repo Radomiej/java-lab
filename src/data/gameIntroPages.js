@@ -22,7 +22,7 @@ export const gameIntroPages={
   page('Kontroler gracza a komponent ruchu','W zadaniu PlayerController jest naszą klasą: czyta klawisze i wybiera kierunek. CharacterController2D jest komponentem silnika: wykonuje move(kierunekX, kierunekY, prędkość), uwzględniając czas. requireComponent szuka go na tym samym obiekcie. Do ruchu tym kontrolerem potrzebny jest też collider: obszar obiektu dla systemu ruchu i kontaktów. Tutaj dodajemy koło o promieniu 12. Szczegóły colliderów poznasz w następnej lekcji.','controller','public class PlayerController extends Component {\n    @Override\n    public void onUpdate(double delta) {\n        double x = getGame().input.isKeyDown("d") ? 1 : 0;\n        requireComponent(CharacterController2D.class)\n            .move(x, 0, 120);\n    }\n}','D daje kierunek (1, 0). PlayerController podejmuje decyzję, CharacterController2D wykonuje ruch, a renderer pokazuje wynik.','Plik PlayerController.java. Przygotowanie obiektu w GameMain pokazano powyżej. PlayerController jest osobnym plikiem.'),
  ],
 };
-// Index is an immutable quiz revision for these updated introductory lessons.
-export const lessonQuizRevision=lesson=>gameIntroPages[lesson.id]?1:0;
+// Index is an immutable quiz revision; bump it whenever quiz content changes so pending submissions keep their questions and keys.
+export const lessonQuizRevision=()=>2;
 
 gameIntroPages['g2d.input'].at(-1).setupCode = 'player.addComponent(new CircleCollider2D(12));\nplayer.addComponent(new CharacterController2D());\nplayer.addComponent(new PlayerController());';

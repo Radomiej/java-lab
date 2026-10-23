@@ -1,15 +1,11 @@
 // Concrete snapshots replace abstract keyword chains. Numbers are teaching examples.
 const hero = (name, state, effect = '', sprite = 'knight') => ({ name, state, effect, sprite });
 export const gameConceptScenes = {
-  'scene:0': [hero('Scena wyprawy', 'Game\n├─ gracz (100, 150)\n└─ skrzynka (240, 150)', '', 'player'), hero('Gracz na planszy', 'Transform: gdzie? (100, 150)\nSprite: jak wygląda?', 'Bez Sprite bohater istnieje, ale go nie widać')],
   'components:0': [hero('Bohater Ada', 'Counter A: counts = 0', '', 'knight'), hero('Bohater Bob', 'Counter B: counts = 0', '', 'ranger')],
   'components:2': [hero('Powstaje bohater', 'onCreate()\nHP ustawione na 8', '1 raz'), hero('Bohater żyje', 'onUpdate(delta)\nsprawdza ruch', 'co klatkę'), hero('Bohater znika', 'onDestroy()\nusunięcie reakcji', '1 raz na końcu')],
-  'input:0': [hero('Wciśnięte D', 'PlayerController:\nkierunek = (1, 0)', 'klasa ucznia'), hero('Ruch w prawo', 'CharacterController2D:\nruch + przeszkody', 'komponent silnika')],
-  'input:2': [hero('Kliknięcie ekranu', 'mysz: (20, 30)\npoczątek kamery: (60, 150)', 'Najpierw sprawdź null', 'ranger'), hero('Cel na mapie', 'świat: (80, 180)\n20 + 60, 30 + 150', 'screenToWorld', 'ranger')],
   'triggers:2': [hero('Pierwszy kontakt z monetą', 'claimed: false → true\nWallet: 4 → 5', '+1 złota'), hero('Następna aktualizacja', 'claimed = true\nWallet = 5', 'Moneta usunięta; brak drugiej nagrody')],
   'health:2': [hero('Ostatni cios', 'HP: 1 → 0', 'onDeath: łup i usunięcie'), hero('Następna aktualizacja', 'jednostka już martwa', 'Nie tworzy drugiego łupu')],
   'enemy-ai:2': [hero('Wróg w (100, 150)', 'EnemyAI:\ncel (160, 150)\nkierunek w prawo', '', 'rogue'), hero('Wróg rusza', 'Kontroler:\n60 px/s × 0.5 s\nx: 100 → 130', 'Ściana może zatrzymać ruch', 'rogue')],
-  'projectiles:0': [hero('Pocisk gracza', 'Sprite: obraz\nCircleCollider: kontakt', 'Grafika ≠ fizyczny kształt', 'ranger'), hero('Zachowanie pocisku', 'lot: dokąd?\nwłaściciel: kogo ignorować?\ntrafienie: komu odjąć HP?', 'Oddzielne odpowiedzialności', 'wizard')],
   'weapons:0': [hero('Cel A: żywy', 'odległość 40\nID 2', 'Wybrany', 'rogue'), hero('Cel B: żywy', 'odległość 80\nID 3', 'Za daleko', 'ranger'), hero('Cel C: martwy', 'odległość 10\nID 1', 'Pomijamy', 'wizard')],
   'loot-xp:0': [hero('Pokonany wróg', 'HP = 0\norb: 2 XP', 'Łup zostaje w miejscu wroga', 'rogue'), hero('Gracz zbiera orb', 'Experience: 1 → 3 XP', 'Orb znika', 'knight')],
   'loot-xp:2': [hero('Nagroda +12 XP', 'XP: 0 → 12\npróg: 5', '', 'wizard'), hero('Awans pierwszy', '12 − 5 = 7 XP\nnowy próg: 6', '+1 poziom', 'wizard'), hero('Awans drugi', '7 − 6 = 1 XP\nnowy próg: 7', '1 < 7: koniec pętli', 'wizard')],

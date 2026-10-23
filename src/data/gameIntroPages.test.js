@@ -12,7 +12,7 @@ test('pending old quizzes keep their old questions and keys; new quizzes match t
  for(const [id,questions] of Object.entries(legacy)){
   const lesson={id,order:id==='g2d.scene'?401:402};
   expect(createLessonQuiz(lesson,{revision:0})).toEqual(questions);
-  expect(lessonQuizRevision(lesson)).toBe(1);
+  expect(lessonQuizRevision(lesson)).toBe(2);
   const current=createLessonQuiz(lesson);
   const assignment=generateAssignment({templateId:'java-quiz-'+id,seed:'INTRO',index:1});
   const key=JSON.parse(assignment.referenceFiles['answer.json']).answers;

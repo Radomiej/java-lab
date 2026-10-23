@@ -1,23 +1,18 @@
 import { test, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import LessonInfographic, { lessonDiagrams } from '../../shared/lab-game-v2/editor/LessonInfographic.jsx';
-import { courseManifest } from '../../shared/lab-game-v2/course/manifest.js';
-import { assetManifest } from '../../shared/lab-game-v2/assets/Assets.js';
+import { render, screen } from '@testing-library/react';
+import LessonInfographic from '../../shared/lab-game-v2/editor/LessonInfographic.jsx';
 
-test('all 24 game lessons have diagrams with existing sprite assets', () => {
-  expect(Object.keys(lessonDiagrams)).toHaveLength(24);
-  for (const chapter of courseManifest.chapters) expect(lessonDiagrams[chapter.id.slice(4)], chapter.id).toBeTruthy();
-  for (const [asset, title, rule, code, effect] of Object.values(lessonDiagrams)) {
-    expect(assetManifest.assets.some(item => item.key === asset)).toBe(true);
-    for (const value of [title, rule, code, effect]) expect(value.length).toBeGreaterThan(5);
-  }
+test('renders rule, code and observation cards from the current page', () => {
+  render(<LessonInfographic lesson={{ id: 'js-fetch', order: 3, title: 'Pobieranie danych', objective: 'Żądanie → odpowiedź → UI', theory: [{ title: 'fetch()', text: 'fetch zwraca odpowiedź serwera.', code: 'const res = await fetch(url);' }] }} />);
+  expect(screen.getByRole('heading', { name: 'Reguła' })).toBeInTheDocument();
+  expect(screen.getByText('fetch zwraca odpowiedź serwera.')).toBeInTheDocument();
+  expect(screen.getByText(/const res = await fetch/)).toBeInTheDocument();
 });
 
-test('reference illustration expands and explains time-based movement', () => {
-  render(<LessonInfographic lesson={{ id: 'fundamentals-03', order: 3, title: 'Warunki', objective: 'Warunek steruje ruchem' }} />);
-  const image = screen.getByRole('img');
-  expect(image).toHaveAttribute('src', '/lesson-illustrations/conditions.png');
-  fireEvent.click(screen.getByRole('button', { name: 'Infografika: Warunki' }));
-  expect(image).toHaveClass('is-expanded');
-  expect(screen.getByText(/1 × 120 × 0.5 = 60 px/)).toBeInTheDocument();
+test('falls back to lesson fields when the page has no theory code', () => {
+  const view = render(<LessonInfographic lesson={{ id: 'js-error-handling', order: 5, title: 'Błędy', objective: 'Obsłuż awarie żądań', tips: ['try/catch łapie wyjątek'] }} language="javascript" />);
+  expect(screen.getByText('Obsłuż awarie żądań')).toBeInTheDocument();
+  expect(screen.getByText('try/catch łapie wyjątek')).toBeInTheDocument();
+  view.rerender(<LessonInfographic lesson={{ id: 'js-error-handling', order: 5, title: 'Błędy', objective: 'Obsłuż awarie żądań' }} language="javascript" />);
+  expect(screen.getAllByText('Obsłuż awarie żądań')).toHaveLength(2);
 });
