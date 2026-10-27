@@ -6,8 +6,8 @@ import { assetManifest } from '../../shared/lab-game-v2/assets/Assets.js';
 import { gameExplanationPages } from '../../shared/lab-game-v2/editor/lessonVisuals.js';
 import PageDiagram from '../../shared/lab-game-v2/editor/PageDiagram.jsx';
 import { gameConceptScenes } from '../data/gameConceptScenes.js';
-import { gameIntroPages } from '../data/gameIntroPages.js';
-import GameIntroDiagram from './GameIntroDiagram.jsx';
+import { gameIntroPages } from '../../shared/lab-game-v2/editor/gameIntroPages.js';
+import GameIntroDiagram from '../../shared/lab-game-v2/editor/GameIntroDiagram.jsx';
 import './JavaLessonExplanation.css';
 import ConsoleOutput from './ConsoleOutput.jsx';
 
@@ -34,8 +34,8 @@ function Pages({ pages, lessonId, tips = [] }) {
           {actor.effect && <span className="concept-effect">{['Miecz', 'Czar'].includes(actor.effect) && <Hero kind={actor.effect === 'Miecz' ? 'slash' : 'magic-burst'} />}{actor.effect}</span>}
         </div>)}
       </div> : page.visual ? <PageDiagram page={page} /> : null}
-      {page.setupCode&&<><p className="game-intro-code-context">GameMain.onCreate(): dodaj do przygotowanego Player</p><CodeExample code={page.setupCode}/></>}
-      {page.code && <>{page.codeContext&&<p className="game-intro-code-context">{page.codeContext}</p>}<CodeExample code={typeof page.code === 'object' ? page.code.java : page.code} /></>}
+      {page.setupCode&&<><p className="game-intro-code-context">GameMain.onCreate(): dodaj do przygotowanego Player</p><CodeExample code={typeof page.setupCode === 'object' ? page.setupCode.java : page.setupCode}/></>}
+      {page.code && <>{page.codeContext&&<p className="game-intro-code-context">{typeof page.codeContext === 'object' ? page.codeContext.java : page.codeContext}</p>}<CodeExample code={typeof page.code === 'object' ? page.code.java : page.code} /></>}
       {page.result && (page.result.endsWith('\n')
         ? <ConsoleOutput key={page.title} label="Wyjście tego przykładu" output={page.result} />
         : <div className="concept-result"><span>Efekt tego przykładu</span><pre>{page.result}</pre></div>)}

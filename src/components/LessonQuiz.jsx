@@ -2,12 +2,14 @@ import {useEffect,useRef,useState} from 'react';
 import {createSubmissionClient} from '../services/assignmentSubmissions.js';
 import {getInstallationId} from '../services/installationId.js';
 import {createLessonQuiz} from '../data/lessonQuiz.js';
-import {lessonQuizRevision} from '../data/gameIntroPages.js';
+import {lessonQuizRevision} from '../data/lessonQuiz.js';
 import CodeExample from '../../shared/lab-game-v2/editor/CodeExample.jsx';
 export default function LessonQuiz({lesson, onContinue}) {
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState(false);
   const [studentId,setStudentId]=useState(()=>{try{return JSON.parse(localStorage.getItem('java-lab-assignment-identity'))?.studentId||'';}catch{return '';}});
+  const [studentName,setStudentName]=useState(()=>{try{return JSON.parse(localStorage.getItem('java-lab-assignment-identity'))?.studentName||'';}catch{return '';}});
+  const idRef=useRef(null),nameRef=useRef(null);
   const [error,setError]=useState('');
   const [submissionId,setSubmissionId]=useState('');
   const [rows,setRows]=useState([]);
@@ -16,11 +18,13 @@ export default function LessonQuiz({lesson, onContinue}) {
   useEffect(()=>{const instance=createSubmissionClient({appId:'java-lab',onChange:(next,failure)=>{setRows(next);if(failure)setError(failure);}});client.current=instance;instance.start();return()=>instance.stop();},[]);
   const accepted=rows.some(row=>row.id===submissionId&&row.status==='broker_accepted');
   async function submit(){
+    if(!studentId.trim()){setError('Podaj swoje ID ucznia (klasa i numer) przed oddaniem quizu.');idRef.current?.focus();return;}
+    if(!studentName.trim()){setError('Podaj imię i nazwisko przed oddaniem quizu.');nameRef.current?.focus();return;}
     setSending(true);setError('');
     try{
       const descriptor={generatorVersion:'1',templateId:'java-quiz-'+lesson.id,seed:getInstallationId(),difficulty:'standard',index:lessonQuizRevision(lesson)};
-      const id=await client.current.submit({assignment:descriptor,studentId,files:{'answer.json':JSON.stringify({answers:Object.fromEntries(Object.entries(answers).map(([id,value])=>[id,String(value)]))})}});
-      setSubmissionId(id);await client.current.flush();
+      const id=await client.current.submit({assignment:descriptor,studentId,studentName,files:{'answer.json':JSON.stringify({answers:Object.fromEntries(Object.entries(answers).map(([id,value])=>[id,String(value)]))})}});
+      setSubmissionId(id);try{localStorage.setItem('java-lab-assignment-identity',JSON.stringify({studentId:studentId.trim(),studentName:studentName.trim()}));}catch{}await client.current.flush();
     }catch(failure){setError(failure.message);}finally{setSending(false);}
   }
   const questions = createLessonQuiz(lesson);
@@ -41,7 +45,7 @@ export default function LessonQuiz({lesson, onContinue}) {
     </fieldset>)}
     <button type="button" disabled={!complete} onClick={()=>setChecked(true)}>Sprawdź odpowiedzi</button>
     {checked&&<><p role="status">Wynik: {score}/{questions.length}. Sprawdzono w tej przeglądarce.</p><button type="button" onClick={download}>Pobierz odpowiedzi</button></>}
-    <label>ID ucznia <input value={studentId} maxLength={80} onChange={event=>setStudentId(event.target.value)} /></label>
+    <div className="java-quiz-identity"><label>ID ucznia (klasa i numer) <input ref={idRef} value={studentId} maxLength={80} placeholder="Np. 3A-12" autoComplete="off" onChange={event=>setStudentId(event.target.value)} /></label><label>Imię i nazwisko <input ref={nameRef} value={studentName} maxLength={80} autoComplete="off" onChange={event=>setStudentName(event.target.value)} /></label></div>
     <button type="button" disabled={!complete||sending} onClick={submit}>{sending?'Wysyłanie…':'Oddaj quiz'}</button>
     {submissionId&&<p role="status">{accepted?'✓ Wysłano':'Zapisano w kolejce wysyłki.'}</p>}
     {submissionId&&!accepted&&<button type="button" onClick={()=>client.current.flush()}>Ponów wysyłkę</button>}

@@ -1,5 +1,5 @@
 import {useId,useState} from 'react';
-import {assetManifest} from '../../shared/lab-game-v2/assets/Assets.js';
+import {assetManifest} from '../assets/Assets.js';
 import './GameIntroDiagram.css';
 const green='#4b9483',orange='#d9973b';
 const card=(label,detail)=>({label,detail});

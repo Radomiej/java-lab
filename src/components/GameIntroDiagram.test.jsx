@@ -1,13 +1,13 @@
 import {render,screen,fireEvent} from '@testing-library/react';
 import {test,expect} from 'vitest';
-import {gameIntroPages} from '../data/gameIntroPages.js';
-import GameIntroDiagram from './GameIntroDiagram.jsx';
+import {gameIntroPages} from '../../shared/lab-game-v2/editor/gameIntroPages.js';
+import GameIntroDiagram from '../../shared/lab-game-v2/editor/GameIntroDiagram.jsx';
 import {conceptPages} from './JavaLessonExplanation.jsx';
 
 test('keeps held-key and remembered-direction explanations after the new movement introduction',()=>{
  const pages=conceptPages({id:'g2d.input'});
- expect(pages).toHaveLength(7);
- expect(pages.slice(-2).map(page=>page.title)).toEqual(['Przytrzymanie czy nowe naciśnięcie?','Kierunek zostaje po zatrzymaniu']);
+ expect(pages).toHaveLength(8);
+ expect(pages.slice(-3).map(page=>page.title)).toEqual(['Przytrzymanie czy nowe naciśnięcie?','Kierunek zostaje po zatrzymaniu','Jak pobrać komponent z obiektu?']);
 });
 test('each of the sixteen introductory pages has a dedicated labelled visual',()=>{
  for(const page of Object.values(gameIntroPages).flat()){

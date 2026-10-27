@@ -1,6 +1,6 @@
 import {test,expect} from 'vitest';
-import {gameIntroPages,lessonQuizRevision} from './gameIntroPages.js';
-import {createLessonQuiz} from './lessonQuiz.js';
+import {gameIntroPages} from '../../shared/lab-game-v2/editor/gameIntroPages.js';
+import {createLessonQuiz,lessonQuizRevision} from './lessonQuiz.js';
 import legacy from './gameIntroQuizLegacy.fixture.json';
 import {generateAssignment} from '../../shared/assignments/generator.js';
 test('introduces one visual concept at a time before asking for movement code',()=>{
