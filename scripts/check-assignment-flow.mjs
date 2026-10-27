@@ -26,6 +26,6 @@ try{
     const saved=store.getSubmission(submissionId);assert.equal(saved.studentId,'TEST-LOCAL');assert.ok(Object.keys(saved.assignment.referenceFiles).length);
     assert.deepEqual(saved.files,payload.files);store.reviewSubmission(submissionId,{grade:80,comment:'Test przepływu'});assert.equal(store.getSubmission(submissionId).review.grade,80);count++;
   }
-  assert.equal(store.listSubmissions().length,24);assert.equal(acked,48);
+  assert.equal(store.listSubmissions().length,templates.length*3);assert.equal(acked,templates.length*6);
   console.log(`PASS: ${count} generated variants, private references, authenticated publication, durable snapshots, idempotent retries and manual grading.`);
 }finally{store.close();}

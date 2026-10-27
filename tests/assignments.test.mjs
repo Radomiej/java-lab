@@ -6,7 +6,7 @@ import {validateSubmission} from '../shared/assignments/contract.js';
 import {createAssignmentHandlers} from '../server/assignments/handlers.js';
 import {issueToken} from '../server/telemetry/token.js';
 
-const request={generatorVersion:'1',templateId:'java-array',seed:'KLASA-A',difficulty:'standard',index:0};
+const request={generatorVersion:'1',templateId:'java-basics',seed:'KLASA-A',difficulty:'standard',index:0};
 const uuid='11111111-1111-4111-8111-111111111111';
 const env={TELEMETRY_TOKEN_SECRET:'x'.repeat(40),TELEMETRY_ALLOWED_ORIGINS:'https://lab.test'};
 const ids={machineId:uuid,sessionId:uuid};
@@ -45,6 +45,23 @@ test('API keeps references private and reconstructs references instead of trusti
   assert.equal((await call(handlers.submit,{...ids,assignment:request}, {...headers,authorization:''})).status,401);
   assert.equal((await call(handlers.generate,{...request,templateId:'sql-select'})).status,400);
   assert.equal((await call(handlers.generate,request,{...headers,origin:'https://evil.test'})).status,403);
+});
+test('variant families draw 10 distinct tasks per seed, independent of difficulty and reproducible',()=>{
+  for(const templateId of ['java-basics','java-gamedev'])for(const seed of ['KLASA-A','KLASA-B','DLA-GRUPY-2']){
+    const variants=new Set();
+    for(let index=0;index<10;index++){
+      const task=generateAssignment({templateId,seed,difficulty:'standard',index,generatorVersion:'1'});
+      assert.ok(!variants.has(task.params.variant),`duplicate variant ${task.params.variant} in seed ${seed}`);variants.add(task.params.variant);
+      // Permutation is set-scoped: the same index keeps its variant at every ramp level.
+      const easy=generateAssignment({templateId,seed,difficulty:'easy',index,generatorVersion:'1'});
+      assert.equal(easy.params.variant,task.params.variant);
+      assert.notDeepEqual(easy.starterFiles,task.starterFiles);
+      assert.ok(task.params.javaTest.length>100,'hidden Java harness is generated');
+    }
+    assert.equal(variants.size,10);
+  }
+  const topics=new Set();for(let index=0;index<10;index++)topics.add(generateAssignment({templateId:'java-basics',seed:'KLASA-A',difficulty:'standard',index,generatorVersion:'1'}).params.topic);
+  assert.deepEqual([...topics].sort(),['01','02','03']);
 });
 test('broker failure is retryable and is not reported as accepted',async()=>{
   const handlers=createAssignmentHandlers({env,appId:'java-lab',publish:async()=>{throw Error('broker');}});

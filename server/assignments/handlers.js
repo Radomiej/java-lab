@@ -1,6 +1,7 @@
 import {generateAssignment,publicAssignment} from '../../shared/assignments/generator.js';
 import {templates} from '../../shared/assignments/catalog.js';
 import {validateSubmission,MAX_SUBMISSION_BYTES} from '../../shared/assignments/contract.js';
+import {gameEngineRuntimeFiles} from '../../src/data/gameEngineRuntime.js';
 import {verifyToken} from '../telemetry/token.js';
 import {createRabbitPublisher} from '../telemetry/rabbitPublisher.js';
 
@@ -13,7 +14,10 @@ export function createAssignmentHandlers({env=process.env,appId='java-lab',publi
   const guard=(req,res)=>{
     if(req.method!=='POST'){send(res,405,{message:'Wymagany POST.'});return false;}
     const origins=(env.TELEMETRY_ALLOWED_ORIGINS||'').split(',').map(s=>s.trim()).filter(Boolean);
-    if(!origins.includes(req.headers.origin)){send(res,403,{message:'Niedozwolone źródło.'});return false;}
+    let sameOrigin=false,loopback=false;
+    try{const origin=new URL(req.headers.origin);const isLoopback=name=>['127.0.0.1','localhost','[::1]'].includes(name);
+      sameOrigin=origin.host===req.headers.host;loopback=isLoopback(origin.hostname)&&isLoopback(new URL(`http://${req.headers.host||'x'}`).hostname);}catch{}
+    if(!sameOrigin&&!loopback&&!origins.includes(req.headers.origin)){send(res,403,{message:'Niedozwolone źródło.'});return false;}
     if(!req.headers['content-type']?.startsWith('application/json')){send(res,415,{message:'Wymagany JSON.'});return false;}
     return true;
   };
@@ -33,7 +37,13 @@ export function createAssignmentHandlers({env=process.env,appId='java-lab',publi
       const assignment=generateAssignment(body.assignment);
       // Reconstruct all teacher materials; never accept a client reference or grade.
       message=validateSubmission({...body,kind:'submission',version:1,appId,assignment});
-      const expected=Object.keys(assignment.starterFiles).sort();if(assignment.params.kind==='course-task'){if(!expected.every(name=>Object.hasOwn(message.files,name))||Object.keys(message.files).some(name=>!expected.includes(name)&&!name.endsWith('.java')))throw Error();}else if(JSON.stringify(Object.keys(message.files).sort())!==JSON.stringify(expected))throw Error();
+      const expected=Object.keys(assignment.starterFiles).sort();
+      if(assignment.params.kind==='course-task'||assignment.params.kind==='game-task'){
+        // Students may add own .java files, but never overwrite engine, launcher or harness classes.
+        const reserved=new Set(['GameLauncher.java','JavaTest.java','StudentGame.java',...Object.keys(gameEngineRuntimeFiles)]);
+        const extra=Object.keys(message.files).filter(name=>!expected.includes(name));
+        if(!expected.every(name=>Object.hasOwn(message.files,name))||extra.some(name=>!name.endsWith('.java')||reserved.has(name.slice(name.lastIndexOf('/')+1))))throw Error();
+      }else if(JSON.stringify(Object.keys(message.files).sort())!==JSON.stringify(expected))throw Error();
     }catch{return send(res,400,{message:'Nieprawidłowe oddanie. Sprawdź ID ucznia, pliki i wersję zadania.'});}
     try{await publish(message);send(res,202,{accepted:true,submissionId:message.submissionId,status:'broker_accepted'});}
     catch{send(res,502,{message:'RabbitMQ chwilowo niedostępny. Praca pozostaje w kolejce wysyłki.'});}

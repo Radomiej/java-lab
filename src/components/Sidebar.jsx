@@ -4,7 +4,7 @@ function lessonIsComplete(lesson, completedTasks) {
   return lesson.tasks.length > 0 && lesson.tasks.every((task) => completedTasks.includes(task.id));
 }
 
-export default function Sidebar({ tracks, trackOrder, lessons, selectedTrack, selectedLessonId, completedTasks, completedCount, onTrackChange, onLessonChange, onOpenSettings, telemetry }) {
+export default function Sidebar({ tracks, trackOrder, lessons, selectedTrack, selectedLessonId, completedTasks, completedCount, onTrackChange, onLessonChange, onOpenSettings, telemetry, generatorLevel = 'standard' }) {
   const track = tracks[selectedTrack] || tracks[trackOrder[0]];
   const trackLessons = lessons.filter((lesson) => lesson.track === selectedTrack);
   const totalTasks = lessons.reduce((sum, lesson) => sum + lesson.tasks.filter(task=>task.mode!=='playground').length, 0);
@@ -58,6 +58,8 @@ export default function Sidebar({ tracks, trackOrder, lessons, selectedTrack, se
       </div>
       </details>
       </div>
+
+      <a className="sidebar-generator" href={`#zadania?poziom=${generatorLevel}`}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h4m3 1v6m-3-3h6"/></svg>Generator zadań</a>
 
       <div className="sidebar-footer"><span>{lessons.length} lekcji</span><span className="offline-badge"><span className="status-dot" /> lokalnie</span><small className="sidebar-version" title={`Wersja laba: ${clientVersion}`}>v{clientVersion}</small></div>
     </nav>

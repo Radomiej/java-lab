@@ -1,9 +1,10 @@
 import {fireEvent,render,screen,waitFor} from '@testing-library/react';
 import {vi,test,expect,afterEach} from 'vitest';
+vi.mock('monaco-editor',()=>{throw new Error('Use fallback for this test');});
 import AssignmentWorkspace from './AssignmentWorkspace.jsx';
 afterEach(()=>{vi.unstubAllGlobals();localStorage.clear();});
 test('generates a seeded task, edits files and requires student ID for an immutable submission',async()=>{
-  const task={id:'test-task',templateId:'java-array',generatorVersion:'1',difficulty:'standard',seed:'KLASA-A',index:0,title:'Suma',prompt:'Policz sumę.',criteria:['Obsłuż pustą tablicę.'],starterFiles:{'Main.java':'start'},params:{}};
+  const task={id:'test-task',templateId:'java-basics',generatorVersion:'1',difficulty:'standard',seed:'KLASA-A',index:0,title:'Suma',prompt:'Policz sumę.',criteria:['Obsłuż pustą tablicę.'],starterFiles:{'Main.java':'start'},params:{}};
   vi.stubGlobal('fetch',vi.fn(async()=>({ok:true,json:async()=>({assignment:task})})));
   const submit=vi.fn(async()=> 'submission'),flush=vi.fn(async()=>{});
   render(<AssignmentWorkspace appId="java-lab" onBack={()=>{}} clientFactory={()=>({start(){},stop(){},submit,flush})}/>);
@@ -12,7 +13,13 @@ test('generates a seeded task, edits files and requires student ID for an immuta
   fireEvent.click(screen.getByRole('button',{name:'Generuj zestaw'}));
   await screen.findByText('Policz sumę.');
   expect(fetch.mock.calls[0][0]).toBe('/api/assignments');
-  fireEvent.change(screen.getByLabelText('Kod pliku Main.java'),{target:{value:'my solution'}});
+  fireEvent.change(await screen.findByLabelText('Kod pliku Main.java'),{target:{value:'my solution'}});
+  expect(screen.getByRole('tab',{name:/Suma/})).toBeInTheDocument();
+  expect(screen.getByText('Obsłuż pustą tablicę.')).toBeInTheDocument();
+  expect(screen.getByRole('button',{name:'Sprawdź'})).toBeEnabled();
+  expect(screen.queryByRole('button',{name:'Oddaj do oceny'})).toBeNull();
+  expect(screen.queryByRole('button',{name:'Pobierz kopię'})).toBeNull();
+  fireEvent.click(screen.getByRole('checkbox',{name:'Ocena'}));
   fireEvent.click(screen.getByRole('button',{name:'Oddaj do oceny'}));
   expect(submit).not.toHaveBeenCalled();
   fireEvent.change(screen.getByLabelText('Twoje ID ucznia'),{target:{value:'3A-12'}});

@@ -1,5 +1,7 @@
 import {generateJavaCourseTask} from './javaCourseAssignments.js';
 import {generateJavaQuiz} from './javaQuizAssignments.js';
+import {javaBasicsVariants,assembleBasicsTask} from './javaBasicsTasks.js';
+import {javaGameDevVariants,assembleGameDevTask} from './javaGameDevTasks.js';
 // SERVER ONLY: never import into the browser bundle.
 import {templates,GENERATOR_VERSION} from './catalog.js';
 
@@ -11,10 +13,25 @@ export function normalizeDescriptor(input={}){
   if(generatorVersion!==GENERATOR_VERSION||!templates.some(t=>t.id===templateId)||!['easy','standard','challenge'].includes(difficulty)||!seed||seed.length>80||!Number.isInteger(index)||index<0||index>9)throw Error('Nieprawidłowy szablon, wersja, seed lub poziom zadania.');
   return {generatorVersion,templateId,seed,difficulty,index};
 }
+const variantFamilies={
+  'java-basics':{variants:javaBasicsVariants,assemble:assembleBasicsTask},
+  'java-gamedev':{variants:javaGameDevVariants,assemble:assembleGameDevTask},
+};
+function generateVariantTask(descriptor){
+  const {templateId,seed,difficulty,index}=descriptor,{variants,assemble}=variantFamilies[templateId];
+  // Set-scoped shuffle: one seed fixes the variant order, so tasks 0..index of a
+  // set never repeat, independent of the chosen difficulty or set length.
+  const order=variants.map((_,i)=>i),shuffle=rng(`${templateId}|${seed}`);
+  for(let i=order.length-1;i>0;i--){const j=Math.floor(shuffle()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
+  const random=rng(JSON.stringify(descriptor)),level=['easy','standard','challenge'].indexOf(difficulty);
+  const task=assemble(variants[order[index]],{level,int:(min,max)=>min+Math.floor(random()*(max-min+1)),pick:list=>list[Math.floor(random()*list.length)]});
+  return {...descriptor,...task,id:`${templateId}-v1-${hash(JSON.stringify(descriptor)).toString(16)}${hash('identity:'+JSON.stringify(descriptor)).toString(16)}`};
+}
 export function generateAssignment(input){
   const descriptor=normalizeDescriptor(input),{templateId,seed,difficulty,index}=descriptor;
   if(templateId.startsWith('java-course-'))return generateJavaCourseTask(descriptor);
   if(templateId.startsWith('java-quiz-'))return generateJavaQuiz(descriptor);
+  if(variantFamilies[templateId])return generateVariantTask(descriptor);
   // Independent per-task stream: changing set length does not alter earlier tasks.
   const random=rng(JSON.stringify(descriptor));const int=(min,max)=>min+Math.floor(random()*(max-min+1));
   const level=['easy','standard','challenge'].indexOf(difficulty),threshold=int(5,15);
@@ -22,32 +39,18 @@ export function generateAssignment(input){
   values.splice(0,4,threshold-1,threshold,threshold+1,threshold);
   const name=['Atlas','Latarnia','Kompas','Przystań'][int(0,3)],params={};
   let title,prompt,criteria,starterFiles,referenceFiles;
-  if(templateId==='java-reward'){
-    const factor=int(2,5),bonus=int(3,12);
-    Object.assign(params,{factor,bonus:level?bonus:0,clamp:level===2});
-    const expression=`${level===2?'Math.max(0, points)':'points'} * ${factor}${level?` + ${bonus}`:''}`;
-    title='Nagroda za punkty';
-    prompt=`Napisz public static int reward(int points) w klasie Main. ${level===2?'Najpierw zastąp ujemne points zerem. ':''}Pomnóż punkty przez ${factor}${level?` i dodaj ${bonus}`:''}. Zwróć wynik metody. W main wypisz reward(10). Zakres points: od -1000 do 1000.`;
-    criteria=['Metoda korzysta z argumentu, także dla 0 i liczb ujemnych.','Zachowaj sygnaturę metody i klasę Main.','main wypisuje jeden wynik, bez dodatkowych komunikatów.'];
-    starterFiles={'Main.java':'public class Main {\n    public static int reward(int points) {\n        // TODO\n        return 0;\n    }\n    public static void main(String[] args) {\n        System.out.println(reward(10));\n    }\n}\n'};
-    referenceFiles={'Main.java':starterFiles['Main.java'].replace('// TODO\n        return 0;',`return ${expression};`)};
-  }else if(['java-array','js-sum','js-filter'].includes(templateId)){
-    const java=templateId==='java-array',filter=templateId==='js-filter';
+  if(['js-sum','js-filter'].includes(templateId)){
+    const filter=templateId==='js-filter';
     const condition=level===0?'true':`value >= ${threshold}${level===2?' && value % 2 == 0':''}`;
     const selection=level===0?'wszystkie wartości':`wartości większe lub równe ${threshold}${level===2?' i jednocześnie parzyste':''}`;
     Object.assign(params,{values,threshold,selection:level});
     title=filter?'Wybierz elementy tablicy':'Suma wybranych elementów';
-    prompt=`Napisz ${java?'public static int solve(int[] values) w klasie Main':'funkcję solve(values)'}. ${filter?'Zwróć nową tablicę zawierającą':'Zwróć sumę obejmującą'} ${selection}. ${filter?'Zachowaj kolejność i duplikaty; nie zmieniaj wejścia.':'Dla braku pasujących elementów zwróć 0.'} Dla pustej tablicy zwróć ${filter?'[]':'0'}. Wejście nie jest null; zawiera do 1000 liczb całkowitych z zakresu -1000…1000. Przykładowe dane: ${JSON.stringify(values)}. ${java?'W main wypisz wynik solve dla tych danych.':'W #result pokaż wynik solve dla tych danych jako JSON.'}`;
+    prompt=`Napisz funkcję solve(values). ${filter?'Zwróć nową tablicę zawierającą':'Zwróć sumę obejmującą'} ${selection}. ${filter?'Zachowaj kolejność i duplikaty; nie zmieniaj wejścia.':'Dla braku pasujących elementów zwróć 0.'} Dla pustej tablicy zwróć ${filter?'[]':'0'}. Wejście nie jest null; zawiera do 1000 liczb całkowitych z zakresu -1000…1000. Przykładowe dane: ${JSON.stringify(values)}. W #result pokaż wynik solve dla tych danych jako JSON.`;
     criteria=['Rozwiązanie działa dla dowolnych danych zgodnych z opisem, nie tylko przykładu.',`${level?'Granica progu jest włączona; ':''}obsłuż duplikaty i pustą tablicę.`,filter?'Nie modyfikuj tablicy wejściowej.':'Nie wypisuj wyników pośrednich.'];
-    if(java){
-      starterFiles={'Main.java':`public class Main {\n    public static int solve(int[] values) {\n        // TODO\n        return 0;\n    }\n    public static void main(String[] args) {\n        System.out.println(solve(new int[]{${values.join(', ')}}));\n    }\n}\n`};
-      referenceFiles={'Main.java':starterFiles['Main.java'].replace('// TODO\n        return 0;',`int total = 0;\n        for (int value : values) {\n            if (${condition}) total += value;\n        }\n        return total;`)};
-    }else{
-      const boot=`\nconst example = ${JSON.stringify(values)};\ndocument.querySelector('#result').textContent = JSON.stringify(solve(example));\n`;
-      starterFiles={'index.html':'<!doctype html><html lang="pl"><head><meta charset="UTF-8"><title>Algorytm</title></head><body><h1>Wynik</h1><output id="result"></output><script src="script.js"></script></body></html>','script.js':`function solve(values) {\n  // TODO\n  return ${filter?'[]':'0'};\n}\n${boot}`};
-      const body=filter?`const result = [];\n  for (const value of values) if (${condition}) result.push(value);\n  return result;`:`let total = 0;\n  for (const value of values) if (${condition}) total += value;\n  return total;`;
-      referenceFiles={...starterFiles,'script.js':`function solve(values) {\n  ${body}\n}\n${boot}`};
-    }
+    const boot=`\nconst example = ${JSON.stringify(values)};\ndocument.querySelector('#result').textContent = JSON.stringify(solve(example));\n`;
+    starterFiles={'index.html':'<!doctype html><html lang="pl"><head><meta charset="UTF-8"><title>Algorytm</title></head><body><h1>Wynik</h1><output id="result"></output><script src="script.js"></script></body></html>','script.js':`function solve(values) {\n  // TODO\n  return ${filter?'[]':'0'};\n}\n${boot}`};
+    const body=filter?`const result = [];\n  for (const value of values) if (${condition}) result.push(value);\n  return result;`:`let total = 0;\n  for (const value of values) if (${condition}) total += value;\n  return total;`;
+    referenceFiles={...starterFiles,'script.js':`function solve(values) {\n  ${body}\n}\n${boot}`};
   }else if(templateId==='html-card'){
     const items=['Mapa','Latarka','Notes'].slice(0,level+1);Object.assign(params,{name,items});
     title=`Karta projektu ${name}`;

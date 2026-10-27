@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createSubmissionClient} from '../src/services/assignmentSubmissions.js';
 const uuid='11111111-1111-4111-8111-111111111111';
-const task={generatorVersion:'1',templateId:'java-array',seed:'A',difficulty:'standard',index:0};
+const task={generatorVersion:'1',templateId:'java-basics',seed:'A',difficulty:'standard',index:0};
 function memory(){const rows=new Map();return {list:async()=>structuredClone([...rows.values()]),put:async row=>rows.set(row.id,structuredClone(row))};}
 test('offline outbox preserves exact code and IDs across reload and retry; acceptance means RabbitMQ only',async()=>{
   const store=memory(),posted=[];let offline=true;

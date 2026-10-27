@@ -67,6 +67,9 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
 .lesson-copy small { margin-top: 3px; color: #829aab; font-size: 9px; line-height: 1.35; white-space: normal; }
 .lesson-copy em { margin-top: 4px; color: #6291a6; font-size: 9px; font-style: normal; }
 .lesson-check { margin-left: auto; color: #73ddbd; font-weight: 800; }
+.sidebar-generator { display: flex; gap: 8px; align-items: center; margin-top: 10px; padding: 12px; color: #b9e9e3; font-size: 12px; font-weight: 700; text-decoration: none; border: 1px solid rgb(255 255 255 / 12%); border-radius: var(--radius-md); }
+.sidebar-generator:hover, .sidebar-generator:focus-visible { color: white; background: rgb(255 255 255 / 7%); }
+.sidebar-generator svg { flex-shrink: 0; }
 .sidebar-footer { display: flex; flex-wrap:wrap;gap:6px; align-items: center; justify-content: space-between; padding: 15px 9px 0; color: #7892a5; font-size: 10px; }
 .sidebar-version{flex-basis:100%;font-size:10px;overflow-wrap:anywhere}
 .offline-badge { color: #9db2c1; }

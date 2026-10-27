@@ -271,6 +271,7 @@ export default function App() {
       onTrackChange={changeTrack}
       onLessonChange={changeLesson}
       onOpenSettings={() => { executionVersion.current++; teavmRunner.stopGame(); progress.hardReset(); }}
+      generatorLevel={activeTask.mode==='guided'?'easy':activeTask.mode==='challenge'?'challenge':'standard'}
     />
   );
 
