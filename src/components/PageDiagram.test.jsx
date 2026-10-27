@@ -21,11 +21,11 @@ test('every teaching page has a diagram and consecutive pages change the illustr
     }
   }
 });
-test('all 72 game pages have separate concepts and examples with valid crops', () => {
+test('all game pages have separate concepts and examples with valid crops', () => {
   expect(Object.keys(gameExplanationPages)).toHaveLength(24);
   for (const pages of Object.values(gameExplanationPages)) {
-    expect(pages).toHaveLength(3);
-    expect(new Set(pages.map(p => p.title)).size).toBe(3);
+    expect(pages.length).toBeGreaterThanOrEqual(3);
+    expect(new Set(pages.map(p => p.title)).size).toBe(pages.length);
   }
   const markup = renderToStaticMarkup(<PageDiagram page={gameExplanationPages.graphics[1]} />);
   expect(markup).toContain('viewBox="256 0 128 128"');

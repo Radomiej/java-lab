@@ -60,7 +60,9 @@ export default function JavaLessonExplanation({ lesson }) {
 
 export function conceptPages(lesson) {
   if (gameIntroPages[lesson.id]) return lesson.id === 'g2d.input'
-    ? [...gameIntroPages[lesson.id], ...gameExplanationPages.input.slice(1)]
+    ? [...gameIntroPages[lesson.id], ...gameExplanationPages.input.slice(1).map((page, index) => page.visual.kind === 'flow' && gameConceptScenes[`input:${index + 1}`]
+      ? { ...page, actors: gameConceptScenes[`input:${index + 1}`], visual: undefined }
+      : page)]
     : gameIntroPages[lesson.id];
   if (javaConceptPages[lesson.id]) return javaConceptPages[lesson.id];
   const chapter = lesson.id?.replace(/^g2d\./, '');
