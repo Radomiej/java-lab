@@ -194,7 +194,9 @@ function startGameRuntime(app, gameId, frameAcknowledgements = false) {
       if (parts[0] === "progress") drawCommands.push({op:"progress",x:Number(parts[1]),y:Number(parts[2]),width:Number(parts[3]),height:Number(parts[4]),progress:Number(parts[5]),frame:parts[6],track:parts[7],fill:parts[8]});
       if (parts[0] === "ninepatch") drawCommands.push({op:"ninepatch",texture:parts[1],x:Number(parts[2]),y:Number(parts[3]),width:Number(parts[4]),height:Number(parts[5]),border:Number(parts[6])});
       if (parts[0] === "collider") drawCommands.push({op:"collider",shape:parts[1],x:Number(parts[2]),y:Number(parts[3]),width:Number(parts[4]),height:Number(parts[5]),trigger:parts[6]==="true"});
+      if (parts[0] === "view") drawCommands.push({op:"view",x:Number(parts[1]),y:Number(parts[2])});
       if (parts[0] === "debug") drawCommands.push({op:"debug",enabled:parts[1]==="true"});
+      if (parts[0] === "audio") drawCommands.push({op:"audio",payload:line.slice(6)});
     }
     self.postMessage({ command: "game-draw", gameId, frameId, op: "frame", commands: drawCommands });
   };

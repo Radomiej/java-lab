@@ -5,6 +5,8 @@ import {tmpdir, homedir} from 'node:os';
 import {join} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {gameEngineRuntimeFiles} from './gameEngineRuntime.js';
+import {prepareGameRequest} from '../services/gameWorkspace.js';
+import {prepareJavaSources} from '../../public/vendor/teavm/source-path.js';
 import {allLessons} from './curriculum.js';
 import {playgroundProject} from './playground.js';
 import {buildGameCourseContract} from '../../tools/course-contract.js';
@@ -268,4 +270,42 @@ it('rejects missing weapon cooldown and target selection',()=>{
     for(const [name,source] of Object.entries({...task.solutionFiles,...task.javaTestFiles}))files[name]=`import engine.*;\n${name==='Weapon.java'?mutate(source):source}`;
     expect(()=>runJava(files,'JavaTest')).toThrow();
   }
+},45000);
+
+it('serializes Song and Audio commands into the frame protocol',()=>{
+  const source=`import engine.*;
+public class AudioTests {
+ static void check(boolean ok,String label){if(!ok)throw new AssertionError(label);}
+ public static void main(String[] args){
+  Game g=new Game();g.start();g.step(0);
+  Song song=new Song(140);song.sequencer("square").notes("C4:1 E4:1 -:2 G4:0.5");song.sequencer("triangle").note("C3",2).rest(1);
+  check(song.trackCount()==2,"track count");check(Math.abs(song.sequencer("square").duration()-0)<1,"fresh seq empty");
+  g.audio.play(song,true);
+  g.audio.playNote("A4",0.5,"triangle");
+  g.step(0.1);
+  String frame=GameCanvas.frame();
+  check(frame.contains("audio|{\\"cmd\\":\\"song\\",\\"loop\\":true"),"song command: "+frame);
+  check(frame.contains("\\"wave\\":\\"square\\"")&&frame.contains("\\"note\\":\\"C4\\",\\"beats\\":1.0"),"lead track");
+  check(frame.contains("\\"note\\":null")&&frame.contains("\\"wave\\":\\"triangle\\""),"rest and bass");
+  check(frame.contains("audio|{\\"cmd\\":\\"note\\",\\"note\\":\\"A4\\",\\"beats\\":0.5,\\"wave\\":\\"triangle\\"}"),"playNote");
+  g.audio.stop();g.step(0);
+  check(GameCanvas.frame().contains("audio|{\\"cmd\\":\\"stop\\"}"),"stop command");
+  boolean bad=false;try{new Song(0);}catch(IllegalArgumentException e){bad=true;}check(bad,"tempo validation");
+  bad=false;try{song.sequencer().note("H4");}catch(IllegalArgumentException e){bad=true;}check(bad,"note validation");
+  bad=false;try{song.sequencer("organ");}catch(IllegalArgumentException e){bad=true;}check(bad,"wave validation");
+  Game early=new Game();early.audio.playNote("C4");early.start();
+  check(GameCanvas.frame().contains("audio|{\\"cmd\\":\\"note\\""),"audio survives clear buffer");
+  early.dispose();g.dispose();System.out.println("AUDIO PASS");
+ }
+}`;
+  expect(runJava({...gameEngineRuntimeFiles,'AudioTests.java':source},'AudioTests')).toContain('AUDIO PASS');
+},45000);
+
+it('compiles the browser pipeline: package lab wrap + wildcard expansion (import engine.Notes stays legal)',()=>{
+  const task=allLessons.find(lesson=>lesson.id==='g2d.scene').tasks[0];
+  const request=prepareGameRequest({files:{...task.solutionFiles,...task.javaTestFiles},mainClass:'JavaTest'});
+  const files=Object.fromEntries(prepareJavaSources(request.files));
+  expect(files['GameLauncher.java']).toContain('import engine.Notes;');
+  delete files['GameLauncher.java']; // org.teavm.jso is only available inside the TeaVM SDK
+  expect(runJava(files,'lab.JavaTest')).toMatch(/PASS|LAB_CHECK_FAILED/);
 },45000);

@@ -1,6 +1,6 @@
 import {prepareGameRequest} from './gameWorkspace.js';
 
-const defaultWorkerFactory = () => new Worker("/vendor/teavm/teavm.worker.js?v=game-wrapper-14", { type: "module" });
+const defaultWorkerFactory = () => new Worker("/vendor/teavm/teavm.worker.js?v=game-wrapper-16", { type: "module" });
 
 function createRunnerError(code, message) {
   const error = new Error(message);
@@ -171,7 +171,7 @@ export function createTeaVMRunner({ workerFactory = defaultWorkerFactory, timeou
         pending.set(id, { resolve, reject, timeoutId, onStage, onGameCommand });
         worker.postMessage({ command: "compile-and-run", id, ...payload, frameAcknowledgements: true });
         const canvas = document.querySelector(".game-canvas");
-        if (canvas) worker.postMessage({ command: "game-resize", width: canvas.clientWidth, height: canvas.clientHeight });
+        if (canvas) worker.postMessage({ command: "game-resize", width: 600, height: 600 });
       });
     },
     dispose() {

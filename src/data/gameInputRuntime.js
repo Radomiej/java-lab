@@ -43,4 +43,16 @@ public class NoneOfKeysPressed extends Component {
     }
 }
 `,
+  'Keys.java': `package engine;
+/** Stałe nazwy klawiszy dla input.isKeyDown/isKeyPressed/isKeyReleased/consumeKey. Te same wartości co GameLab.Keys w JavaScript. */
+public final class Keys {
+    private Keys() {}
+    public static final String UP="ArrowUp"; public static final String DOWN="ArrowDown"; public static final String LEFT="ArrowLeft"; public static final String RIGHT="ArrowRight";
+    public static final String W="w"; public static final String A="a"; public static final String S="s"; public static final String D="d";
+    public static final String X="x"; public static final String Y="y"; public static final String Z="z";
+    public static final String DIGIT_1="1"; public static final String DIGIT_2="2"; public static final String DIGIT_3="3";
+    public static final String SPACE="Space"; public static final String ENTER="Enter"; public static final String SHIFT="Shift"; public static final String TAB="Tab"; public static final String ESCAPE="Escape";
+    public static final String ACTION_A="ACTION_A"; public static final String ACTION_B="ACTION_B"; public static final String ACTION_X="ACTION_X"; public static final String ACTION_Y="ACTION_Y"; public static final String ACTION_START="ACTION_START"; public static final String ACTION_SELECT="ACTION_SELECT";
+}
+`,
 };

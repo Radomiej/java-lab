@@ -139,6 +139,7 @@ public class Game {
     public final Time time=new Time();
     public final InputManager input=new InputManager();
     public final Canvas canvas=new Canvas();
+    public final Audio audio=new Audio();
     public final Vector2 getCameraView(){for(GameObject o:getObjects()){Camera2D c=o.getComponent(Camera2D.class);if(o.active&&!o.destroyed&&c!=null&&c.enabled)return c.getView();}return new Vector2();}
     public final Physics2D physics=new Physics2D(this);
     public final Random random=new Random(1);
@@ -219,6 +220,7 @@ public class Game {
                 Camera2D camera=object.getComponent(Camera2D.class);
                 if(object.active&&!object.destroyed&&camera!=null&&camera.enabled){Vector2 view=camera.getView();cameraX=view.x;cameraY=view.y;break;}
             }
+            if(!disposed) GameCanvas.drawView(cameraX,cameraY);
             java.util.ArrayList<TileMap> tiles=new java.util.ArrayList<>();
             if(!disposed)for(GameObject o:getObjects())if(o.active&&!o.destroyed)for(Component c:o.getComponents())if(c.enabled&&c.created&&!c.removed){if(c instanceof TileMap)tiles.add((TileMap)c);else c.onDrawBackground();}
             tiles.sort((a,b)->{int n=Integer.compare(a.layer,b.layer);return n==0?Integer.compare(a.order,b.order):n;});for(TileMap tile:tiles)tile.onDrawBackground();
@@ -272,11 +274,15 @@ public class Game {
 public final class GameCanvas {
     private GameCanvas() {}
     private static final StringBuilder frame = new StringBuilder();
+    private static final StringBuilder audio = new StringBuilder();
     private static double width = 600;
-    private static double height = 400;
+    private static double height = 600;
     public static double getWidth() { return width; }
     public static double getHeight() { return height; }
     public static void setSize(double nextWidth, double nextHeight) { width = nextWidth; height = nextHeight; }
+
+    /** Komendy audio przeżywają clear(): są czyszczone dopiero przy odczycie ramki. */
+    public static void emitAudio(String json) { audio.append("audio|").append(json.replace("|", "/").replace((char) 10, ' ')).append((char) 10); }
 
     public static void clear(String color) { frame.setLength(0); frame.append("clear|").append(color).append((char) 10); }
     public static void drawRect(double x, double y, double width, double height, String color) { frame.append("rect|").append(x).append('|').append(y).append('|').append(width).append('|').append(height).append('|').append(color).append((char) 10); }
@@ -285,10 +291,12 @@ public final class GameCanvas {
     public static void drawCenteredText(String text, double x, double y, String color) { frame.append("text|").append(text.replace("|", "/").replace((char) 10, ' ')).append('|').append(x).append('|').append(y).append('|').append(color).append("|center").append((char) 10); }
     public static void drawShape(double x,double y,double width,double height,String color,double rotation,double scaleX,double scaleY){frame.append("rect|").append(x).append('|').append(y).append('|').append(width).append('|').append(height).append('|').append(color).append('|').append(rotation).append('|').append(scaleX).append('|').append(scaleY).append((char)10);}
     public static void drawCircle(double x,double y,double radius,String color,double rotation,double scaleX,double scaleY){if(!Double.isFinite(radius)||radius<0)throw new IllegalArgumentException("Niepoprawny promien");frame.append("circle|").append(x).append('|').append(y).append('|').append(radius).append('|').append(color).append('|').append(rotation).append('|').append(scaleX).append('|').append(scaleY).append((char)10);}
-    public static String frame() { return frame.toString(); }
+    public static String frame() { String out = frame.toString() + audio; audio.setLength(0); return out; }
     public static void drawProgressBar(double x,double y,double width,double height,double progress,String border,String track,String fill){frame.append("progress|").append(x).append('|').append(y).append('|').append(width).append('|').append(height).append('|').append(progress).append('|').append(border).append('|').append(track).append('|').append(fill).append((char)10);}
     public static void drawNinePatch(String asset,double x,double y,double width,double height,double border){frame.append("ninepatch|").append(asset).append('|').append(x).append('|').append(y).append('|').append(width).append('|').append(height).append('|').append(border).append((char)10);}
     public static void drawDebugState(boolean enabled) { frame.append("debug|").append(enabled).append((char)10); }
+    /** Pozycja lewego górnego rogu widoku kamery — podgląd pokazuje ją jako nakładkę z współrzędnymi. */
+    public static void drawView(double x,double y) { frame.append("view|").append(x).append('|').append(y).append((char)10); }
     /** Metadane debugowania: renderer wyświetla je po włączeniu Collidery. */
     public static void drawCollider(String shape,double x,double y,double width,double height,boolean trigger) {
         frame.append("collider|").append(shape).append('|').append(x).append('|').append(y).append('|').append(width).append('|').append(height).append('|').append(trigger).append((char)10);
@@ -471,7 +479,9 @@ export const gameCoreApiDescription = [
   { name: "CharacterController2D", methods: "move, velocity, constrainToBounds, onAfterMove, enabled", description: "move normalizuje kierunek; prędkość w px/s. Granice świata ustawia game.setWorldBounds." },
   { name: "Transform", methods: "x, y, rotation, scale, visualOffset", description: "Pozycja środka świata, obrót w radianach i skala obrazu. Skala grafiki nie zmienia collidera." },
   { name: "Game", methods: "createObject, find, getObjects, getObjectsWith, getObjectsWithTag, pause, resume, isPaused, setWorldBounds, time, input, physics, canvas", description: "Scena i cykl życia onCreate/onUpdate/onDrawUI/onDestroy. getObjectsWith(Player.class, Collider2D.class) zwraca kopię wyników indeksu." },
-  { name: "GameCanvas", methods: "clear, drawRect, drawText, drawCenteredText, drawSprite, getWidth, getHeight", description: "Rysowanie i rozmiar planszy w pikselach CSS." },
+  { name: "GameCanvas", methods: "clear, drawRect, drawText, drawCenteredText, drawSprite, getWidth, getHeight", description: "Rysowanie i rozmiar planszy. Stała rozdzielczość logiczna 600×600 px; ekran skaluje ją letterboxem." },
+  { name: "Audio", methods: "game.audio.play(song, loop), game.audio.playNote(\"C4\", beats, wave), game.audio.stop()", description: "Syntezator. Nuty C4, C#4, Db4; pauza \"-\"; czas w taktach; fale square, triangle, sine, sawtooth, noise." },
+  { name: "Song / Sequencer", methods: "new Song(tempo).sequencer(\"square\").notes(\"C4:1 E4:0.5 -:2\")", description: "Utwór z tempem BPM i równoległymi śladami. sequencer() zwraca ścieżkę: note, rest, notes, duration." },
   { name: "GameObject", methods: "id, setPosition, addComponent, getComponent, getComponents, hasComponent, requireComponent, removeComponent, removeComponents, onComponentChange, addTag, removeTag, hasTag, getTags, destroy", description: "Obiekt sceny ze stabilnym ID. Brak komponentu oznacza null; listy wyników są kopiami." },
   { name: "Component", methods: "onCreate, onUpdate, onLateUpdate, onDestroy, onCollision, onTrigger, onComponentChange, getComponent, getComponents, hasComponent, removeComponents, requireComponent, getGame, enabled, updateMode, gameObject, transform", description: "Własne zachowanie obiektu. updateMode WORLD zatrzymuje się przy pauzie, UI działa nadal." },
 ];

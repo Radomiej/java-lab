@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { createGameInterop, drawAtlasSprite } from "./gameInterop.js";
+import { Keys } from "../../shared/lab-game-v2/keys.js";
+import { gameEngineRuntimeFiles } from "../data/gameEngineRuntime.js";
 
 const canvasMethods = () => ({save(){},restore(){},translate(){},rotate(){},scale(){}});
 describe("game interop", () => {
@@ -52,16 +54,18 @@ describe("game interop", () => {
       ['drawImage',image,0,0,32,32,-20,-10,40,20],['restore'],
     ]);
   });
-  it('reports failed texture loading and allows a fresh bridge to retry',async()=>{
+  it('warns about failed textures instead of blocking the game, and a fresh bridge retries',async()=>{
     const context={...canvasMethods(),setTransform(){},fillRect(){},drawImage:vi.fn()};
     HTMLCanvasElement.prototype.getContext=()=>context;
     let failing=true;
     vi.stubGlobal('Image',class {set src(value){queueMicrotask(()=>failing?this.onerror():this.onload());}});
+    const warn=vi.spyOn(console,'warn').mockImplementation(()=>{});
     const bridge=createGameInterop(document.createElement('canvas'));
-    await expect(bridge.assetsReady).rejects.toThrow('Nie można załadować tekstury:');
+    await expect(bridge.assetsReady).resolves.toBeUndefined();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Nie można załadować tekstury:'));
     bridge.dispose();failing=false;
     const retry=createGameInterop(document.createElement('canvas'));
-    try {await retry.assetsReady;} finally {retry.dispose();vi.unstubAllGlobals();}
+    try {await retry.assetsReady;} finally {retry.dispose();vi.unstubAllGlobals();warn.mockRestore();}
   });
   it("centruje etykietę obiektu i przywraca lewe wyrównanie zwykłego tekstu", () => {
     const alignments = [];
@@ -124,5 +128,12 @@ describe("game interop", () => {
     canvas.dispatchEvent(new KeyboardEvent("keyup", { key: "ArrowRight" }));
     expect(bridge.isKeyDown("ArrowRight")).toBe(false);
     bridge.dispose();
+  });
+  it("engine.Keys w Javie ma te same stałe co GameLab.Keys", () => {
+    const java = Object.fromEntries(
+      [...gameEngineRuntimeFiles["Keys.java"].matchAll(/public static final String (\w+)="([^"]*)";/g)]
+        .map((match) => [match[1], match[2]])
+    );
+    expect(java).toEqual({ ...Keys });
   });
 });

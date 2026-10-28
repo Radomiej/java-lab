@@ -1,6 +1,10 @@
 import { createRenderer } from '../../shared/lab-game-v2/renderer.js';
 import { assetManifest } from '../../shared/lab-game-v2/assets/Assets.js';
-const CONTROL_KEYS = new Set(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d", " "]); 
+import { createLabAudio } from '../../shared/lab-game-v2/audio.js';
+import { createFrameStats } from '../../shared/lab-game-v2/stats.js';
+import { Keys } from '../../shared/lab-game-v2/keys.js';
+const LOGICAL_WIDTH = 600, LOGICAL_HEIGHT = 600;
+const CONTROL_KEYS = new Set([Keys.UP, Keys.DOWN, Keys.LEFT, Keys.RIGHT, Keys.W, Keys.A, Keys.S, Keys.D, " "]); 
 const normalizeKey = (key) => key === " " ? "Space" : key.length === 1 ? key.toLowerCase() : key;
 let activeAssetsReady=Promise.resolve();
 export function getGameAssetsReady(){return activeAssetsReady;}
@@ -36,6 +40,31 @@ export function createGameInterop(canvas) {
   const assetsReady=renderer.load(window).then(()=>{if(!disposed&&lastFrame)onGameDraw({detail:lastFrame});});
   activeAssetsReady=assetsReady;
   assetsReady.catch(error=>{if(!disposed)window.dispatchEvent(new CustomEvent('java-lab-game-render-error',{detail:error.message}));});
+  const audioKit = createLabAudio();
+  const audioOut = audioKit.createAudio({ window });
+  const handleAudio = (payload) => {
+    try {
+      const command = typeof payload === 'string' ? JSON.parse(payload) : payload;
+      if (command?.cmd === 'note') audioOut.playNote(command.note, { beats: command.beats ?? 1, wave: command.wave ?? 'square', tempo: command.tempo ?? 120 });
+      else if (command?.cmd === 'song') audioOut.playSong(command.song, { loop: Boolean(command.loop) });
+      else if (command?.cmd === 'stop') audioOut.stop();
+    } catch (error) { console.warn('Audio gry:', error.message); }
+  };
+  const stats = createFrameStats(3000);
+  let lastFrameTime = 0, lastStatsEmit = 0;
+  const cameraView = { x: 0, y: 0 };
+  const view = { scale: 1, offsetX: 0, offsetY: 0 };
+  const applyTransform = () => {
+    const ratio = window.devicePixelRatio || 1;
+    context.setTransform(view.scale * ratio, 0, 0, view.scale * ratio, view.offsetX * ratio, view.offsetY * ratio);
+  };
+  const paintBezel = () => {
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.fillStyle = '#0a1524';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    applyTransform();
+  };
+  const toLogical = (x, y) => ({ x: (x - view.offsetX) / view.scale, y: (y - view.offsetY) / view.scale });
   const resize = () => {
     const rect = canvas.getBoundingClientRect();
     const ratio = window.devicePixelRatio || 1;
@@ -43,13 +72,17 @@ export function createGameInterop(canvas) {
     const height = Math.max(1, Math.round(rect.height * ratio));
     if (canvas.width !== width) canvas.width = width;
     if (canvas.height !== height) canvas.height = height;
-    context.setTransform(ratio, 0, 0, ratio, 0, 0);
-    window.dispatchEvent(new CustomEvent("java-lab-game-resize", { detail: { width: rect.width, height: rect.height } }));
+    const boxWidth = Math.max(1, rect.width), boxHeight = Math.max(1, rect.height);
+    view.scale = Math.min(boxWidth / LOGICAL_WIDTH, boxHeight / LOGICAL_HEIGHT);
+    view.offsetX = (boxWidth - LOGICAL_WIDTH * view.scale) / 2;
+    view.offsetY = (boxHeight - LOGICAL_HEIGHT * view.scale) / 2;
+    applyTransform();
+    window.dispatchEvent(new CustomEvent("java-lab-game-resize", { detail: { width: LOGICAL_WIDTH, height: LOGICAL_HEIGHT } }));
     if (lastFrame) onGameDraw({ detail: lastFrame });
   };
   const emitInput = (key, pressed) => window.dispatchEvent(new CustomEvent("java-lab-game-input", { detail: { key, pressed } }));
   const mouseButtons=new Set();
-  const onPointerMove=event=>{const rect=canvas.getBoundingClientRect();window.dispatchEvent(new CustomEvent('java-lab-game-input',{detail:{kind:'pointer',x:event.clientX-rect.left,y:event.clientY-rect.top}}));};
+  const onPointerMove=event=>{const rect=canvas.getBoundingClientRect();const p=toLogical(event.clientX-rect.left,event.clientY-rect.top);window.dispatchEvent(new CustomEvent('java-lab-game-input',{detail:{kind:'pointer',x:p.x,y:p.y}}));};
   const onPointerDown=event=>{canvas.focus();onPointerMove(event);mouseButtons.add(event.button);canvas.setPointerCapture?.(event.pointerId);window.dispatchEvent(new CustomEvent('java-lab-game-input',{detail:{kind:'mouse',button:event.button,pressed:true}}));};
   const onPointerUp=event=>{onPointerMove(event);mouseButtons.delete(event.button);window.dispatchEvent(new CustomEvent('java-lab-game-input',{detail:{kind:'mouse',button:event.button,pressed:false}}));};
   const onKeyDown = (event) => {
@@ -68,9 +101,21 @@ export function createGameInterop(canvas) {
     const command = event.detail;
     if (command.op === "frame") {
       lastFrame = command;
+      const now = performance.now();
+      if (lastFrameTime) stats.push(now - lastFrameTime, now);
+      lastFrameTime = now;
+      if (now - lastStatsEmit > 250) {
+        lastStatsEmit = now;
+        window.dispatchEvent(new CustomEvent('java-lab-game-stats', { detail: stats.snapshot(now) }));
+        window.dispatchEvent(new CustomEvent('java-lab-game-view', { detail: { x: cameraView.x, y: cameraView.y } }));
+      }
+      paintBezel();
+      applyTransform();
       for (const item of command.commands || []) onGameDraw({ detail: item });
       return;
     }
+    if (command.op === "audio") { handleAudio(command.payload); return; }
+    if (command.op === 'view') { cameraView.x = Number(command.x) || 0; cameraView.y = Number(command.y) || 0; return; }
     if (command.op === "clear") api.clear(command.color);
     if (command.op === 'debug') {
       if(debugColliders!==Boolean(command.enabled)) {
@@ -112,7 +157,8 @@ export function createGameInterop(canvas) {
       }
     },
     resize,
-    clear: (color = "#0b2033") => { context.fillStyle = color; context.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight); },
+    audio: audioOut,
+    clear: (color = "#0b2033") => { context.fillStyle = color; context.fillRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT); },
     drawObject: (name, x, y, color = "#76b9f2", size = 25) => {
       context.fillStyle = color;
       context.fillRect(x - size / 2, y - size / 2, size, size);
@@ -157,6 +203,7 @@ export function createGameInterop(canvas) {
     disposed = true;
     resizeObserver?.disconnect();
     onBlur();
+    audioOut.dispose();
     dispose();
     if (window.__javaLabGameBridge === api) delete window.__javaLabGameBridge;
   };
