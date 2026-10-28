@@ -1,5 +1,6 @@
 import {studentGameCriteria} from '../gameDevStudentCopy.js';
 import { courseManifest, defaultCourseScaffolding } from '../../../shared/lab-game-v2/course/manifest.js';
+import { formatProjectFiles, formatSource } from '../../../shared/lab-game-v2/course/formatSource.js';
 import { buildCourseProject } from '../labGameV2Course.js';
 import { courseJavaTest } from '../labGameV2Checks.js';
 import { gameDevTeaching } from '../gameDevTeaching.js';
@@ -9,6 +10,7 @@ export const gameDevLessons=courseManifest.chapters.map(chapter=>({
   theory:[...gameDevTeaching(chapter.id.slice(4)).theory,...(chapter.id==='g2d.camera'?[{title:'Wskaźnik i przyciski myszy',text:pointerTheory}]:[])],tips:gameDevTeaching(chapter.id.slice(4)).tips,
   tasks:chapter.tasks.map(task=>{
     const key=chapter.id.slice(4),starter=buildCourseProject('java',key,task.mode,false),solution=buildCourseProject('java',key,task.mode);
-    return {...task,criteria:studentGameCriteria(task),engine:true,engineApiVersion:'2.0.0',mainClass:'GameMain',runMode:'game',starterFiles:starter.files,solutionFiles:solution.files,solutionReady:solution.ready,checks:[],gameTests:[{label:'Scenariusz zachowania zadania.'}],javaTestMainClass:'JavaTest',javaTestFiles:{'JavaTest.java':courseJavaTest(key,task.mode)},steps:[`Otwórz plik z TODO: ${Object.entries(starter.files).filter(([,code])=>code.includes('TODO')).map(([name])=>name).join(', ') || 'GameMain.java'}. Uzupełnij zachowanie opisane w poleceniu.`, 'Kliknij RUN: zobaczysz scenę i oddzielny wynik testów Java. Niepełne rozwiązanie może działać, ale nie zalicza zadania.', 'Porównaj zachowanie z kryteriami poniżej. Błędy kompilacji popraw w edytorze; niespełnione kryteria znajdziesz w wynikach testów.']};
+    const starterFiles=formatProjectFiles(starter.files),solutionFiles=formatProjectFiles(solution.files);
+    return {...task,criteria:studentGameCriteria(task),engine:true,engineApiVersion:'2.0.0',mainClass:'GameMain',runMode:'game',starterFiles,solutionFiles,solutionReady:solution.ready,checks:[],gameTests:[{label:'Scenariusz zachowania zadania.'}],javaTestMainClass:'JavaTest',javaTestFiles:{'JavaTest.java':formatSource(courseJavaTest(key,task.mode))},steps:[`Otwórz plik z TODO: ${Object.entries(starterFiles).filter(([,code])=>code.includes('TODO')).map(([name])=>name).join(', ') || 'GameMain.java'}. Uzupełnij zachowanie opisane w poleceniu.`, 'Kliknij RUN: zobaczysz scenę i oddzielny wynik testów Java. Niepełne rozwiązanie może działać, ale nie zalicza zadania.', 'Porównaj zachowanie z kryteriami poniżej. Błędy kompilacji popraw w edytorze; niespełnione kryteria znajdziesz w wynikach testów.']};
   })
 }));

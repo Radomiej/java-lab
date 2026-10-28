@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {createPortal} from 'react-dom';
 import {engineGuide} from '../data/engineGuide.js';
+import {Code} from '../../shared/lab-game-v2/editor/CodeExample.jsx';
 import './EngineGuide.css';
 
 export default function EngineGuide() {
@@ -34,15 +35,15 @@ export default function EngineGuide() {
             <h3>Obiekt + komponenty = zachowanie</h3>
             <p><code>GameMain extends Game</code> tworzy scenę. Każdy <code>GameObject</code> ma pozycję i listę komponentów. Dodajesz tylko to, czego obiekt potrzebuje.</p>
             <div className="engine-guide-composition"><strong>Gracz</strong><span>Sprite → wygląd</span><span>CharacterController2D → ruch</span><span>CircleCollider2D → kolizje</span><span>PlayerController → Twoje sterowanie</span></div>
-            <pre><code>{'GameObject player = createObject("Gracz").setPosition(180, 120);\nplayer.addComponent(new Sprite("player"));\nplayer.addComponent(new CharacterController2D());\nplayer.addComponent(new CircleCollider2D(12));\nplayer.addComponent(new PlayerController());'}</code></pre>
+            <pre><code><Code code={'GameObject player = createObject("Gracz").setPosition(180, 120);\nplayer.addComponent(new Sprite("player"));\nplayer.addComponent(new CharacterController2D());\nplayer.addComponent(new CircleCollider2D(12));\nplayer.addComponent(new PlayerController());'}/></code></pre>
             <h3>Co daje silnik, a co piszesz sam?</h3>
             <p>Silnik daje rysowanie, wejście z klawiatury, ruch, kolizje, zachowania AI i animacje. Ty piszesz reguły gry: sterowanie, punkty, obrażenia, skrzynki oraz wybór ulepszeń. Klasy PlayerController, Weapon, Health, Chest i UpgradeMenu należą do przykładów ucznia.</p>
             <h3>Pierwszy własny komponent</h3>
-            <pre><code>{'public class PlayerController extends Component {\n    public void onUpdate(double delta) {\n        double x = (Input.isKeyDown("d") ? 1 : 0)\n                 - (Input.isKeyDown("a") ? 1 : 0);\n        requireComponent(CharacterController2D.class).move(x, 0, 120);\n        if (x != 0) requireComponent(Sprite.class).flipX = x < 0;\n    }\n}'}</code></pre>
+            <pre><code><Code code={'public class PlayerController extends Component {\n    public void onUpdate(double delta) {\n        double x = (Input.isKeyDown("d") ? 1 : 0)\n                 - (Input.isKeyDown("a") ? 1 : 0);\n        requireComponent(CharacterController2D.class).move(x, 0, 120);\n        if (x != 0) requireComponent(Sprite.class).flipX = x < 0;\n    }\n}'}/></code></pre>
             <p>Pozycja jest środkiem sprite’a; dodatnie Y biegnie w dół. Prędkość podaj w px/s, czas w sekundach. <code>move</code> już uwzględnia czas klatki. <code>requireComponent</code> pobiera istniejący komponent z tego samego obiektu.</p>
             <h3>Dwa rodzaje postaci</h3><p><code>TopDownCharacterController2D</code> porusza się po obu osiach bez grawitacji. <code>PlatformerCharacterController2D</code> ma ruch poziomy, grawitację i skok. Do jednej postaci dodaj jeden kontroler. Oba odbijają sprite przez flipX i udostępniają <code>isWalk()</code>, <code>isRunning()</code> oraz <code>setRunning(boolean)</code>. Metody sprawdzają zadaną prędkość, także przy blokującej ścianie.</p>
             <h3>Wiązania klawiszy</h3>
-            <pre><code>{'// W GameMain.onCreate, po utworzeniu player:\nTopDownCharacterController2D character =\n    player.addComponent(new TopDownCharacterController2D());\nplayer.addComponent(new KeyPressed("W", () -> debug = true));\nplayer.addComponent(new KeyDoublePressed("D",\n    () -> character.setRunning(true)));\nplayer.addComponent(new NoneOfKeysPressed(\n    new String[]{"W", "A", "S", "D"},\n    () -> character.setRunning(false)));\n// Własny komponent ruchu dodaj po tych bindingach.\n// W nim controller.move(x,y) używa wybranego trybu biegu.'}</code></pre>
+            <pre><code><Code code={'// W GameMain.onCreate, po utworzeniu player:\nTopDownCharacterController2D character =\n    player.addComponent(new TopDownCharacterController2D());\nplayer.addComponent(new KeyPressed("W", () -> debug = true));\nplayer.addComponent(new KeyDoublePressed("D",\n    () -> character.setRunning(true)));\nplayer.addComponent(new NoneOfKeysPressed(\n    new String[]{"W", "A", "S", "D"},\n    () -> character.setRunning(false)));\n// Własny komponent ruchu dodaj po tych bindingach.\n// W nim controller.move(x,y) używa wybranego trybu biegu.'}/></code></pre>
             <p>Bindingi można dodawać i wyłączać także podczas gry. Callback to <code>Runnable</code>, zapisany jako <code>() → ...</code>. Brak klawiszy oznacza „żaden nie jest trzymany”; callback jest wtedy wykonywany w każdej klatce. Komponenty aktualizują się w kolejności dodania — bindingi dodaj przed komponentem ruchu. Jawne <code>move(x,y,speed)</code> wybiera prędkość niezależnie od wcześniejszego trybu biegu.</p>
             <p>Importy silnika i wspólny pakiet są dopisywane automatycznie. Źródła wbudowanych klas otworzysz przez Ctrl+klik lub F12. Kliknij planszę, żeby sterować grą.</p>
           </>}
@@ -60,7 +61,7 @@ export default function EngineGuide() {
           {section==='components'&&<>
             <label className="engine-guide-search">Znajdź klasę lub funkcję<input type="search" value={query} onChange={event=>setQuery(event.target.value)} placeholder="np. Sprite, kolizje, shake…"/></label>
             <p className="engine-guide-count">{entries.length} z {engineGuide.length} wbudowanych klas i interfejsów. Przykłady z createObject umieść w GameMain.onCreate; hooki w swoim komponencie. Nazwy player, enemy i object oznaczają wcześniej utworzone obiekty.</p>
-            {entries.map(item=><details className="engine-guide-entry" key={item.name} open={search?true:undefined}><summary><strong>{item.name}</strong><span>{item.group}</span></summary><p>{item.description}</p><h4>Pola i metody</h4><p className="engine-guide-fields">{item.fields}</p><h4>Przykład użycia</h4><pre><code>{item.example}</code></pre></details>)}
+            {entries.map(item=><details className="engine-guide-entry" key={item.name} open={search?true:undefined}><summary><strong>{item.name}</strong><span>{item.group}</span></summary><p>{item.description}</p><h4>Pola i metody</h4><p className="engine-guide-fields">{item.fields}</p><h4>Przykład użycia</h4><pre><code><Code code={item.example}/></code></pre></details>)}
             {!entries.length&&<p>Brak wyników. Spróbuj nazwy klasy lub słowa „ruch”, „grafika”, „AI”.</p>}
             <p>Tekstury: player (bohater RPG), slime / slime-blue (niebieski), slime-red (czerwony), bat, coin, heart, gem, projectile, potion, tree, grass, dirt, stone, sand, wood, leaves, water, coal-ore, chest. Podaj nazwę w konstruktorze Sprite lub TileMap.</p>
           </>}
