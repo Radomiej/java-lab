@@ -22,8 +22,12 @@ test('generates a seeded task, edits files and requires student ID for an immuta
   fireEvent.click(screen.getByRole('checkbox',{name:'Ocena'}));
   fireEvent.click(screen.getByRole('button',{name:'Oddaj do oceny'}));
   expect(submit).not.toHaveBeenCalled();
-  fireEvent.change(screen.getByLabelText('Twoje ID ucznia'),{target:{value:'3A-12'}});
+  fireEvent.change(screen.getByLabelText('ID ucznia (klasa i numer)'),{target:{value:'3A-12'}});
   fireEvent.click(screen.getByRole('button',{name:'Oddaj do oceny'}));
-  await waitFor(()=>expect(submit).toHaveBeenCalledWith(expect.objectContaining({studentId:'3A-12',files:{'Main.java':'my solution'}})));
+  expect(submit).not.toHaveBeenCalled();
+  expect(screen.getByRole('alert')).toHaveTextContent('imię i nazwisko');
+  fireEvent.change(screen.getByLabelText('Imię i nazwisko'),{target:{value:'Jan Kowalski'}});
+  fireEvent.click(screen.getByRole('button',{name:'Oddaj do oceny'}));
+  await waitFor(()=>expect(submit).toHaveBeenCalledWith(expect.objectContaining({studentId:'3A-12',studentName:'Jan Kowalski',files:{'Main.java':'my solution'}})));
   expect(screen.queryByText('Rozwiązanie referencyjne')).toBeNull();
 });
