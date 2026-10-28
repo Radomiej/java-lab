@@ -22,11 +22,14 @@ test('explains manual copying if clipboard access fails', async () => {
   await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Ctrl+C'));
 });
 test('shared damage explanation displays the correct language', () => {
+  const codeText = re => [...document.querySelectorAll('pre code')].some(el => re.test(el.textContent ?? ''));
   const view = render(<LessonExplanation lesson={{id:'g2d.health'}} language="javascript"/>);
-  expect(screen.getByText(/const health = other.getComponent/)).toBeInTheDocument();
-  expect(screen.queryByText(/Health.class/)).not.toBeInTheDocument();
+  const next = screen.getByRole('button', { name: 'Następny krok' });
+  const findOnPages = re => { for (let i = 0; i < 8 && !codeText(re); i++) { if (next.disabled) break; fireEvent.click(next); } return codeText(re); };
+  expect(findOnPages(/const health = other\.getComponent/)).toBe(true);
+  expect(codeText(/Health\.class/)).toBe(false);
   view.rerender(<LessonExplanation lesson={{id:'g2d.health'}} language="java"/>);
-  expect(screen.getByText(/Health.class/)).toBeInTheDocument();
+  expect(findOnPages(/Health\.class/)).toBe(true);
 });
 test('editor copy follows the active file and clears stale confirmation', async () => {
   const writeText = vi.fn().mockResolvedValue(undefined);
