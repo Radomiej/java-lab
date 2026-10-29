@@ -2,6 +2,146 @@
   "mode": "built-in image_gen",
   "assets": [
     {
+      "id": "algorithms-01",
+      "title": "Tablica: indeks wskazuje komórkę",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Tablica: indeks wskazuje komórkę\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-01.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-02",
+      "title": "Sortowanie bąbelkowe: sąsiedzi zamieniają się miejscami",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Sortowanie bąbelkowe: sąsiedzi zamieniają się miejscami\". Explain exactly this concept in 3 simple connected panels: int[] values = {9, 1, 5, 2} → para 9 i 1 zamienia się przez temp → posortowane {1, 2, 5, 9}. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/algorithms-02.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-03",
+      "title": "Sortowanie przez wybór: minimum staje na start",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Sortowanie przez wybór: minimum staje na start\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-03.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-04",
+      "title": "Sortowanie przez wstawianie: klucz wchodzi w dziurę",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Sortowanie przez wstawianie: klucz wchodzi w dziurę\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-04.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-05",
+      "title": "Sortowanie przez scalanie: dziel i scalaj",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Sortowanie przez scalanie: dziel i scalaj\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-05.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-06",
+      "title": "Sortowanie szybkie: pivot ustawia granicę",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Sortowanie szybkie: pivot ustawia granicę\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-06.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-07",
+      "title": "Sortowanie przez zliczanie: kubełki bez porównań",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Sortowanie przez zliczanie: kubełki bez porównań\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-07.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-08",
+      "title": "Shell i kopiec: odstępy oraz drzewo maksimum",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Shell i kopiec: odstępy oraz drzewo maksimum\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-08.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-09",
+      "title": "Wyszukiwanie binarne: odrzucamy połowę",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Wyszukiwanie binarne: odrzucamy połowę\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-09.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-10",
+      "title": "Rekurencja: warunek stopu i krok rekurencyjny",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Rekurencja: warunek stopu i krok rekurencyjny\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-10.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-11",
+      "title": "Ciąg Fibonacciego: dwa wywołania albo pętla",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Ciąg Fibonacciego: dwa wywołania albo pętla\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-11.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-12",
+      "title": "Algorytm Euklidesa: NWD przez reszty",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Algorytm Euklidesa: NWD przez reszty\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-12.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-13",
+      "title": "Liczby pierwsze: dzielniki do pierwiastek z n, potem sito",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Liczby pierwsze: dzielniki do pierwiastek z n, potem sito\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-13.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-14",
+      "title": "Palindrom: dwa wskaźniki do środka",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Palindrom: dwa wskaźniki do środka\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-14.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-15",
+      "title": "Szyfr Cezara: litera to pozycja w alfabecie",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Szyfr Cezara: litera to pozycja w alfabecie\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-15.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-16",
+      "title": "Systemy liczbowe: reszty od końca",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Systemy liczbowe: reszty od końca\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-16.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-17",
+      "title": "Wzorzec w tekście: okno o długości wzorca",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Wzorzec w tekście: okno o długości wzorca\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-17.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-18",
+      "title": "Macierz int[][]: wiersz, potem kolumna",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Macierz int[][]: wiersz, potem kolumna\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-18.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-19",
+      "title": "Stos: ostatni wchodzi, pierwszy wychodzi",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Stos: ostatni wchodzi, pierwszy wychodzi\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-19.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
+      "id": "algorithms-20",
+      "title": "Graf: sąsiedzi, visited i kolejka BFS",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Graf: sąsiedzi, visited i kolejka BFS\". 3 simple connected panels explaining the algorithm with minimal Polish labels and exact valid Java identifiers.",
+      "asset": "public/course-assets/java-concepts/algorithms-20.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
+    },
+    {
       "id": "fundamentals-01",
       "title": "Program wykonuje instrukcje po kolei",
       "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Program wykonuje instrukcje po kolei\". Explain exactly this concept in 3 simple connected panels: Main.java → main → konsola. Dwie linie wyniku: Start, Gotowy. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
@@ -26,6 +166,30 @@
       "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Metoda zwraca wynik\". Explain exactly this concept in 3 simple connected panels: collect(7, 3) → return gold + reward → 10 przypisane do total. Return nie wypisuje. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
       "asset": "public/course-assets/java-concepts/fundamentals-04.png",
       "finalEditPrompt": "Change only the method declaration in middle panel to static int collect(int gold, int reward) { so it can be called from static main. Preserve every other detail."
+    },
+    {
+      "id": "inheritance-09",
+      "title": "Dziedziczenie rozszerza klasę",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Dziedziczenie rozszerza klasę\". Explain exactly this concept in 3 simple connected panels: Character pole name. Mage extends Character ma name oraz mana. Jeden obiekt Mage: name Ewa, mana 12. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/inheritance-09.png"
+    },
+    {
+      "id": "inheritance-10",
+      "title": "Przesłanianie zmienia zachowanie",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Przesłanianie zmienia zachowanie\". Explain exactly this concept in 3 simple connected panels: Character.attack() zwraca Miecz. Mage extends Character przesłania attack() i zwraca Czar. Dwie podpisane karty metod. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/inheritance-10.png"
+    },
+    {
+      "id": "inheritance-11",
+      "title": "Typ obiektu wybiera metodę",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Typ obiektu wybiera metodę\". Explain exactly this concept in 3 simple connected panels: Character hero = new Mage(); hero.attack() → Mage.attack() → Czar. Typ zmiennej Character, obiekt Mage wyraźnie rozróżnione. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/inheritance-11.png"
+    },
+    {
+      "id": "inheritance-12",
+      "title": "Wyjątek prowadzi do obsługi błędu",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Wyjątek prowadzi do obsługi błędu\". Explain exactly this concept in 3 simple connected panels: buy(-4) → throw IllegalArgumentException → pasujący catch → komunikat Zła cena → dalszy program. Nie wykonuje Kupiono. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/inheritance-12.png"
     },
     {
       "id": "objects-05",
@@ -53,37 +217,6 @@
       "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Test sprawdza rzeczywisty stan\". Explain exactly this concept in 3 simple connected panels: Przygotuj hp=8 → damage(3) → sprawdź getHp()==5. Prosta zielona kontrolka wyniku. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
       "asset": "public/course-assets/java-concepts/objects-08.png",
       "finalEditPrompt": "Use the actual course Hero example, no disabled-by-default Java assert. First code Hero hero = new Hero(\"Iga\", 8);. Middle code hero.damage(3);. Third code if (hero.getHp() != 5) { throw new AssertionError(\"HP\"); }. Label object boxes hero instead of c. Keep three-panel calm style, same hp8 to hp5 and passed icon."
-    },
-    {
-      "id": "inheritance-09",
-      "title": "Dziedziczenie rozszerza klasę",
-      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Dziedziczenie rozszerza klasę\". Explain exactly this concept in 3 simple connected panels: Character pole name. Mage extends Character ma name oraz mana. Jeden obiekt Mage: name Ewa, mana 12. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
-      "asset": "public/course-assets/java-concepts/inheritance-09.png"
-    },
-    {
-      "id": "inheritance-10",
-      "title": "Przesłanianie zmienia zachowanie",
-      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Przesłanianie zmienia zachowanie\". Explain exactly this concept in 3 simple connected panels: Character.attack() zwraca Miecz. Mage extends Character przesłania attack() i zwraca Czar. Dwie podpisane karty metod. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
-      "asset": "public/course-assets/java-concepts/inheritance-10.png"
-    },
-    {
-      "id": "inheritance-11",
-      "title": "Typ obiektu wybiera metodę",
-      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Typ obiektu wybiera metodę\". Explain exactly this concept in 3 simple connected panels: Character hero = new Mage(); hero.attack() → Mage.attack() → Czar. Typ zmiennej Character, obiekt Mage wyraźnie rozróżnione. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
-      "asset": "public/course-assets/java-concepts/inheritance-11.png"
-    },
-    {
-      "id": "inheritance-12",
-      "title": "Wyjątek prowadzi do obsługi błędu",
-      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Wyjątek prowadzi do obsługi błędu\". Explain exactly this concept in 3 simple connected panels: buy(-4) → throw IllegalArgumentException → pasujący catch → komunikat Zła cena → dalszy program. Nie wykonuje Kupiono. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
-      "asset": "public/course-assets/java-concepts/inheritance-12.png"
-    },
-    {
-      "id": "algorithms-01",
-      "title": "Sortowanie bąbelkowe: sąsiedzi zamieniają się miejscami",
-      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Sortowanie bąbelkowe: sąsiedzi zamieniają się miejscami\". Explain exactly this concept in 3 simple connected panels: int[] values = {9, 1, 5, 2} → para 9 i 1 zamienia się przez temp → posortowane {1, 2, 5, 9}. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
-      "asset": "public/course-assets/java-concepts/algorithms-01.png",
-      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
     }
   ]
 }

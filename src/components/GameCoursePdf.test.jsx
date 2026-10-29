@@ -5,7 +5,7 @@ import LessonOverview from './LessonOverview.jsx';
 afterEach(cleanup);
 
 test('shows PDF information behind a compact accessible question mark', () => {
-  render(<LessonOverview lesson={{id:'g2d.scene',track:'game-dev',title:'Scena',order:401}} />);
+  render(<LessonOverview lesson={{id:'g2d.scene',track:'game-dev',title:'Scena',order:501}} />);
   const help = screen.getByText('?');
   expect(help.tagName).toBe('SUMMARY');
   expect(help).toHaveAttribute('aria-label', 'O materiałach PDF');

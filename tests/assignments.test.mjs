@@ -69,7 +69,7 @@ test('broker failure is retryable and is not reported as accepted',async()=>{
   assert.equal(response.status,502);
 });
 
-test('all 37 lesson quizzes and 111 code tasks reach the submission publisher with server keys',async()=>{
+test('all 56 lesson quizzes and 56 code tasks reach the submission publisher with server keys',async()=>{
   let published;
   const handlers=createAssignmentHandlers({env,publish:async message=>{published=message;}});
   for(const template of templates.filter(item=>item.kind))for(let index=0;index<(template.kind==='course-task'?3:1);index++){

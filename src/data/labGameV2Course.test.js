@@ -50,7 +50,7 @@ test('all source contracts are exact and each ready Java example compiles agains
     execFileSync(javac().replace(/javac(\.exe)?$/,'java$1'),['-cp',classpath,'JavaTest'],{encoding:'utf8',timeout:15000});
     if(files['MovementAudit.java'])execFileSync(javac().replace(/javac(\.exe)?$/,'java$1'),['-cp',classpath,'MovementAudit'],{encoding:'utf8',timeout:15000});
     const visible=Number(execFileSync(javac().replace(/javac(\.exe)?$/,'java$1'),['-cp',classpath,'VisibilityAudit'],{encoding:'utf8',timeout:15000}).trim());
-    visibility.push({lesson:401+index,task:task.id,visibleCommands:visible});
+    visibility.push({lesson:501+index,task:task.id,visibleCommands:visible});
    }
   }
   mkdirSync('artifacts',{recursive:true});writeFileSync('artifacts/course-visibility-audit.json',JSON.stringify(visibility,null,2));

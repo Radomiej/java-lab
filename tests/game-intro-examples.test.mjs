@@ -5,7 +5,7 @@ import {join} from 'node:path';
 import {tmpdir,homedir} from 'node:os';
 import {execFileSync} from 'node:child_process';
 import {gameEngineRuntimeFiles} from '../src/data/gameEngineRuntime.js';
-import {gameIntroPages} from '../src/data/gameIntroPages.js';
+import {gameIntroPages} from '../shared/lab-game-v2/editor/gameIntroPages.js';
 const jdks=process.env.JAVA_HOME?[process.env.JAVA_HOME]:readdirSync(join(homedir(),'.jdks')).map(name=>join(homedir(),'.jdks',name));
 const bin=name=>jdks.map(path=>join(path,'bin',name+(process.platform==='win32'?'.exe':''))).find(existsSync)||name;
 test('all introduction snippets compile against the real engine; coordinates, render size and movement agree with the lesson',()=>{
@@ -17,7 +17,7 @@ test('all introduction snippets compile against the real engine; coordinates, re
   const examples=[];
   for(const [index,page] of Object.values(gameIntroPages).flat().entries()){
    if(!page.code)continue;
-   let name,source=page.code;
+   let name,source=typeof page.code==='object'?page.code.java:page.code;
    if(source.startsWith('public class '))name=source.match(/public class (\w+)/)[1];
    else {
     name='IntroExample'+index;

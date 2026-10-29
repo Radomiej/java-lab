@@ -36,7 +36,8 @@ export function createLessonQuiz(lesson,{revision=lessonQuizRevision(lesson)}={}
       distractors = [...new Set(other)].filter(text => text.length < 220).slice(index * 2, index * 2 + 2);
     }
     const options = [answer, ...distractors];
-    const rotation = (index + lesson.order) % options.length;
+    const seed = [...lesson.id].reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+    const rotation = (index + seed) % options.length;
     const choices = options.slice(rotation).concat(options.slice(0, rotation));
     return {id: `${lesson.id}-quiz-${index + 1}`, title: page.title,
       prompt: page.result ? 'Jaki jest efekt opisanego przykładu?' : 'Które wyjaśnienie pasuje do tego kroku lekcji?',

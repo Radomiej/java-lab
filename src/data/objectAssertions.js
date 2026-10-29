@@ -42,7 +42,7 @@ const contracts={
     contract('int[] first={4,2,7,3};Main.selectionSort(first);int[] second={5,1};Main.selectionSort(second);',
       check('sorted-first','Posortowana przez wybór','first[0]==2 && first[1]==3 && first[2]==4 && first[3]==7'),
       check('sorted-second','Dwa elementy też','second[0]==1 && second[1]==5')),
-    contract('',check('from-one','Minimum od indeksu 1','Main.minIndex(new int[]{4,2,7,3},1)==3'),check('from-zero','Minimum całej tablicy','Main.minIndex(new int[]{4,2,7,3},0)==1'),check('from-last','Zakres od ostatniego','Main.minIndex(new int[]{4,2,7,3},3)==3')),
+    contract('',check('from-two','Minimum od indeksu 2','Main.minIndex(new int[]{4,2,7,3},2)==3'),check('from-zero','Minimum całej tablicy','Main.minIndex(new int[]{4,2,7,3},0)==1'),check('from-last','Zakres od ostatniego','Main.minIndex(new int[]{4,2,7,3},3)==3')),
     contract('int[] first={4,2,7,3};Main.selectionDescending(first);',
       check('desc','Posortowana malejąco','first[0]==7 && first[1]==4 && first[2]==3 && first[3]==2')),
   ],
@@ -121,7 +121,7 @@ const contracts={
     contract('',check('yes','tok i kot to anagramy','Main.areAnagrams("tok","kot")'),check('no','kot i pies nie są','!Main.areAnagrams("kot","pies")'),check('length','Różne długości','!Main.areAnagrams("kot","kota")')),
   ],
   'algorithms-15':[
-    contract('',check('cipher','ABC + 3 to DEF','"DEF".equals(Main.caesar("ABC",3))'),check('wrap','Zawija alfabet','"ABC".equals(Main.caesar("XYZ",3))'),check('keep','Litery poza zakresem bez zmian','"A1".equals(Main.caesar("A1",3))')),
+    contract('',check('cipher','ABC + 3 to DEF','"DEF".equals(Main.caesar("ABC",3))'),check('wrap','Zawija alfabet','"ABC".equals(Main.caesar("XYZ",3))'),check('keep','Znaki poza zakresem bez zmian','"D1".equals(Main.caesar("A1",3))')),
     contract('',check('dec','DEF - 3 to ABC','"ABC".equals(Main.caesarDec("DEF",3))'),check('dec-wrap','Zawija w tył','"XYZ".equals(Main.caesarDec("ABC",3))')),
     contract('',check('rot','HELLO to URYYB','"URYYB".equals(Main.rot13("HELLO"))'),check('double','Podwójne ROT13 to tekst','"HELLO".equals(Main.rot13("URYYB"))')),
   ],
@@ -146,7 +146,7 @@ const contracts={
     contract('',check('yes','(())() zbalansowane','Main.balanced("(())()")'),check('no',')( niezbalansowane','!Main.balanced(")(")'),check('open','( niezamknięte','!Main.balanced("(")')),
   ],
   'algorithms-20':[
-    contract('',check('all','Wszystkie 4 osiągalne','Main.reachable(new int[][]{{1,2},{0,3},{0},{1}},0)==4'),check('part','Część grafu','Main.reachable(new int[][]{{1},{0},{3},{2}},0)==2'),check('alone','Wierzchołek samotny','Main.reachable(new int[][]{{},{0}},1)==1')),
+    contract('',check('all','Wszystkie 4 osiągalne','Main.reachable(new int[][]{{1,2},{0,3},{0},{1}},0)==4'),check('part','Część grafu','Main.reachable(new int[][]{{1},{0},{3},{2}},0)==2'),check('alone','Wierzchołek samotny','Main.reachable(new int[][]{{},{0}},0)==1')),
     contract('',check('yes','Ścieżka 0→3 istnieje','Main.hasPath(0,3,new int[][]{{1,2},{0,3},{0},{1}},new boolean[4])'),check('no','Ścieżka nie istnieje','!Main.hasPath(0,3,new int[][]{{1},{0},{},{}} ,new boolean[4])'),check('self','Cel to start','Main.hasPath(0,0,new int[][]{{}},new boolean[1])')),
     contract('',check('two','Dwie składowe','Main.countComponents(new int[][]{{1},{0},{}})==2'),check('one','Jedna składowa','Main.countComponents(new int[][]{{1},{0,2},{1}})==1'),check('three','Trzy samotne','Main.countComponents(new int[][]{{},{},{}})==3')),
   ],

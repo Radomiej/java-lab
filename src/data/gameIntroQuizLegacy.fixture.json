@@ -6,11 +6,11 @@
       "prompt": "Które wyjaśnienie pasuje do tego kroku lekcji?",
       "code": "",
       "choices": [
-        "HP: 8\nGotowy\n",
         "Game przechowuje całą mapę i obiekty. GameObject jest kontenerem, Transform określa pozycję, a komponenty nadają mu wygląd i zachowania. Sprite lub ShapeRenderer rysuje obiekt; sam GameObject jest niewidoczny.",
-        "Start wyprawy\nHP: 8\n"
+        "Start wyprawy\nHP: 8\n",
+        "HP: 8\nGotowy\n"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "Game przechowuje całą mapę i obiekty. GameObject jest kontenerem, Transform określa pozycję, a komponenty nadają mu wygląd i zachowania. Sprite lub ShapeRenderer rysuje obiekt; sam GameObject jest niewidoczny."
     },
     {
@@ -19,11 +19,11 @@
       "prompt": "Które wyjaśnienie pasuje do tego kroku lekcji?",
       "code": "",
       "choices": [
-        "Transform określa punkt obiektu w świecie. W tym silniku X rośnie w prawo, Y w dół. Przykład (100,150) oznacza 100 jednostek w prawo i 150 w dół od początku mapy.",
         "10\n",
-        "Ada nie ma klucza. false nie jest tekstem \"false\"."
+        "Ada nie ma klucza. false nie jest tekstem \"false\".",
+        "Transform określa punkt obiektu w świecie. W tym silniku X rośnie w prawo, Y w dół. Przykład (100,150) oznacza 100 jednostek w prawo i 150 w dół od początku mapy."
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "Transform określa punkt obiektu w świecie. W tym silniku X rośnie w prawo, Y w dół. Przykład (100,150) oznacza 100 jednostek w prawo i 150 w dół od początku mapy."
     },
     {
@@ -32,11 +32,11 @@
       "prompt": "Które wyjaśnienie pasuje do tego kroku lekcji?",
       "code": "",
       "choices": [
-        "2\n2.5\n",
         "Zamknięte\n",
-        "Sprite i collider umieszczamy względem pozycji obiektu. Ich wymiary oraz przesunięcia są osobne. Transform nie określa środka widocznych pikseli grafiki."
+        "Sprite i collider umieszczamy względem pozycji obiektu. Ich wymiary oraz przesunięcia są osobne. Transform nie określa środka widocznych pikseli grafiki.",
+        "2\n2.5\n"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "Sprite i collider umieszczamy względem pozycji obiektu. Ich wymiary oraz przesunięcia są osobne. Transform nie określa środka widocznych pikseli grafiki."
     }
   ],
@@ -47,11 +47,11 @@
       "prompt": "Które wyjaśnienie pasuje do tego kroku lekcji?",
       "code": "",
       "choices": [
-        "PlayerController jest klasą ucznia. Odczytuje wejście i wybiera kierunek. CharacterController2D wykonuje ruch z uwzględnieniem czasu i przeszkód.",
         "Start wyprawy\nHP: 8\n",
-        "HP: 8\nGotowy\n"
+        "HP: 8\nGotowy\n",
+        "PlayerController jest klasą ucznia. Odczytuje wejście i wybiera kierunek. CharacterController2D wykonuje ruch z uwzględnieniem czasu i przeszkód."
       ],
-      "correct": 0,
+      "correct": 2,
       "explanation": "PlayerController jest klasą ucznia. Odczytuje wejście i wybiera kierunek. CharacterController2D wykonuje ruch z uwzględnieniem czasu i przeszkód."
     },
     {
@@ -60,11 +60,11 @@
       "prompt": "Które wyjaśnienie pasuje do tego kroku lekcji?",
       "code": "",
       "choices": [
-        "10\n",
         "Ada nie ma klucza. false nie jest tekstem \"false\".",
-        "Przytrzymanie służy do chodzenia. Nowe naciśnięcie wywołuje pojedynczą akcję. Trzy klatki przytrzymania nie powinny oznaczać trzech nowych naciśnięć."
+        "Przytrzymanie służy do chodzenia. Nowe naciśnięcie wywołuje pojedynczą akcję. Trzy klatki przytrzymania nie powinny oznaczać trzech nowych naciśnięć.",
+        "10\n"
       ],
-      "correct": 2,
+      "correct": 1,
       "explanation": "Przytrzymanie służy do chodzenia. Nowe naciśnięcie wywołuje pojedynczą akcję. Trzy klatki przytrzymania nie powinny oznaczać trzech nowych naciśnięć."
     },
     {
@@ -73,11 +73,11 @@
       "prompt": "Które wyjaśnienie pasuje do tego kroku lekcji?",
       "code": "",
       "choices": [
-        "Zamknięte\n",
         "CharacterController2D.getDirection() zwraca kopię ostatniego niezerowego kierunku. Po ruchu w prawo i puszczeniu D gracz stoi, ale kierunek nadal wynosi (1,0). Broń w lekcji 5 użyje go do strzału.",
-        "2\n2.5\n"
+        "2\n2.5\n",
+        "Zamknięte\n"
       ],
-      "correct": 1,
+      "correct": 0,
       "explanation": "CharacterController2D.getDirection() zwraca kopię ostatniego niezerowego kierunku. Po ruchu w prawo i puszczeniu D gracz stoi, ale kierunek nadal wynosi (1,0). Broń w lekcji 5 użyje go do strzału."
     }
   ]

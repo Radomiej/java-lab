@@ -415,7 +415,7 @@ const additionalTasks = {
 
     public static void main(String[] args) {
         int[] scores = {4, 2, 7, 3};
-        System.out.println(minIndex(scores, 1));
+        System.out.println(minIndex(scores, 2));
     }
 }
 `,
@@ -432,7 +432,7 @@ const additionalTasks = {
 
     public static void main(String[] args) {
         int[] scores = {4, 2, 7, 3};
-        System.out.println(minIndex(scores, 1));
+        System.out.println(minIndex(scores, 2));
     }
 }
 `,
