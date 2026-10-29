@@ -301,7 +301,7 @@ const additionalTasks = {
 `,
       checks: [
         { kind: "contains", file: "Main.java", value: "values[i] > limit", label: "Warunek progu" },
-        { kind: "contains", file: "Main.java", value: "bigger++", label: "Licznik trafień" },
+        { kind: "contains", file: "Main.java", value: "bigger++", label: "Zwiększanie licznika" },
       ],
     }),
   ],
@@ -658,7 +658,7 @@ public class Main {
     independentTask("algorithms-05", "independent-2", {
       title: "Scalanie malejąco",
       prompt: "Uzupełnij metodę mergeDesc tak, aby scalała dwie tablice posortowane malejąco w jedną malejącą.",
-      steps: ["Te same trzy wskaźniki co w merge.", "Porównanie odwrócone: bierz większą wartość (a[i] >= b[j]).", "Dopisz resztkę niepobranej strony."],
+      steps: ["Takie same trzy indeksy i, j, k jak w metodzie merge.", "Porównanie odwrotne: wybieraj większą wartość (a[i] >= b[j]).", "Po głównej pętli przepisz pozostałe elementy drugiej tablicy."],
       starter: `import java.util.Arrays;
 
 public class Main {
@@ -696,7 +696,7 @@ public class Main {
 `,
       checks: [
         { kind: "contains", file: "Main.java", value: "a[i] >= b[j]", label: "Porównanie malejące" },
-        { kind: "contains", file: "Main.java", value: "while (j < b.length)", label: "Resztka drugiej strony" },
+        { kind: "contains", file: "Main.java", value: "while (j < b.length)", label: "Przepisanie pozostałych elementów" },
       ],
     }),
   ],
@@ -833,10 +833,10 @@ public class Main {
     independentTask("algorithms-07", "independent-1", {
       title: "Zliczanie w małym zakresie",
       prompt: "Uzupełnij metodę countingSort tak, aby sortowała wartości z zakresu 0..5 przez zliczanie.",
-      steps: ["count ma 6 komórek (wartości 0..5).", "Zlicz wystąpienia pętlą for-each.", "Wypisz każde v tyle razy, ile wynosi count[v], do tablicy wyniku."],
+      steps: ["Tablica count ma 6 elementów (dla wartości 0..5).", "Zlicz wystąpienia pętlą for-each.", "Wpisz każdą wartość v do tablicy tyle razy, ile wynosi count[v]."],
       starter: `public class Main {
     static void countingSort(int[] values) {
-        // TODO: kubełki 0..5
+        // TODO: tablica liczników dla zakresu 0..5
     }
 
     public static void main(String[] args) {
@@ -873,8 +873,8 @@ public class Main {
 }
 `,
       checks: [
-        { kind: "contains", file: "Main.java", value: "new int[6]", label: "Kubełki zakresu 0..5" },
-        { kind: "contains", file: "Main.java", value: "while (count[v] > 0)", label: "Rozpisywanie" },
+        { kind: "contains", file: "Main.java", value: "new int[6]", label: "Tablica liczników zakresu 0..5" },
+        { kind: "contains", file: "Main.java", value: "while (count[v] > 0)", label: "Zapisywanie wartości" },
       ],
     }),
     independentTask("algorithms-07", "independent-2", {
@@ -985,8 +985,8 @@ public class Main {
       ],
     }),
     independentTask("algorithms-08", "independent-2", {
-      title: "Sortowanie głupie (gnome)",
-      prompt: "Uzupełnij metodę gnomeSort tak, aby sortowała jak ogrodnik: po zamianie cofa się o krok, bez zamiany idzie do przodu.",
+      title: "Sortowanie gnomowe (gnome sort)",
+      prompt: "Uzupełnij metodę gnomeSort tak, aby sortowała tablicę: gdy sąsiednie elementy stoją w złej kolejności, zamienia je i cofa się o krok; w przeciwnym razie idzie o krok do przodu.",
       steps: ["Indeks i zaczyna się od 1.", "Gdy values[i-1] <= values[i] — i++ do przodu.", "Gdy większe — zamień i cofnij i (ale nie poniżej 1)."],
       starter: `public class Main {
     static void gnomeSort(int[] values) {
@@ -1039,7 +1039,7 @@ public class Main {
     independentTask("algorithms-09", "independent-1", {
       title: "Pierwsze wystąpienie",
       prompt: "Uzupełnij metodę firstIndex tak, aby w posortowanej tablicy z powtórzeniami zwracała indeks pierwszego wystąpienia celu albo -1.",
-      steps: ["Jak w findIndex: low, high, mid i połowienie.", "Przy trafieniu zapamiętaj found = mid i szukaj dalej w lewo: high = mid - 1.", "Zwróć found po pętli."],
+      steps: ["Ustaw low, high i mid tak jak w metodzie findIndex.", "Gdy znajdziesz szukaną wartość, zapamiętaj found = mid i szukaj dalej w lewej połowie: high = mid - 1.", "Zwróć found po pętli."],
       starter: `public class Main {
     static int firstIndex(int[] sorted, int target) {
         // TODO: pierwsze wystąpienie binarnie
@@ -1076,14 +1076,14 @@ public class Main {
 }
 `,
       checks: [
-        { kind: "contains", file: "Main.java", value: "found = mid", label: "Zapamiętanie trafu" },
-        { kind: "contains", file: "Main.java", value: "high = mid - 1", label: "Szukanie w lewo" },
+        { kind: "contains", file: "Main.java", value: "found = mid", label: "Zapamiętanie znalezionego indeksu" },
+        { kind: "contains", file: "Main.java", value: "high = mid - 1", label: "Szukanie w lewej połowie" },
       ],
     }),
     independentTask("algorithms-09", "independent-2", {
       title: "Ostatnie wystąpienie",
-      prompt: "Uzupełnij metodę lastIndex tak, aby zwracała indeks ostatniego wystąpienia celu albo -1.",
-      steps: ["Te same low, high, mid i połowienie.", "Przy trafieniu found = mid i szukaj dalej w prawo: low = mid + 1.", "Zwróć found po pętli."],
+      prompt: "Uzupełnij metodę lastIndex tak, aby zwracała indeks ostatniego wystąpienia szukanej wartości albo -1.",
+      steps: ["Ustaw low, high i mid tak jak w metodzie findIndex.", "Gdy znajdziesz szukaną wartość, zapamiętaj found = mid i szukaj dalej w prawej połowie: low = mid + 1.", "Zwróć found po pętli."],
       starter: `public class Main {
     static int lastIndex(int[] sorted, int target) {
         // TODO: ostatnie wystąpienie binarnie
@@ -1120,8 +1120,8 @@ public class Main {
 }
 `,
       checks: [
-        { kind: "contains", file: "Main.java", value: "found = mid", label: "Zapamiętanie trafu" },
-        { kind: "contains", file: "Main.java", value: "low = mid + 1", label: "Szukanie w prawo" },
+        { kind: "contains", file: "Main.java", value: "found = mid", label: "Zapamiętanie znalezionego indeksu" },
+        { kind: "contains", file: "Main.java", value: "low = mid + 1", label: "Szukanie w prawej połowie" },
       ],
     }),
   ],
@@ -1416,7 +1416,7 @@ public class Main {
     independentTask("algorithms-13", "independent-2", {
       title: "N-ta liczba pierwsza",
       prompt: "Uzupełnij metodę nthPrime tak, aby zwracała n-tą liczbę pierwszą, używając isPrime.",
-      steps: ["isPrime jest dostępne w klasie.", "Kandydat candidate rośnie od 2, licznik found zlicza trafienia.", "Gdy found == n — zwróć candidate."],
+      steps: ["Metoda isPrime jest już dostępna w klasie.", "Sprawdzaj kolejne liczby candidate od 2 w górę, a w zmiennej found zliczaj znalezione liczby pierwsze.", "Gdy found == n, zwróć candidate."],
       starter: `public class Main {
     static boolean isPrime(int n) {
         if (n < 2) return false;
@@ -1464,7 +1464,7 @@ public class Main {
 `,
       checks: [
         { kind: "contains", file: "Main.java", value: "isPrime(candidate)", label: "Test pierwszości" },
-        { kind: "contains", file: "Main.java", value: "found < n", label: "Licznik trafień" },
+        { kind: "contains", file: "Main.java", value: "found < n", label: "Licznik znalezionych liczb pierwszych" },
       ],
     }),
   ],
@@ -1508,7 +1508,7 @@ public class Main {
     independentTask("algorithms-14", "independent-2", {
       title: "Anagramy",
       prompt: "Uzupełnij metodę areAnagrams tak, aby zwracała true, gdy słowa mają te same litery w innej kolejności — przez zliczanie liter.",
-      steps: ["Różne długości od razu dają false.", "int[] letters o 26 komórkach: dla znaku a dodaj do a.charAt(i) - 'a', dla b odejmij.", "Po pętli zwróć, czy wszystkie komórki są zerami."],
+      steps: ["Słowa różnej długości nie mogą być anagramami — od razu zwróć false.", "Utwórz tablicę int[] letters o 26 elementach: dla każdego znaku z napisu a zwiększ licznik letters[a.charAt(i) - 'a'], a dla znaku z b zmniejsz.", "Po pętli sprawdź, czy wszystkie elementy tablicy letters są równe 0."],
       starter: `public class Main {
     static boolean areAnagrams(String a, String b) {
         // TODO: zliczanie liter 0..25
@@ -1706,7 +1706,7 @@ public class Main {
       steps: ["count zaczyna się od 0, pętla start jak w find.", "Przy pełnym dopasowaniu count++ i szukaj dalej.", "Zwróć count po pętli."],
       starter: `public class Main {
     static int countMatches(String text, String pattern) {
-        // TODO: zlicz trafienia
+        // TODO: zlicz wystąpienia wzorca
         return 0;
     }
 
@@ -1736,7 +1736,7 @@ public class Main {
 }
 `,
       checks: [
-        { kind: "contains", file: "Main.java", value: "count++", label: "Licznik trafień" },
+        { kind: "contains", file: "Main.java", value: "count++", label: "Licznik wystąpień" },
         { kind: "contains", file: "Main.java", value: "i == pattern.length()", label: "Pełne dopasowanie" },
       ],
     }),
@@ -1787,7 +1787,7 @@ public class Main {
     independentTask("algorithms-18", "independent-1", {
       title: "Transponuj macierz",
       prompt: "Uzupełnij metodę transpose tak, aby zwracała macierz z zamienionymi wierszami i kolumnami.",
-      steps: ["Nowa macierz t ma wymiary odwrócone: new int[m[0].length][m.length].", "Każda komórka t[c][r] = m[r][c].", "Zwróć t."],
+      steps: ["Nowa macierz t ma zamienione wymiary: new int[m[0].length][m.length].", "Każdy element przypisz jako t[c][r] = m[r][c].", "Zwróć macierz t."],
       starter: `public class Main {
     static int[][] transpose(int[][] m) {
         // TODO: wiersze na kolumny
@@ -1873,7 +1873,7 @@ public class Main {
 `,
       checks: [
         { kind: "contains", file: "Main.java", value: "a[r][k] * b[k][c]", label: "Iloczyn wiersza i kolumny" },
-        { kind: "contains", file: "Main.java", value: "result[r][c] +=", label: "Akumulator komórki" },
+        { kind: "contains", file: "Main.java", value: "result[r][c] +=", label: "Sumowanie iloczynów w elemencie macierzy" },
       ],
     }),
   ],
@@ -1881,7 +1881,7 @@ public class Main {
     independentTask("algorithms-19", "independent-1", {
       title: "Odejmowanie w ONP",
       prompt: "Uzupełnij metodę evalRpn tak, aby obsługiwała też odejmowanie: \"4 2 -\" to 4 - 2 = 2.",
-      steps: ["Liczby i \"+\" jak w lekcji głównej.", "Token \"-\": b to górna wartość, a dolna — odkładamy a - b.", "Zwróć stack[0]."],
+      steps: ["Obsługa liczb i operatora \"+\" pozostaje taka sama jak w głównym zadaniu.", "Dla operatora \"-\" zdejmij najpierw b (prawy argument), potem a (lewy argument) i włóż na stos wynik a - b.", "Zwróć stack[0]."],
       starter: `public class Main {
     static int evalRpn(String[] tokens) {
         int[] stack = new int[tokens.length];
@@ -1929,8 +1929,8 @@ public class Main {
 }
 `,
       checks: [
-        { kind: "contains", file: "Main.java", value: "a - b", label: "Kolejność operandów" },
-        { kind: "contains", file: "Main.java", value: "stack[--top]", label: "Zdjęcie operandu" },
+        { kind: "contains", file: "Main.java", value: "a - b", label: "Kolejność argumentów" },
+        { kind: "contains", file: "Main.java", value: "stack[--top]", label: "Zdjęcie argumentu ze stosu" },
       ],
     }),
     independentTask("algorithms-19", "independent-2", {
@@ -1980,7 +1980,7 @@ public class Main {
     independentTask("algorithms-20", "independent-1", {
       title: "Ścieżka w grafie DFS",
       prompt: "Uzupełnij metodę hasPath tak, aby sprawdzała rekurencyjnie, czy z wierzchołka v da się dojść do target.",
-      steps: ["Odwiedź v; gdy v == target zwróć true.", "Dla każdego sąsiada bez visited: jeśli hasPath(next,...) zwraca true — zwróć true.", "Po pętli false — ślepy zaułek."],
+      steps: ["Jeśli v == target, zwróć true; w przeciwnym razie oznacz v jako odwiedzony.", "Dla każdego nieodwiedzonego sąsiada next: jeśli wywołanie hasPath(next, target, graph, visited) zwróci true, również zwróć true.", "Po pętli zwróć false — z tego wierzchołka nie prowadzi ścieżka do celu."],
       starter: `public class Main {
     static boolean hasPath(int v, int target, int[][] graph, boolean[] visited) {
         // TODO: DFS w stronę celu
@@ -2014,7 +2014,7 @@ public class Main {
 }
 `,
       checks: [
-        { kind: "contains", file: "Main.java", value: "v == target", label: "Trafienie celu" },
+        { kind: "contains", file: "Main.java", value: "v == target", label: "Osiągnięcie wierzchołka docelowego" },
         { kind: "contains", file: "Main.java", value: "hasPath(next, target", label: "Rekurencja DFS" },
       ],
     }),

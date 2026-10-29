@@ -15,8 +15,8 @@ export const algorithmsLessons = [
   lesson("algorithms-01", 1, "Tablica i przeglądanie danych", "int[], indeksy, max, suma i zliczanie",
     "Zapiszesz pierwsze algorytmy na tablicy liczb: znajdziesz największą wartość, policzysz sumę i zliczysz elementy spełniające warunek.",
     [
-      page("Algorytm to przepis na kroki", "Algorytm opisuje dokładnie, jak przejść od danych do wyniku w skończonej liczbie kroków. Dane trzymamy w tablicy: int[] scores = {9, 1, 5, 2}. Element wybieramy indeksem od zera: scores[0] to 9, a scores.length mówi, ile jest komórek. Najprostszym algorytmem jest przejście przez całą tablicę pętlą.", "int[] scores = {9, 1, 5, 2};\n\nfor (int i = 0; i < scores.length; i++) {\n    System.out.println(scores[i]);\n}"),
-      page("Maksimum: zapamiętaj najlepsze", "Szukanie maksimum zaczyna się od założenia, że pierwszy element jest największy. Potem każda kolejna komórka wygrywa, gdy jest większa od zapamiętanej wartości. Po całej pętli max trzyma największą liczbę.", "static int findMax(int[] values) {\n    int max = values[0];\n    for (int i = 1; i < values.length; i++) {\n        if (values[i] > max) {\n            max = values[i];\n        }\n    }\n    return max;\n}"),
+      page("Algorytm to przepis na kroki", "Algorytm opisuje dokładnie, jak przejść od danych do wyniku w skończonej liczbie kroków. Dane trzymamy w tablicy: int[] scores = {9, 1, 5, 2}. Element wybieramy indeksem od zera: scores[0] to 9, a scores.length mówi, ile jest elementów. Najprostszym algorytmem jest przejście przez całą tablicę pętlą.", "int[] scores = {9, 1, 5, 2};\n\nfor (int i = 0; i < scores.length; i++) {\n    System.out.println(scores[i]);\n}"),
+      page("Maksimum: zapamiętaj największą wartość", "Szukanie maksimum zaczyna się od założenia, że pierwszy element jest największy. Potem każdy kolejny element zastępuje dotychczasowe maksimum, gdy jest od niego większy. Po całej pętli zmienna max przechowuje największą liczbę.", "static int findMax(int[] values) {\n    int max = values[0];\n    for (int i = 1; i < values.length; i++) {\n        if (values[i] > max) {\n            max = values[i];\n        }\n    }\n    return max;\n}"),
       page("Akumulator: suma i zliczanie", "Suma i licznik działają tak samo: zaczynamy od zera i w każdym obrocie pętli coś dodajemy. Zliczanie dodaje jedynkę tylko wtedy, gdy element spełnia warunek — dlatego if siedzi wewnątrz pętli.", "int sum = 0;\nint bigger = 0;\nfor (int i = 0; i < values.length; i++) {\n    sum += values[i];\n    if (values[i] > 5) {\n        bigger++;\n    }\n}"),
     ],
     ["Indeksy tablicy zaczynają się od 0, a ostatni to length - 1.", "Startuj max od values[0] — wartość neutralna jak 0 zepsułaby wynik dla samych ujemnych."],
@@ -54,7 +54,7 @@ export const algorithmsLessons = [
 `,
       [
         { kind: "contains", file: "Main.java", value: "int max = values[0]", label: "Start od pierwszego elementu" },
-        { kind: "contains", file: "Main.java", value: "values[i] > max", label: "Porównanie z liderem" },
+        { kind: "contains", file: "Main.java", value: "values[i] > max", label: "Porównanie z dotychczasowym maksimum" },
       ], ["9"])),
 
   lesson("algorithms-02", 2, "Sortowanie bąbelkowe", "porównanie sąsiadów i zamiana",
@@ -167,12 +167,12 @@ export const algorithmsLessons = [
     "Posortujesz tablicę wstawiając każdy element we właściwe miejsce rosnącej posortowanej części — jak karty w ręce.",
     [
       page("Klucz i posortowana lewa strona", "Sortowanie przez wstawianie bierze kolejny element (klucz) i przesuwa go w lewo, póki napotyka mniejszy albo początek tablicy. Lewa część jest zawsze posortowana — wstawiamy tylko w nią. Tak układamy karty na ręce.", "for (int i = 1; i < values.length; i++) {\n    int key = values[i];\n    int j = i - 1;\n    while (j >= 0 && values[j] > key) {\n        values[j + 1] = values[j];\n        j--;\n    }\n    values[j + 1] = key;\n}"),
-      page("Przesuwanie zamiast zamiany", "Nie zamieniamy pary — zamiast tego przesuwamy większe elementy o jedno miejsce w prawo, robiąc dziurę dla klucza. Gdy klucz jest już na miejscu, pętla while kończy się warunkiem values[j] > key równym false.", "// {5, 1, 8, 2}, i = 1, key = 1\n// values[1] = 5 przesuwa się: {5, 5, 8, 2}\n// klucz wpada na start: {1, 5, 8, 2}"),
-      page("Prawie posortowana jest szybka", "Dla prawie posortowanej tablicy wewnętrzne przesuwanie prawie nie pracuje — algorytm zbliża się wtedy do O(n). W najgorszym razie (kolejność odwrotna) to O(n²) przesunięć.", "// już posortowane {1, 2, 3}:\n// while od razu jest fałszywe — zero przesunięć"),
+      page("Przesuwanie zamiast zamiany", "Nie zamieniamy par elementów — zamiast tego przesuwamy większe elementy o jedną pozycję w prawo, zwalniając miejsce dla klucza. Gdy klucz trafi na właściwą pozycję, pętla while kończy się, bo warunek values[j] > key staje się fałszywy.", "// {5, 1, 8, 2}, i = 1, key = 1\n// values[1] = 5 przesuwa się: {5, 5, 8, 2}\n// klucz trafia na początek: {1, 5, 8, 2}"),
+      page("Prawie posortowana tablica jest szybka", "Dla prawie posortowanej tablicy wewnętrzna pętla przesuwająca wykonuje bardzo mało kroków — algorytm zbliża się wtedy do O(n). W najgorszym przypadku (kolejność malejąca) wykonuje O(n²) przesunięć.", "// już posortowane {1, 2, 3}:\n// while od razu jest fałszywe — zero przesunięć"),
     ],
-    ["key trzyma wartość, bo komórka values[i] zostanie nadpisana przesuwaniem.", "Warunek j >= 0 musi być pierwszy — inaczej zajrzymy poza tablicę."],
+    ["Zmienna key przechowuje wstawianą wartość, bo element values[i] zostanie nadpisany podczas przesuwania.", "Warunek j >= 0 musi stać pierwszy — inaczej odwołamy się poza zakres tablicy."],
     consoleTask("Wstawiaj elementy na miejsce", "Uzupełnij metodę insertionSort tak, aby sortowała tablicę rosnąco. Program wypisuje posortowane wyniki.",
-      ["Zewnętrzna pętla od i = 1 pobiera key = values[i].", "Pętla while przesuwa w prawo elementy większe od key, aż j < 0 albo values[j] <= key.", "Wstaw key do dziury: values[j + 1] = key."],
+      ["Zewnętrzna pętla od i = 1 pobiera key = values[i].", "Pętla while przesuwa w prawo elementy większe od key, dopóki j >= 0 i values[j] > key.", "Wstaw key na zwolnioną pozycję: values[j + 1] = key."],
       ["Przesuwanie to values[j + 1] = values[j], a dopiero potem wpisujemy key."],
       `public class Main {
     static void insertionSort(int[] values) {
@@ -218,14 +218,14 @@ export const algorithmsLessons = [
   lesson("algorithms-05", 5, "Sortowanie przez scalanie", "dziel i scalaj posortowane połowy",
     "Połączysz dwie posortowane tablice w jedną i użyjesz tego kroku w rekurencyjnym sortowaniu przez scalanie.",
     [
-      page("Scalanie dwóch posortowanych ciągów", "Dwie posortowane tablice scalamy palcami: patrzymy na czoła obu i zawsze bierzemy mniejszą wartość. Po skończeniu jednej strony dopisujemy resztę drugiej. Wynik jest posortowany.", "int[] result = new int[a.length + b.length];\nint i = 0, j = 0, k = 0;\nwhile (i < a.length && j < b.length) {\n    if (a[i] <= b[j]) {\n        result[k++] = a[i++];\n    } else {\n        result[k++] = b[j++];\n    }\n}\nwhile (i < a.length) result[k++] = a[i++];\nwhile (j < b.length) result[k++] = b[j++];"),
-      page("Merge sort: podziel na połowy", "Sortowanie przez scalanie dzieli tablicę na połowy, sortuje każdą osobno tym samym algorytmem (rekurencja) i scala wyniki. Warunek stopu: jednoelementowa tablica jest już posortowana.", "static void mergeSort(int[] v) {\n    if (v.length < 2) {\n        return;\n    }\n    int mid = v.length / 2;\n    int[] left = Arrays.copyOfRange(v, 0, mid);\n    int[] right = Arrays.copyOfRange(v, mid, v.length);\n    mergeSort(left);\n    mergeSort(right);\n    int[] merged = merge(left, right);\n    for (int i = 0; i < v.length; i++) {\n        v[i] = merged[i];\n    }\n}"),
-      page("Dzielenie to log n poziomów", "Połowa połowy połowy... Dzielenie wymaga log n kroków, a scalanie na każdym poziomie dotyka każdego elementu raz. Razem O(n log n) — dużo szybciej niż O(n²) prostych metod.", "// 8 → 4+4 → 2+2+2+2 → 1×8\n// 3 poziomy scalania po 8 elementów"),
+      page("Scalanie dwóch posortowanych tablic", "Dwie posortowane tablice scalamy za pomocą dwóch indeksów: porównujemy bieżące elementy obu tablic i zawsze przepisujemy mniejszy. Gdy jedna tablica się skończy, dopisujemy pozostałe elementy drugiej. Wynik jest posortowany.", "int[] result = new int[a.length + b.length];\nint i = 0, j = 0, k = 0;\nwhile (i < a.length && j < b.length) {\n    if (a[i] <= b[j]) {\n        result[k++] = a[i++];\n    } else {\n        result[k++] = b[j++];\n    }\n}\nwhile (i < a.length) result[k++] = a[i++];\nwhile (j < b.length) result[k++] = b[j++];"),
+      page("Merge sort: podziel na połowy", "Sortowanie przez scalanie dzieli tablicę na dwie połowy, sortuje każdą z nich rekurencyjnie i scala posortowane części. Warunek stopu: tablica jednoelementowa jest już posortowana.", "static void mergeSort(int[] v) {\n    if (v.length < 2) {\n        return;\n    }\n    int mid = v.length / 2;\n    int[] left = Arrays.copyOfRange(v, 0, mid);\n    int[] right = Arrays.copyOfRange(v, mid, v.length);\n    mergeSort(left);\n    mergeSort(right);\n    int[] merged = merge(left, right);\n    for (int i = 0; i < v.length; i++) {\n        v[i] = merged[i];\n    }\n}"),
+      page("Dzielenie daje log n poziomów", "Kolejne dzielenie na pół daje log₂ n poziomów, a scalanie na każdym poziomie przegląda każdy element raz. Razem daje to złożoność O(n log n) — znacznie szybszą niż O(n²) prostych metod sortowania.", "// 8 → 4+4 → 2+2+2+2 → 1×8\n// 3 poziomy scalania po 8 elementów"),
     ],
-    ["Do podziału używamy Arrays.copyOfRange — dodaj import java.util.Arrays.", "Scalanie wymaga osobnej tablicy wynikowej — nie da się w miejscu."],
-    consoleTask("Scal dwie posortowane tablice", "Uzupełnij metodę merge tak, aby zwracała jedną posortowaną tablicę z elementów dwóch posortowanych tablic. Program wypisuje wynik.",
-      ["Utwórz tablicę result o długości a.length + b.length.", "Trzy wskaźniki i, j, k porównują czoła: mniejsza wartość trafia do result.", "Po pętli dopisz resztkę tej tablicy, która nie została skonsumowana."],
-      ["Dopięcie resztek to dwa krótkie while za główną pętlą."],
+    ["Do podziału używamy Arrays.copyOfRange — dodaj import java.util.Arrays.", "Scalanie wymaga pomocniczej tablicy wynikowej — nie wykonuje się w miejscu."],
+    consoleTask("Scal dwie posortowane tablice", "Uzupełnij metodę merge tak, aby łączyła dwie posortowane tablice w jedną posortowaną tablicę. Program wypisuje wynik.",
+      ["Utwórz tablicę result o długości a.length + b.length.", "Indeksy i, j, k porównują bieżące elementy a[i] oraz b[j]: mniejsza wartość trafia do result[k].", "Po głównej pętli przepisz pozostałe elementy tej tablicy, w której zostały jeszcze dane."],
+      ["Przepisanie pozostałych elementów to dwie krótkie pętle while za główną pętlą."],
       `import java.util.Arrays;
 
 public class Main {
@@ -269,8 +269,8 @@ public class Main {
 }
 `,
       [
-        { kind: "contains", file: "Main.java", value: "a[i] <= b[j]", label: "Porównanie czołów" },
-        { kind: "contains", file: "Main.java", value: "while (i < a.length)", label: "Dopięcie resztki" },
+        { kind: "contains", file: "Main.java", value: "a[i] <= b[j]", label: "Porównanie bieżących elementów" },
+        { kind: "contains", file: "Main.java", value: "while (i < a.length)", label: "Przepisanie pozostałych elementów" },
       ], ["[1, 2, 3, 4, 5]"])),
 
   lesson("algorithms-06", 6, "Sortowanie szybkie", "pivot dzieli tablicę na mniejsze i większe",
@@ -326,17 +326,17 @@ public class Main {
         { kind: "contains", file: "Main.java", value: "return i + 1", label: "Indeks pivota" },
       ], ["2"])),
 
-  lesson("algorithms-07", 7, "Sortowanie przez zliczanie", "kubełki liczą wystąpienia",
-    "Posortujesz liczby bez porównań — zliczając, ile razy każda wartość występuje, i rozpisując je z powrotem.",
+  lesson("algorithms-07", 7, "Sortowanie przez zliczanie", "tablica liczników wystąpień",
+    "Posortujesz liczby bez porównywania elementów — zliczając, ile razy występuje każda wartość, i zapisując je po kolei do tablicy.",
     [
-      page("Kubek na każdą wartość", "Gdy wartości pochodzą z małego zakresu, można policzyć je w tablicy liczników: count[4] mówi, ile razy wystąpiła czwórka. Potem przepisujemy wartości z powrotem — tyle razy, ile ich było. Zero porównań.", "int[] count = new int[max + 1];\nfor (int v : values) {\n    count[v]++;\n}\nint k = 0;\nfor (int v = 0; v <= max; v++) {\n    while (count[v] > 0) {\n        values[k++] = v;\n        count[v]--;\n    }\n}"),
-      page("for (int v : values) — pętla po elementach", "To skrót pętli po wszystkich elementach tablicy: v przyjmuje po kolei każdą wartość, bez indeksu. Nadaje się do odczytu; nie zmienia tablicy.", "for (int v : values) {\n    count[v]++;\n}\n// to samo co:\nfor (int i = 0; i < values.length; i++) {\n    count[values[i]]++;\n}"),
-      page("Działa tylko dla małego zakresu", "Tablica count musi pomieścić każdą możliwą wartość. Dla zakresu 0..9 to 10 komórek; dla wartości do miliona — milion komórek. Wtedy lepsze porównania jak w sortowaniu szybkim.", "// wartości 0..9 → count[10]\n// {4, 1, 3, 1, 2}: count[1] = 2, reszta po 1\n// wypisujemy: 1, 1, 2, 3, 4"),
+      page("Licznik dla każdej wartości", "Gdy liczby należą do niewielkiego zakresu, możemy policzyć ich wystąpienia w tablicy liczników: count[4] mówi, ile razy pojawiła się liczba 4. Następnie wpisujemy kolejne wartości do tablicy wyjściowej tyle razy, ile wynosi ich licznik — bez ani jednego porównania elementów.", "int[] count = new int[max + 1];\nfor (int v : values) {\n    count[v]++;\n}\nint k = 0;\nfor (int v = 0; v <= max; v++) {\n    while (count[v] > 0) {\n        values[k++] = v;\n        count[v]--;\n    }\n}"),
+      page("for (int v : values) — pętla po elementach", "To skrócony zapis pętli przeglądającej wszystkie elementy tablicy: zmienna v przyjmuje po kolei wartość każdego elementu, bez używania indeksu. Służy do odczytu; nie modyfikuje tablicy.", "for (int v : values) {\n    count[v]++;\n}\n// to samo co:\nfor (int i = 0; i < values.length; i++) {\n    count[values[i]]++;\n}"),
+      page("Działa tylko dla małego zakresu wartości", "Tablica count musi mieć tyle elementów, ile wynosi największa możliwa wartość powiększona o 1. Dla zakresu 0..9 wystarczy tablica 10-elementowa; dla liczb do miliona potrzebowalibyśmy miliona elementów — wtedy lepsze są algorytmy porównaniowe, np. sortowanie szybkie.", "// wartości 0..9 → count[10]\n// {4, 1, 3, 1, 2}: count[1] = 2, reszta po 1\n// wypisujemy: 1, 1, 2, 3, 4"),
     ],
-    ["count musi mieć rozmiar max + 1 — indeks wartości to sama wartość.", "Zliczanie daje O(n + zakres) — szybciej niż O(n²), ale kosztem pamięci."],
-    consoleTask("Zlicz wystąpienia wartości", "Uzupełnij metodę countingSort tak, aby sortowała wartości z zakresu 0..9 przez zliczanie. Program wypisuje posortowane liczby.",
-      ["Utwórz int[] count = new int[10] i zlicz wystąpienia pętlą for-each.", "Zewnętrzna pętla przechodzi wartości v od 0 do 9.", "Dla każdego v dopisz go do values tyle razy, ile wynosi count[v] (pętla while odejmuje licznik)."],
-      ["k to osobny indeks pisania w values — startuje od 0."],
+    ["Tablica count musi mieć rozmiar max + 1, ponieważ sama wartość elementu jest jej indeksem.", "Zliczanie działa w czasie O(n + zakres) — szybciej niż O(n²), ale kosztem dodatkowej pamięci."],
+    consoleTask("Zlicz wystąpienia wartości", "Uzupełnij metodę countingSort tak, aby sortowała liczby z zakresu 0..9 przez zliczanie. Program wypisuje posortowane liczby.",
+      ["Utwórz tablicę int[] count = new int[10] i zlicz wystąpienia pętlą for-each.", "Zewnętrzna pętla przechodzi przez wartości v od 0 do 9.", "Dla każdego v wpisz je do tablicy values tyle razy, ile wynosi count[v] (pętla while zmniejsza licznik)."],
+      ["Zmienna k to osobny indeks zapisu w tablicy values — zaczyna się od 0."],
       `public class Main {
     static void countingSort(int[] values) {
         // TODO: zlicz wystąpienia i wypisz je z powrotem
@@ -377,17 +377,17 @@ public class Main {
 `,
       [
         { kind: "contains", file: "Main.java", value: "count[v]++", label: "Zliczanie wystąpień" },
-        { kind: "contains", file: "Main.java", value: "while (count[v] > 0)", label: "Rozpisywanie kubełków" },
+        { kind: "contains", file: "Main.java", value: "while (count[v] > 0)", label: "Zapisywanie wartości wg licznika" },
       ], ["1", "1", "2", "3", "4"])),
 
   lesson("algorithms-08", 8, "Shell i kopiec: szybsze metody", "odstępy zamiast sąsiadów i drzewo maksimum",
     "Poznasz dwie szybsze odmiany prostych algorytmów: sortowanie Shella z odstępami i sortowanie przez kopcowanie z drzewem maksimum.",
     [
-      page("Shell: insertion na odległych parach", "Sortowanie Shella to sortowanie przez wstawianie, które zaczyna od dużego odstępu gap. Elementy daleko od siebie porównujemy najpierw, więc duże liczby szybko trafiają na koniec. Odstęp zmniejszamy — ostatni przejście to zwykłe wstawianie na prawie posortowanych danych.", "for (int gap = values.length / 2; gap > 0; gap /= 2) {\n    for (int i = gap; i < values.length; i++) {\n        int key = values[i];\n        int j = i;\n        while (j >= gap && values[j - gap] > key) {\n            values[j] = values[j - gap];\n            j -= gap;\n        }\n        values[j] = key;\n    }\n}"),
-      page("Kopiec: rodzic zawsze największy", "Kopiec (heap) to drzewo w tablicy: rodzic komórki i to (i - 1) / 2, dzieci to 2i + 1 i 2i + 2. W max-heapie rodzic jest większy od dzieci, więc korzeń zawsze trzyma maksimum. Naprawa kopca (siftDown) przesuwa duże dziecko w górę.", "static void siftDown(int[] v, int size, int i) {\n    int largest = i;\n    int left = 2 * i + 1;\n    int right = 2 * i + 2;\n    if (left < size && v[left] > v[largest]) largest = left;\n    if (right < size && v[right] > v[largest]) largest = right;\n    if (largest != i) {\n        int temp = v[i]; v[i] = v[largest]; v[largest] = temp;\n        siftDown(v, size, largest);\n    }\n}"),
-      page("Heap sort: zdejmuj maksimum", "Najpierw budujemy kopiec od środka do początku. Potem korzeń (maksimum) zamieniamy z ostatnim elementem, zmniejszamy kopiec i naprawiamy — każdy krok odkłada największą wartość na koniec. Razem O(n log n) bez dodatkowej tablicy.", "static void heapSort(int[] v) {\n    for (int i = v.length / 2 - 1; i >= 0; i--) {\n        siftDown(v, v.length, i);\n    }\n    for (int end = v.length - 1; end > 0; end--) {\n        int temp = v[0]; v[0] = v[end]; v[end] = temp;\n        siftDown(v, end, 0);\n    }\n}"),
+      page("Shell: wstawianie z odstępem", "Sortowanie Shella to sortowanie przez wstawianie, które zaczyna od dużego odstępu gap. Najpierw porównujemy elementy odległe od siebie, dzięki czemu duże wartości szybko przemieszczają się w stronę końca tablicy. Odstęp stopniowo zmniejszamy — ostatnie przejście (gap = 1) to zwykłe wstawianie na prawie posortowanej tablicy.", "for (int gap = values.length / 2; gap > 0; gap /= 2) {\n    for (int i = gap; i < values.length; i++) {\n        int key = values[i];\n        int j = i;\n        while (j >= gap && values[j - gap] > key) {\n            values[j] = values[j - gap];\n            j -= gap;\n        }\n        values[j] = key;\n    }\n}"),
+      page("Kopiec: rodzic zawsze największy", "Kopiec (ang. heap) to drzewo binarne zapisane w tablicy: rodzic elementu o indeksie i leży pod indeksem (i - 1) / 2, a jego dzieci pod indeksami 2i + 1 oraz 2i + 2. W kopcu typu max-heap każdy rodzic jest nie mniejszy od swoich dzieci, więc korzeń v[0] zawsze zawiera największy element. Naprawa kopca (siftDown) przywraca tę własność, przesuwając mniejszy element w dół.", "static void siftDown(int[] v, int size, int i) {\n    int largest = i;\n    int left = 2 * i + 1;\n    int right = 2 * i + 2;\n    if (left < size && v[left] > v[largest]) largest = left;\n    if (right < size && v[right] > v[largest]) largest = right;\n    if (largest != i) {\n        int temp = v[i]; v[i] = v[largest]; v[largest] = temp;\n        siftDown(v, size, largest);\n    }\n}"),
+      page("Heap sort: wyciągaj maksimum na koniec", "Najpierw budujemy kopiec, naprawiając poddrzewa od środka tablicy do początku. Następnie zamieniamy korzeń (największy element) z ostatnim elementem nieposortowanej części, zmniejszamy rozmiar kopca o 1 i naprawiamy korzeń — każdy krok ustawia kolejną największą wartość na końcu tablicy. Złożoność to O(n log n) bez dodatkowej tablicy.", "static void heapSort(int[] v) {\n    for (int i = v.length / 2 - 1; i >= 0; i--) {\n        siftDown(v, v.length, i);\n    }\n    for (int end = v.length - 1; end > 0; end--) {\n        int temp = v[0]; v[0] = v[end]; v[end] = temp;\n        siftDown(v, end, 0);\n    }\n}"),
     ],
-    ["W kopcu dzieci komórki i to 2i + 1 i 2i + 2 — liczymy jak w drzewie na tablicy.", "Shell: gap /= 2 jest najprostszym wyborem; koniec na gap = 1."],
+    ["W kopcu dzieci elementu o indeksie i mają indeksy 2i + 1 oraz 2i + 2.", "W sortowaniu Shella najprostszy ciąg odstępów to dzielenie przez 2 aż do gap = 1."],
     consoleTask("Sortuj odstępami jak Shell", "Uzupełnij metodę shellSort tak, aby sortowała odstępem malejącym od length / 2 do 1. Program wypisuje posortowane liczby.",
       ["Zewnętrzna pętla: gap od values.length / 2, zmniejszane przez gap /= 2.", "Wewnątrz jest wstawianie z odstępem: key = values[i], j zaczyna się od i.", "Przesuwaj values[j - gap] o gap w prawo, póki j >= gap i element jest większy od key."],
       ["To insertionSort, w którym indeks 1 zastąpiono odstępem gap."],
@@ -439,9 +439,9 @@ public class Main {
     [
       page("Środek decyduje o połowie", "W posortowanej tablicy patrzymy na środek zakresu low..high. Cel większy od środka odrzuca całą lewą stronę, mniejszy — prawą. Zamiast n kroków liniowych mamy około log₂ n porównań.", "int low = 0;\nint high = sorted.length - 1;\nwhile (low <= high) {\n    int mid = (low + high) / 2;\n    if (sorted[mid] == target) {\n        return mid;\n    } else if (sorted[mid] < target) {\n        low = mid + 1;\n    } else {\n        high = mid - 1;\n    }\n}\nreturn -1;"),
       page("Warunek: tablica musi być posortowana", "Połowienie działa tylko na danych uporządkowanych. W nieposortowanej tablicy odrzucenie połowy może wyrzucić razem z nią cel — wtedy jedyne pewne jest przeszukiwanie liniowe.", "// {2, 4, 6, 8, 10}, cel 8\n// mid = 2 → sorted[2] = 6 < 8 → szukamy w {8, 10}"),
-      page("Wariant: pierwsze wystąpienie", "Gdy wartości się powtarzają, trafienie na środek nie musi być pierwszym wystąpieniem. Wariant szukający pierwszego zapamiętuje traf i szuka dalej w lewej połowie.", "static int firstIndex(int[] sorted, int target) {\n    int low = 0, high = sorted.length - 1, found = -1;\n    while (low <= high) {\n        int mid = (low + high) / 2;\n        if (sorted[mid] == target) {\n            found = mid;\n            high = mid - 1;   // szukaj wcześniejszego\n        } else if (sorted[mid] < target) {\n            low = mid + 1;\n        } else {\n            high = mid - 1;\n        }\n    }\n    return found;\n}"),
+      page("Wariant: pierwsze wystąpienie", "Gdy wartości w tablicy się powtarzają, trafienie na element środkowy nie musi oznaczać pierwszego wystąpienia szukanej liczby. Wariant szukający pierwszego wystąpienia zapamiętuje znaleziony indeks i kontynuuje przeszukiwanie w lewej połowie.", "static int firstIndex(int[] sorted, int target) {\n    int low = 0, high = sorted.length - 1, found = -1;\n    while (low <= high) {\n        int mid = (low + high) / 2;\n        if (sorted[mid] == target) {\n            found = mid;\n            high = mid - 1;   // szukaj wcześniejszego\n        } else if (sorted[mid] < target) {\n            low = mid + 1;\n        } else {\n            high = mid - 1;\n        }\n    }\n    return found;\n}"),
     ],
-    ["Brak wyniku zwracamy jako -1 — indeks 0 byłby mylący.", "low <= high: przy low == high zakres ma jeszcze jedną komórkę do sprawdzenia."],
+    ["Brak elementu oznaczamy wartością -1 — indeks 0 wskazywałby pierwszy element tablicy.", "Warunek low <= high: gdy low == high, przedział zawiera jeszcze jeden element do sprawdzenia."],
     consoleTask("Znajdź wynik binarnie", "Uzupełnij metodę findIndex tak, aby w posortowanej tablicy szukała celu przeszukiwaniem binarnym i zwracała indeks albo -1.",
       ["Ustaw low na 0 i high na sorted.length - 1.", "W pętli while (low <= high) porównuj sorted[mid] z celem.", "Zwróć mid przy trafieniu, zwężaj połowy i zwróć -1 za pętlą."],
       ["mid to (low + high) / 2 — środek bieżącego zakresu."],
@@ -744,7 +744,7 @@ public class Main {
     [
       page("Reszty czytane od końca", "Zamiana na system o podstawie b: dzielimy liczbę przez b i zapisujemy resztę. Wynik to reszty czytane od ostatniej do pierwszej. 13 / 2 = 6 r. 1, 6 / 2 = 3 r. 0, 3 / 2 = 1 r. 1, 1 / 2 = 0 r. 1 → 1101.", "static String toBase(int number, int base) {\n    String digits = \"0123456789ABCDEF\";\n    String result = \"\";\n    do {\n        result = digits.charAt(number % base) + result;\n        number /= base;\n    } while (number > 0);\n    return result;\n}"),
       page("Dopisywanie z przodu", "Reszty zbieramy w odwrotnej kolejności, więc każdą doklejamy PRZED wynik: digit + result. Zapis do...while gwarantuje jedną cyfrę nawet dla zera.", "// 13, baza 2:\n// reszta 1 → \"1\"\n// reszta 0 → \"01\"\n// reszta 1 → \"101\"\n// reszta 1 → \"1101\""),
-      page("Z powrotem: mnożenie przez podstawę", "Zamiana zapisu na liczbę idzie od lewej: wartość = wartość × baza + cyfra. To horyzont — ta sama pętla działa dla binarnego, szesnastkowego i każdej innej podstawy.", "static int fromBase(String text, int base) {\n    String digits = \"0123456789ABCDEF\";\n    int value = 0;\n    for (int i = 0; i < text.length(); i++) {\n        value = value * base + digits.indexOf(text.charAt(i));\n    }\n    return value;\n}"),
+      page("Z powrotem: mnożenie przez podstawę", "Zamiana zapisu na liczbę przebiega od lewej do prawej: wartość = wartość × podstawa + cyfra (schemat Hornera). Ta sama pętla działa dla systemu binarnego, szesnastkowego i każdej innej podstawy.", "static int fromBase(String text, int base) {\n    String digits = \"0123456789ABCDEF\";\n    int value = 0;\n    for (int i = 0; i < text.length(); i++) {\n        value = value * base + digits.indexOf(text.charAt(i));\n    }\n    return value;\n}"),
     ],
     ["do...while wykonuje się raz — liczba 0 też wypisuje cyfrę.", "indexOf w stringu digits zamienia znak na wartość cyfry."],
     consoleTask("Zamień na binarny", "Uzupełnij metodę toBinary tak, aby zwracała liczbę zapisaną binarnie przez reszty z dzielenia przez 2.",
@@ -786,7 +786,7 @@ public class Main {
     [
       page("Okno o długości wzorca", "Naiwne szukanie wzorca ustawia okno o długości wzorca na każdej pozycji tekstu i porównuje znak po znaku. Pierwsza różnica przesuwa okno o jedno miejsce.", "static int find(String text, String pattern) {\n    for (int start = 0; start <= text.length() - pattern.length(); start++) {\n        int i = 0;\n        while (i < pattern.length() && text.charAt(start + i) == pattern.charAt(i)) {\n            i++;\n        }\n        if (i == pattern.length()) {\n            return start;\n        }\n    }\n    return -1;\n}"),
       page("start + i to pozycja w tekście", "Indeks i chodzi po wzorcu, a start + i po tekście. Trafienie wymaga i == pattern.length() — wszystkie znaki pasowały. Ostatnia sensowna pozycja start to length - pattern.length().", "// \"ala ma kota\", wzorzec \"kot\"\n// start od 0 do 8; trafienie na start = 7"),
-      page("Zliczanie wszystkich wystąpień", "Zamiast return po trafieniu, zliczamy count++ i szukamy dalej od start + 1. Tak powstaje algorytm dla nakładających się wystąpień jak \"ana\" w \"banana\" — dwa trafy.", "static int countMatches(String text, String pattern) {\n    int count = 0;\n    for (int start = 0; start <= text.length() - pattern.length(); start++) {\n        if (text.substring(start, start + pattern.length()).equals(pattern)) {\n            count++;\n        }\n    }\n    return count;\n}"),
+      page("Zliczanie wszystkich wystąpień", "Zamiast kończyć metodę po pierwszym dopasowaniu, zwiększamy licznik count++ i przesuwamy okno o jedną pozycję dalej (start + 1). Dzięki temu wykrywamy również nakładające się wystąpienia, np. wzorzec \"ana\" w napisie \"banana\" (dwa wystąpienia: na pozycjach 1 i 3).", "static int countMatches(String text, String pattern) {\n    int count = 0;\n    for (int start = 0; start <= text.length() - pattern.length(); start++) {\n        if (text.substring(start, start + pattern.length()).equals(pattern)) {\n            count++;\n        }\n    }\n    return count;\n}"),
     ],
     ["substring(a, b) wycina fragment [a, b) — wariant porównujący znaki też działa.", "Granica start <= length - pattern.length() pilnuje wyjścia poza tekst."],
     consoleTask("Znajdź wzorzec", "Uzupełnij metodę find tak, aby zwracała pozycję pierwszego wystąpienia wzorca w tekście albo -1.",
@@ -830,8 +830,8 @@ public class Main {
   lesson("algorithms-18", 18, "Macierze", "int[][] i dwie pętle",
     "Wykonasz operacje na macierzy dwuwymiarowej: sumę przekątnej, transpozycję i mnożenie.",
     [
-      page("Tablica tablic", "Macierz to int[][] — wiersze po kolumnach. m[0][1] to pierwszy wiersz, druga komórka. Przejście przez całą macierz wymaga dwóch pętli: wiersz po wierszu.", "int[][] m = {\n    {1, 2},\n    {3, 4}\n};\nfor (int r = 0; r < m.length; r++) {\n    for (int c = 0; c < m[r].length; c++) {\n        System.out.print(m[r][c] + \" \");\n    }\n    System.out.println();\n}"),
-      page("Przekątna: r == c", "Suma głównej przekątnej bierze tylko komórki, gdzie wiersz równa się kolumnie. Kwadratowa macierz ma length wierszy i tyle samo kolumn.", "static int diagonalSum(int[][] m) {\n    int sum = 0;\n    for (int r = 0; r < m.length; r++) {\n        sum += m[r][r];\n    }\n    return sum;\n}"),
+      page("Tablica dwuwymiarowa", "Macierz w Javie to tablica tablic int[][] — pierwszy indeks oznacza wiersz, drugi kolumnę. Element m[0][1] leży w pierwszym wierszu i drugiej kolumnie. Przejście przez całą macierz wymaga dwóch zagnieżdżonych pętli: po wierszach i po kolumnach.", "int[][] m = {\n    {1, 2},\n    {3, 4}\n};\nfor (int r = 0; r < m.length; r++) {\n    for (int c = 0; c < m[r].length; c++) {\n        System.out.print(m[r][c] + \" \");\n    }\n    System.out.println();\n}"),
+      page("Przekątna główna: r == c", "Suma głównej przekątnej obejmuje elementy, w których indeks wiersza jest równy indeksowi kolumny (m[r][r]). Macierz kwadratowa ma tyle samo wierszy co kolumn.", "static int diagonalSum(int[][] m) {\n    int sum = 0;\n    for (int r = 0; r < m.length; r++) {\n        sum += m[r][r];\n    }\n    return sum;\n}"),
       page("Transpozycja zamienia wymiary", "Transponowana macierz t ma wiersze z kolumn oryginału: t[c][r] = m[r][c]. Mnożenie to suma iloczynów wiersza z kolumną — trzy zagnieżdżone pętle.", "static int[][] transpose(int[][] m) {\n    int[][] t = new int[m[0].length][m.length];\n    for (int r = 0; r < m.length; r++) {\n        for (int c = 0; c < m[r].length; c++) {\n            t[c][r] = m[r][c];\n        }\n    }\n    return t;\n}"),
     ],
     ["m.length to liczba wierszy, m[0].length to liczba kolumn.", "Transpozycja nowej macierzy ma odwrócone wymiary."],
@@ -870,17 +870,17 @@ public class Main {
         { kind: "contains", file: "Main.java", value: "sum +=", label: "Akumulator sumy" },
       ], ["5"])),
 
-  lesson("algorithms-19", 19, "Stos i odwrócona notacja", "LIFO: odkładamy i zdejmujemy",
+  lesson("algorithms-19", 19, "Stos i odwrócona notacja", "LIFO: wkładamy na stos i zdejmujemy ze stosu",
     "Zbudujesz stos na tablicy i użyjesz go do obliczenia wyrażenia w odwróconej notacji polskiej (ONP).",
     [
-      page("Stos: ostatni wchodzi, pierwszy wychodzi", "Stos działa jak talia kart: push kładzie na wierzchu, pop zdejmuje z wierzchu. W tablicy wystarczy wskaźnik top na wolne miejsce — pop bierze wartość spod top.", "int[] stack = new int[100];\nint top = 0;\nstack[top++] = 5;   // push 5\nstack[top++] = 3;   // push 3\nint value = stack[--top];  // pop → 3"),
-      page("ONP: operandy na stos, operator działa", "W odwróconej notacji polskiej operator stoi PO argumentach: \"3 4 +\" to 3 + 4. Liczby odkładamy na stos; operator zdejmuje dwie wartości, liczy wynik i odkłada go z powrotem. Nawiasy nie są potrzebne.", "for (String token : tokens) {\n    if (token.equals(\"+\")) {\n        int b = stack[--top];\n        int a = stack[--top];\n        stack[top++] = a + b;\n    } else {\n        stack[top++] = Integer.parseInt(token);\n    }\n}"),
-      page("Kolejność operandów ma znaczenie", "Przy - i / pierwszy zdjęty element to PRAWY operand: dla \"4 2 -\" zdejmujemy b = 2, potem a = 4, liczymy a - b = 2. Zamiana kolejności zmienia wynik.", "// \"4 2 -\": b = 2, a = 4 → 2\n// \"4 2 /\": b = 2, a = 4 → 2\n// \"2 4 /\": b = 4, a = 2 → 0"),
+      page("Stos: ostatni wchodzi, pierwszy wychodzi", "Stos działa zgodnie z zasadą LIFO (Last In, First Out): operacja push wkłada element na wierzch stosu, a pop zdejmuje element z wierzchu. W tablicy wystarczy indeks top wskazujący pierwszą wolną pozycję — pop zmniejsza top i pobiera wartość.", "int[] stack = new int[100];\nint top = 0;\nstack[top++] = 5;   // push 5\nstack[top++] = 3;   // push 3\nint value = stack[--top];  // pop → 3"),
+      page("ONP: liczby na stos, operator wykonuje działanie", "W odwróconej notacji polskiej operator stoi PO swoich argumentach: \"3 4 +\" oznacza 3 + 4. Liczby wkładamy na stos; gdy napotkamy operator, zdejmujemy ze stosu dwie wartości, wykonujemy działanie i wynik wkładamy z powrotem na stos. Nawiasy nie są potrzebne.", "for (String token : tokens) {\n    if (token.equals(\"+\")) {\n        int b = stack[--top];\n        int a = stack[--top];\n        stack[top++] = a + b;\n    } else {\n        stack[top++] = Integer.parseInt(token);\n    }\n}"),
+      page("Kolejność argumentów ma znaczenie", "Przy odejmowaniu i dzieleniu pierwszy zdjęty ze stosu element jest PRAWYM argumentem działania: dla \"4 2 -\" najpierw zdejmujemy b = 2, potem a = 4, i obliczamy a - b = 2. Odwrócenie kolejności dałoby błędny znak.", "// \"4 2 -\": b = 2, a = 4 → 2\n// \"4 2 /\": b = 2, a = 4 → 2\n// \"2 4 /\": b = 4, a = 2 → 0"),
     ],
-    ["Integer.parseInt(token) zamienia tekst liczby na int.", "Błąd stosu: pop przy top == 0 to brak operandu — ONP musi być poprawna."],
-    consoleTask("Policz wyrażenie ONP", "Uzupełnij metodę evalRpn tak, aby obliczała wyrażenie w odwróconej notacji polskiej z tokenów + i -.",
-      ["Stos: int[] stack i top = 0; liczby odkładaj przez Integer.parseInt.", "Token \"+\" zdejmuje dwie wartości, dodaje i odkłada wynik.", "Token \"-\" zdejmuje b, potem a i odkłada a - b. Wynik to stack[0]."],
-      ["for (String token : tokens) przechodzi po tablicy tokenów."],
+    ["Integer.parseInt(token) zamienia napis reprezentujący liczbę na typ int.", "Próba zdjęcia elementu przy top == 0 oznacza puste miejsce na stosie — poprawne wyrażenie ONP zawsze zapewnia dwa argumenty dla operatora."],
+    consoleTask("Oblicz wyrażenie ONP", "Uzupełnij metodę evalRpn tak, aby obliczała wartość wyrażenia w odwróconej notacji polskiej z operatorami + oraz -.",
+      ["Stos to tablica int[] stack i indeks top = 0; liczby wkładaj na stos przez Integer.parseInt.", "Operator \"+\" zdejmuje dwie wartości ze stosu, dodaje je i wkłada wynik na stos.", "Operator \"-\" zdejmuje najpierw b, potem a, i wkłada na stos wynik a - b. Końcowy wynik znajduje się w stack[0]."],
+      ["Pętla for (String token : tokens) przechodzi przez kolejne elementy wyrażenia."],
       `public class Main {
     static int evalRpn(String[] tokens) {
         // TODO: stos + operatory
@@ -918,7 +918,7 @@ public class Main {
 }
 `,
       [
-        { kind: "contains", file: "Main.java", value: "stack[top++]", label: "Odkładanie na stos" },
+        { kind: "contains", file: "Main.java", value: "stack[top++]", label: "Wkładanie na stos" },
         { kind: "contains", file: "Main.java", value: "stack[--top]", label: "Zdejmowanie ze stosu" },
       ], ["5"])),
 
@@ -926,12 +926,12 @@ public class Main {
     "Przejdziesz graf zapisaną listą sąsiedztwa — wszerz kolejką (BFS) i w głąb rekurencją (DFS).",
     [
       page("Graf jako lista sąsiedztwa", "Wierzchołki numerujemy 0..n-1, a lista sąsiedztwa to int[][]: g[v] to tablica numerów połączonych z v. Flaga visited[] pilnuje, by nie wejść w cykl po raz drugi.", "int[][] graph = {\n    {1, 2},    // 0 łączy się z 1 i 2\n    {0, 3},    // 1 z 0 i 3\n    {0},       // 2 z 0\n    {1}        // 3 z 1\n};"),
-      page("BFS: kolejka dochodzi falowo", "Przeszukiwanie wszerz zaczyna od wierzchołka, odkłada sąsiadów do kolejki i przetwarza po kolei — najpierw najbliżsi, potem dalsi. Kolejka to tablica z dwoma wskaźnikami.", "boolean[] visited = new boolean[n];\nint[] queue = new int[n];\nint head = 0, tail = 0;\nvisited[start] = true;\nqueue[tail++] = start;\nwhile (head < tail) {\n    int v = queue[head++];\n    for (int next : graph[v]) {\n        if (!visited[next]) {\n            visited[next] = true;\n            queue[tail++] = next;\n        }\n    }\n}"),
-      page("DFS: rekurencja w głąb", "Przeszukiwanie w głąb idzie po jednej gałęzi do końca, zanim wróci. Rekurencja w naturalny sposób robi stos wywołań — warunek stopu to odwiedzony wierzchołek.", "static void dfs(int v, int[][] graph, boolean[] visited) {\n    visited[v] = true;\n    for (int next : graph[v]) {\n        if (!visited[next]) {\n            dfs(next, graph, visited);\n        }\n    }\n}"),
+      page("BFS: przeszukiwanie warstwa po warstwie", "Przeszukiwanie wszerz (BFS) zaczyna od wierzchołka startowego, dopisuje jego sąsiadów na koniec kolejki i przetwarza wierzchołki w kolejności zgłoszenia — najpierw najbliższe, potem coraz dalsze. Kolejkę najprościej zapisać w tablicy z dwoma indeksami: head (początek) i tail (koniec).", "boolean[] visited = new boolean[n];\nint[] queue = new int[n];\nint head = 0, tail = 0;\nvisited[start] = true;\nqueue[tail++] = start;\nwhile (head < tail) {\n    int v = queue[head++];\n    for (int next : graph[v]) {\n        if (!visited[next]) {\n            visited[next] = true;\n            queue[tail++] = next;\n        }\n    }\n}"),
+      page("DFS: przeszukiwanie w głąb przez rekurencję", "Przeszukiwanie w głąb (DFS) podąża jedną ścieżką tak daleko, jak to możliwe, zanim cofnie się do wcześniejszego rozgałęzienia. Rekurencja naturalnie wykorzystuje stos wywołań — warunkiem stopu jest napotkanie już odwiedzonego wierzchołka.", "static void dfs(int v, int[][] graph, boolean[] visited) {\n    visited[v] = true;\n    for (int next : graph[v]) {\n        if (!visited[next]) {\n            dfs(next, graph, visited);\n        }\n    }\n}"),
     ],
-    ["Odwiedzenie ustawiamy PRZY odkładaniu do kolejki — inaczej ten sam wierzchołek wpadnie wielokrotnie.", "BFS używa kolejki (koniec vs początek), DFS — stosu lub rekurencji."],
-    consoleTask("Policz osiągalne wierzchołki", "Uzupełnij metodę reachable tak, aby zwracała liczbę wierzchołków osiągalnych ze startu przez BFS.",
-      ["boolean[] visited i kolejka int[] queue z head/tail.", "Odwiedź start, odłóż go; pętla while (head < tail) zdejmuje v.", "Dla każdego next w graph[v] bez visited: odwiedź i odłóż; zwróć count."],
+    ["Flagę visited[next] = true ustawiamy w momencie dopisywania wierzchołka do kolejki — inaczej ten sam wierzchołek mógłby trafić do niej wielokrotnie.", "BFS używa kolejki FIFO (pierwszy wchodzi, pierwszy wychodzi), a DFS — stosu lub rekurencji."],
+    consoleTask("Policz osiągalne wierzchołki", "Uzupełnij metodę reachable tak, aby zwracała liczbę wierzchołków osiągalnych z wierzchołka start algorytmem BFS.",
+      ["Utwórz tablicę boolean[] visited oraz kolejkę int[] queue z indeksami head i tail.", "Oznacz start jako odwiedzony i dopisz go do kolejki; w pętli while (head < tail) pobieraj kolejny wierzchołek v = queue[head++].", "Dla każdego nieodwiedzonego sąsiada next z tablicy graph[v]: oznacz go jako odwiedzony i dopisz do kolejki; na końcu zwróć count."],
       ["count rośnie przy każdym nowym visited — łącznie ze startem."],
       `public class Main {
     static int reachable(int[][] graph, int start) {
