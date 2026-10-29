@@ -1,6 +1,7 @@
 import { fundamentalsLessons } from "./lessons/fundamentals.js";
 import { objectLessons } from "./lessons/objects.js";
 import { inheritanceLessons } from "./lessons/inheritance.js";
+import { algorithmsLessons } from "./lessons/algorithms.js";
 import { gameDevLessons } from "./lessons/gameDev.js";
 import { addIndependentTasks } from "./lessonTasks.js";
 import { withConsoleExpectations } from "./consoleExpectations.js";
@@ -25,6 +26,7 @@ export const allLessons = numberLessons([
   ...fundamentalsLessons,
   ...objectLessons,
   ...inheritanceLessons,
+  ...algorithmsLessons,
   ...gameDevLessons,
 ].map(addIndependentTasks).map(withConsoleExpectations).map(withObjectAssertions).concat(playgroundLesson)).sort((left, right) => left.order - right.order);
 

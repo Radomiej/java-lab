@@ -3,10 +3,11 @@
 import { writeFileSync } from 'node:fs';
 import { courseManifest, defaultCourseScaffolding } from '../shared/lab-game-v2/course/manifest.js';
 import { gameExplanationPages } from '../shared/lab-game-v2/editor/lessonVisuals.js';
-import { gameIntroPages } from '../src/data/gameIntroPages.js';
+import { gameIntroPages } from '../shared/lab-game-v2/editor/gameIntroPages.js';
 import { gameConceptScenes } from '../src/data/gameConceptScenes.js';
 import { gameDevTeaching } from '../src/data/gameDevTeaching.js';
 import { studentGameCriteria } from '../src/data/gameDevStudentCopy.js';
+import { trackOrder } from '../src/data/tracks.js';
 
 const F = {
   intro: 'src/data/gameIntroPages.js',
@@ -47,17 +48,18 @@ const out = [];
 for (const chapter of courseManifest.chapters) {
   const key = chapter.id.slice(4);
   out.push(`\n## Lekcja ${chapter.order} — ${chapter.id} „${chapter.title}"`);
-  out.push(`Definicja lekcji: ${F.manifest} → ${F.course} (track game-dev, order ${400 + chapter.order})`);
+  out.push(`Definicja lekcji: ${F.manifest} → ${F.course} (track game-dev, order ${(trackOrder.indexOf('game-dev') + 1) * 100 + chapter.order})`);
   out.push(`Scaffolding: ${chapter.scaffolding ?? `${defaultCourseScaffolding} (domyślne)`}`);
   out.push(`\n| Page | Tytuł | Treść | Miejsce w kodzie |`);
   out.push(`|---|---|---|---|`);
   const pages = conceptPages(chapter.id) || [];
   pages.forEach((p, i) => {
     const extras = [];
-    if (p.code) extras.push(`kod: ${esc(typeof p.code === 'object' ? p.code.java : p.code)}`);
-    if (p.setupCode) extras.push(`setupCode: ${esc(p.setupCode)}`);
-    if (p.result) extras.push(`efekt: ${esc(p.result)}`);
-    if (p.codeContext) extras.push(`kontekst: ${esc(p.codeContext)}`);
+    const pick = value => typeof value === 'object' ? value.java : value;
+    if (p.code) extras.push(`kod: ${esc(pick(p.code))}`);
+    if (p.setupCode) extras.push(`setupCode: ${esc(pick(p.setupCode))}`);
+    if (p.result) extras.push(`efekt: ${esc(pick(p.result))}`);
+    if (p.codeContext) extras.push(`kontekst: ${esc(pick(p.codeContext))}`);
     if (p.visual?.note) extras.push(`nota: ${esc(p.visual.note)}`);
     if (p.actors) extras.push(`scenka: ${p.actors.map(actorText).join(' / ')}`);
     out.push(`| ${i + 1} | ${esc(p.title)} | ${esc(p.text)}${extras.length ? '<br><br>' + extras.join('<br>') : ''} | ${p.src} |`);

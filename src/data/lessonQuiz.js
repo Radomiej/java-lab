@@ -2,7 +2,7 @@ import { javaConceptPages } from './javaConceptPages.js';
 import { gameExplanationPages } from '../../shared/lab-game-v2/editor/lessonVisuals.js';
 import {gameIntroPages} from '../../shared/lab-game-v2/editor/gameIntroPages.js';
 // Index is an immutable quiz revision; bump it whenever quiz content changes so pending submissions keep their questions and keys.
-export const lessonQuizRevision=()=>2;
+export const lessonQuizRevision=()=>3;
 
 export function lessonQuizPages(lesson,{revision=lessonQuizRevision(lesson)}={}) {
   if(revision>=1&&gameIntroPages[lesson.id])return gameIntroPages[lesson.id];

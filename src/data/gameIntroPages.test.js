@@ -10,7 +10,7 @@ test('introduces one visual concept at a time before asking for movement code',(
 });
 test('pending old quizzes keep their old questions and keys; new quizzes match the new introduction',()=>{
  for(const [id,questions] of Object.entries(legacy)){
-  const lesson={id,order:id==='g2d.scene'?401:402};
+  const lesson={id,order:id==='g2d.scene'?501:502};
   expect(createLessonQuiz(lesson,{revision:0})).toEqual(questions);
   expect(lessonQuizRevision(lesson)).toBe(2);
   const current=createLessonQuiz(lesson);

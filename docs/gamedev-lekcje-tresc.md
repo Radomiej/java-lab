@@ -1,4 +1,4 @@
-# Treść lekcji Game Dev (Java Lab) — zrzut 2026-10-22
+# Treść lekcji Game Dev (Java Lab) — zrzut 2026-10-29
 
 Legenda:
 - wiersze `1..N` = strony paginowanego wyjaśnienia „ZOBACZ, JAK TO DZIAŁA" (to widzi uczeń w lekcji),
@@ -8,22 +8,22 @@ Legenda:
 - `Scaffolding` wyświetla się jako podpowiedź w TaskPanel; lekcje bez własnego tekstu dostają domyślne.
 
 ## Lekcja 1 — g2d.scene „Scena, obiekty i komponenty"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 401)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 501)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki jeszcze niewyjaśnione w kursie. Edytuj wyłącznie miejsce TODO; pliki pomocnicze możesz obejrzeć.
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
 |---|---|---|---|
 | 1 | Gra działa w pętli | Gra to program, który wielokrotnie odczytuje wejście, aktualizuje swój stan i rysuje obraz. Gdy gracz naciska D, program może zmienić pozycję postaci, a kolejna klatka pokaże ją w nowym miejscu. Sam rysunek nie podejmuje decyzji.<br><br>efekt: Wejście → zmiana danych → nowy obraz. Ten cykl powtarza się podczas gry.<br>kontekst: Fragment metody onCreate() w klasie GameMain. | src/data/gameIntroPages.js |
-| 2 | Game jest gospodarzem sceny | Scena to obiekty aktualnie tworzące nasz świat gry. W tym silniku przechowuje je obiekt Game; nie tworzymy osobnej klasy Scene. Nasza klasa GameMain rozszerza Game. Silnik uruchamia onCreate() raz, aby przygotować scenę. RUN w laboratorium uruchamia tę grę.<br><br>kod: public class GameMain extends Game { ⏎     @Override ⏎     public void onCreate() { ⏎         // Tutaj przygotujemy obiekty sceny. ⏎     } ⏎ }<br>efekt: Pusta scena nie ma jeszcze gracza ani skrzynki. Samo GameMain nie rysuje postaci.<br>kontekst: Plik GameMain.java. Klasy silnika są importowane przez laboratorium. | src/data/gameIntroPages.js |
+| 2 | Game jest gospodarzem sceny | Scena to obiekty aktualnie tworzące nasz świat gry. W tym silniku przechowuje je obiekt Game; nie tworzymy osobnej klasy Scene. Nasza klasa rozszerza Game. Silnik uruchamia onCreate() raz, aby przygotować scenę. RUN w laboratorium uruchamia tę grę.<br><br>kod: public class GameMain extends Game { ⏎     @Override ⏎     public void onCreate() { ⏎         // Tutaj przygotujemy obiekty sceny. ⏎     } ⏎ }<br>efekt: Pusta scena nie ma jeszcze gracza ani skrzynki. Samo GameMain nie rysuje postaci.<br>kontekst: Plik GameMain.java. Klasy silnika są importowane przez laboratorium. | src/data/gameIntroPages.js |
 | 3 | GameObject to jeden obiekt w scenie | createObject tworzy obiekt, rejestruje go w bieżącym Game i zwraca referencję. GameObject to pojemnik na dane i komponenty: może reprezentować gracza, skrzynkę lub monetę. Nazwa Player pomaga go rozpoznać; nie nadaje mu grafiki ani sterowania.<br><br>kod: GameObject player = createObject("Player");<br>efekt: W scenie istnieje Player z własnym Transform w (0, 0). Na planszy nadal nie widać postaci.<br>kontekst: Fragment metody onCreate() w klasie GameMain. | src/data/gameIntroPages.js |
 | 4 | Transform odpowiada: gdzie jest obiekt? | Każdy GameObject dostaje własny Transform automatycznie. setPosition(100, 150) ustawia x i y. Początek świata jest w lewym górnym rogu: X rośnie w prawo, Y w dół. To punkt odniesienia obiektu, a nie rozmiar jego grafiki.<br><br>kod: GameObject player = createObject("Player"); ⏎ player.setPosition(100, 150);<br>efekt: Player ma x=100 i y=150. Krzyżyk na schemacie jest pomocą do nauki; sam Transform nie rysuje go w grze.<br>kontekst: Fragment metody onCreate() w klasie GameMain. | src/data/gameIntroPages.js |
 | 5 | Zmień tylko X i porównaj wynik | Transform przechowuje liczby. Jeśli zmienisz tylko x, obiekt przesunie się poziomo. y pozostanie bez zmian. Nie tworzysz nowego obiektu: zmieniasz pozycję tego samego Player.<br><br>kod: player.setPosition(100, 150); // przed zmianą ⏎ player.transform.x = 220;     // zmieniamy tylko X<br>efekt: Po zmianie Player jest w (220, 150): 120 px w prawo, bez zmiany wysokości.<br>kontekst: Dalszy fragment onCreate(); player jest obiektem z poprzedniego przykładu. | src/data/gameIntroPages.js |
-| 6 | Renderer sprawia, że obiekt widać | Renderer jest komponentem odpowiedzialnym za rysowanie. ShapeRenderer rysuje prosty kształt. new tworzy komponent, a addComponent podłącza go do Player. Prostokąt ma szerokość 40 i wysokość 24; jego środek wypada w pozycji obiektu.<br><br>kod: GameObject player = createObject("Player"); ⏎ player.setPosition(100, 150); ⏎ player.addComponent( ⏎     new ShapeRenderer(40, 24, "#4b9483") ⏎ );<br>efekt: Widać prostokąt 40×24 px, ze środkiem w (100, 150). Przed dodaniem renderera ten sam obiekt istniał, ale był niewidoczny.<br>kontekst: Fragment metody onCreate() w klasie GameMain. | src/data/gameIntroPages.js |
+| 6 | Renderer sprawia, że obiekt widać | Renderer jest komponentem odpowiedzialnym za rysowanie. ShapeRenderer rysuje prosty kształt. Tworzymy komponent, a addComponent podłącza go do Player. Prostokąt ma szerokość 40 i wysokość 24; jego środek wypada w pozycji obiektu.<br><br>kod: GameObject player = createObject("Player"); ⏎ player.setPosition(100, 150); ⏎ player.addComponent( ⏎     new ShapeRenderer(40, 24, "#4b9483") ⏎ );<br>efekt: Widać prostokąt 40×24 px, ze środkiem w (100, 150). Przed dodaniem renderera ten sam obiekt istniał, ale był niewidoczny.<br>kontekst: Fragment metody onCreate() w klasie GameMain. | src/data/gameIntroPages.js |
 | 7 | Wybierz renderer do rodzaju obrazu | ShapeRenderer rysuje kształt, Sprite rysuje grafikę z zasobów, a TextRenderer napis. Wszystkie są komponentami wyglądu. Nie dodają samodzielnie sterowania, punktów życia ani kolizji. W tych przykładach każdy renderer trafia do osobnego obiektu.<br><br>kod: shape.addComponent(new ShapeRenderer(40, 24, "#4b9483")); ⏎ hero.addComponent(new Sprite(Assets.PLAYER01, 40, 40)); ⏎ label.addComponent(new TextRenderer("Start", 16, "#173b46"));<br>efekt: shape pokazuje prostokąt, hero grafikę gracza, a label napis Start. Są to trzy sposoby rysowania.<br>kontekst: Fragment onCreate(); shape, hero i label są trzema wcześniej utworzonymi GameObject. | src/data/gameIntroPages.js |
 | 8 | Skala zmienia rozmiar rysunku | Transform przechowuje też scale: mnożniki rozmiaru grafiki w osiach X i Y. Początkowo to (1,1). Wartość (2,1) daje dwa razy szerszy obraz, bez zmiany wysokości. Pozycja obiektu pozostaje punktem odniesienia.<br><br>kod: player.transform.scale.set(2, 1);<br>efekt: Prostokąt renderera 40×24 jest rysowany jako 80×24. Jego środek nadal jest w (100,150).<br>kontekst: Fragment onCreate(); player ma ShapeRenderer(40,24), pozycję (100,150) i obrót 0. | src/data/gameIntroPages.js |
 | 9 | Obrót dotyczy grafiki wokół pozycji obiektu | rotation jest kątem w radianach. Math.PI/2 to ćwierć obrotu, czyli 90°. Ten przykład zaczyna ze skalą (1,1). Obracamy ten sam prostokąt wokół punktu obiektu; nie zmieniamy x ani y.<br><br>kod: player.transform.rotation = Math.PI / 2;<br>efekt: Prostokąt 40×24 jest teraz ustawiony pionowo. Jego środek pozostaje w (100,150).<br>kontekst: Fragment onCreate(); player ma ShapeRenderer(40,24), pozycję (100,150) i skalę (1,1). | src/data/gameIntroPages.js |
 | 10 | Komponent ma własne dane i jedną rolę | addComponent zwraca dodany komponent. Możemy zachować tę referencję i zmienić jego kolor. Transform nadal odpowiada za pozycję, obrót i skalę, a ShapeRenderer za kształt i kolor. Zmiana koloru nie przesuwa Player. Transform jest polem obiektu; nie dodajemy go przez addComponent.<br><br>kod: GameObject player = createObject("Player"); ⏎ player.setPosition(100, 150); ⏎ ShapeRenderer skin = player.addComponent( ⏎     new ShapeRenderer(40, 24, "#4b9483") ⏎ ); ⏎ skin.color = "#d9973b";<br>efekt: Ten sam prostokąt zmienia kolor z zielonego na pomarańczowy. Pozycja (100, 150) i rozmiar 40×24 pozostają takie same.<br>kontekst: Fragment metody onCreate() w klasie GameMain. | src/data/gameIntroPages.js |
-| 11 | Dwa obiekty to dwa niezależne zestawy danych | Każde createObject tworzy nową instancję GameObject z osobnym Transform. Każde new ShapeRenderer tworzy osobny komponent. Zmiana pozycji First nie przesuwa Second. Nie podłączaj tej samej instancji komponentu do dwóch obiektów.<br><br>kod: GameObject first = createObject("First"); ⏎ first.setPosition(100, 150); ⏎ first.addComponent(new ShapeRenderer(40, 24, "#4b9483")); ⏎ GameObject second = createObject("Second"); ⏎ second.setPosition(220, 100); ⏎ second.addComponent(new ShapeRenderer(40, 24, "#d9973b")); ⏎ first.transform.x = 140;<br>efekt: First jest teraz w (140, 150). Second nadal jest w (220, 100). Każdy ma własny Transform i renderer.<br>kontekst: Fragment metody onCreate() w klasie GameMain. | src/data/gameIntroPages.js |
+| 11 | Dwa obiekty to dwa niezależne zestawy danych | Każde createObject tworzy nową instancję GameObject z osobnym Transform. Każdy nowy komponent to osobna instancja. Zmiana pozycji First nie przesuwa Second. Nie podłączaj tej samej instancji komponentu do dwóch obiektów.<br><br>kod: GameObject first = createObject("First"); ⏎ first.setPosition(100, 150); ⏎ first.addComponent(new ShapeRenderer(40, 24, "#4b9483")); ⏎ GameObject second = createObject("Second"); ⏎ second.setPosition(220, 100); ⏎ second.addComponent(new ShapeRenderer(40, 24, "#d9973b")); ⏎ first.transform.x = 140;<br>efekt: First jest teraz w (140, 150). Second nadal jest w (220, 100). Każdy ma własny Transform i renderer.<br>kontekst: Fragment metody onCreate() w klasie GameMain. | src/data/gameIntroPages.js |
 | teoria | Obiekt, pozycja i wygląd | Game przechowuje scenę. GameObject jest jednym obiektem, np. graczem. Transform przechowuje pozycję, a Sprite lub ShapeRenderer określa wygląd. Sam obiekt bez renderera nie jest widoczny. X rośnie w prawo, Y w dół. Transform określa pozycję obiektu w świecie, np. (100,100). Sprite i collider są umieszczane względem tego punktu; domyślne wyśrodkowanie renderera jest osobną regułą rysowania.<br><br>kod: GameObject box = createObject("Box"); ⏎ box.setPosition(200, 120); ⏎ box.addComponent(new ShapeRenderer(40, 30, "#76b9f2")); | src/data/gameDevTeaching.js |
 | wskazówka | Zapamiętaj | Dwa wywołania createObject tworzą niezależne obiekty. | src/data/gameDevTeaching.js |
 
@@ -60,7 +60,7 @@ Scaffolding: Gotowa baza: infrastruktura i mechaniki jeszcze niewyjaśnione w ku
   - Bez dodanego zachowania obiekty nie zmieniają pozycji po upływie sekundy.
 
 ## Lekcja 2 — g2d.input „Sterowanie i kierunek postaci"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 402)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 502)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki jeszcze niewyjaśnione w kursie. Edytuj wyłącznie miejsce TODO; pliki pomocnicze możesz obejrzeć.
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -68,10 +68,11 @@ Scaffolding: Gotowa baza: infrastruktura i mechaniki jeszcze niewyjaśnione w ku
 | 1 | Własny komponent opisuje zachowanie | Renderer pokazuje obiekt, ale nim nie porusza. Własna klasa MoveRight rozszerza Component i opisuje ruch. Silnik wywołuje onUpdate(delta) w kolejnych klatkach dla podłączonego, aktywnego komponentu. gameObject oznacza jego właściciela. Samo napisanie klasy nie podłącza jej do gracza.<br><br>kod: public class MoveRight extends Component { ⏎     @Override ⏎     public void onUpdate(double delta) { ⏎         gameObject.transform.x += 20 * delta; ⏎     } ⏎ }<br>efekt: MoveRight potrafi przesuwać właściciela w prawo z prędkością 20 px/s. Zacznie działać po podłączeniu.<br>kontekst: Osobny plik MoveRight.java. To nasza klasa, a nie gotowy komponent silnika. | src/data/gameIntroPages.js |
 | 2 | Podłącz zachowanie do konkretnego obiektu | Player ma już pozycję i wygląd. addComponent(new MoveRight()) daje mu teraz zachowanie z poprzedniej strony. Renderer i MoveRight korzystają z tego samego właściciela: ruch zmienia Transform, a renderer rysuje obiekt w nowym miejscu.<br><br>kod: GameObject player = createObject("Player"); ⏎ player.setPosition(100, 150); ⏎ player.addComponent(new ShapeRenderer(40, 24, "#4b9483")); ⏎ player.addComponent(new MoveRight());<br>efekt: Po 1 sekundzie Player przechodzi z (100, 150) do (120, 150). Renderer nie wykonuje ruchu; pokazuje jego wynik.<br>kontekst: Fragment metody onCreate() w klasie GameMain. | src/data/gameIntroPages.js |
 | 3 | delta mówi, ile czasu minęło | delta to czas od poprzedniej aktualizacji, w sekundach. Prędkość razy czas daje przesunięcie. Dla 20 px/s i delta=0.05 otrzymujemy 1 px. Dzięki temu ruch zależy od czasu, a nie od liczby klatek. Silnik przekazuje delta; nie wpisujemy jej na stałe.<br><br>kod: gameObject.transform.x += 20 * delta;<br>efekt: Dla x=100 i delta=0.05: 100 + 20×0.05 = 101. Y pozostaje 150.<br>kontekst: Linia z onUpdate(double delta) komponentu MoveRight. | src/data/gameIntroPages.js |
-| 4 | Klawisz decyduje, czy wykonać ruch | getGame() udostępnia Game właściciela komponentu. input.isKeyDown("d") zwraca true, gdy D jest przytrzymane. Warunek if decyduje, czy zmienić pozycję w tej klatce. Bez wciśniętego D ten komponent nie wykonuje ruchu.<br><br>kod: public class MoveWithD extends Component { ⏎     @Override ⏎     public void onUpdate(double delta) { ⏎         if (getGame().input.isKeyDown("d")) { ⏎             gameObject.transform.x += 120 * delta; ⏎         } ⏎     } ⏎ }<br>efekt: D przytrzymane: ruch w prawo. D zwolnione: brak zmiany x. Pozycja Y nie jest zmieniana.<br>kontekst: Plik MoveWithD.java. W GameMain podłącz new MoveWithD() zamiast new MoveRight(). | src/data/gameIntroPages.js |
+| 4 | Klawisz decyduje, czy wykonać ruch | Dostęp do gry udostępnia Game właściciela komponentu. input.isKeyDown("d") zwraca true, gdy D jest przytrzymane. Warunek if decyduje, czy zmienić pozycję w tej klatce. Bez wciśniętego D ten komponent nie wykonuje ruchu.<br><br>kod: public class MoveWithD extends Component { ⏎     @Override ⏎     public void onUpdate(double delta) { ⏎         if (getGame().input.isKeyDown("d")) { ⏎             gameObject.transform.x += 120 * delta; ⏎         } ⏎     } ⏎ }<br>efekt: D przytrzymane: ruch w prawo. D zwolnione: brak zmiany x. Pozycja Y nie jest zmieniana.<br>kontekst: Plik MoveWithD.java. W GameMain podłącz new MoveWithD() zamiast new MoveRight(). | src/data/gameIntroPages.js |
 | 5 | Kontroler gracza a komponent ruchu | W zadaniu PlayerController jest naszą klasą: czyta klawisze i wybiera kierunek. CharacterController2D jest komponentem silnika: wykonuje move(kierunekX, kierunekY, prędkość), uwzględniając czas. requireComponent szuka go na tym samym obiekcie. Do ruchu tym kontrolerem potrzebny jest też collider: obszar obiektu dla systemu ruchu i kontaktów. Tutaj dodajemy koło o promieniu 12. Szczegóły colliderów poznasz w następnej lekcji.<br><br>kod: public class PlayerController extends Component { ⏎     @Override ⏎     public void onUpdate(double delta) { ⏎         double x = getGame().input.isKeyDown("d") ? 1 : 0; ⏎         requireComponent(CharacterController2D.class) ⏎             .move(x, 0, 120); ⏎     } ⏎ }<br>setupCode: player.addComponent(new CircleCollider2D(12)); ⏎ player.addComponent(new CharacterController2D()); ⏎ player.addComponent(new PlayerController());<br>efekt: D daje kierunek (1, 0). PlayerController podejmuje decyzję, CharacterController2D wykonuje ruch, a renderer pokazuje wynik.<br>kontekst: Plik PlayerController.java. Przygotowanie obiektu w GameMain pokazano powyżej. PlayerController jest osobnym plikiem. | src/data/gameIntroPages.js |
 | 6 | Przytrzymanie czy nowe naciśnięcie? | Przytrzymanie służy do chodzenia. Nowe naciśnięcie wywołuje pojedynczą akcję. Trzy klatki przytrzymania nie powinny oznaczać trzech nowych naciśnięć. | shared/lab-game-v2/editor/lessonVisuals.js |
 | 7 | Kierunek zostaje po zatrzymaniu | CharacterController2D.getDirection() zwraca kopię ostatniego niezerowego kierunku. Po ruchu w prawo i puszczeniu D gracz stoi, ale kierunek nadal wynosi (1,0). Broń w lekcji 5 użyje go do strzału. | shared/lab-game-v2/editor/lessonVisuals.js |
+| 8 | Jak pobrać komponent z obiektu? | PlayerController i CharacterController2D to dwa komponenty tego samego GameObject. Wewnątrz komponentu piszesz this.requireComponent(CharacterController2D) — zwraca komponent albo zgłasza błąd, gdy obiekt go nie ma. Wersja getComponent zwraca komponent lub null; sprawdź wynik, zanim wywołasz metodę. Komponent innego obiektu bierzesz z jego referencji: other.getComponent(...) w onTrigger, a sam obiekt znajdziesz przez this.game.find("Nazwa").<br><br>nota: requireComponent zgłasza błąd od razu — to najbezpieczniejszy wybór, gdy komponent musi istnieć. | shared/lab-game-v2/editor/lessonVisuals.js |
 | teoria | Odczyt wejścia i wykonanie ruchu | PlayerController jest Twoją klasą: odczytuje klawisze i decyduje o kierunku. CharacterController2D wykonuje ruch z uwzględnieniem przeszkód. Przytrzymanie klawisza służy do chodzenia; nowe naciśnięcie do pojedynczej akcji. Kliknij planszę, aby klawiatura sterowała grą, a nie edytorem.<br><br>kod: requireComponent(CharacterController2D.class).move(x, y, 120); | src/data/gameDevTeaching.js |
 | wskazówka | Zapamiętaj | move otrzymuje kierunek i prędkość; kontroler uwzględnia czas aktualizacji. | src/data/gameDevTeaching.js |
 
@@ -88,25 +89,25 @@ Scaffolding: Gotowa baza: infrastruktura i mechaniki jeszcze niewyjaśnione w ku
   - S+D przez sekundę daje dystans 120 px, z zachowaniem równych składowych.
 
 **g2d.input.modified** (modified / Samodzielnie) — Sprint
-- Polecenie: Gotowy gracz porusza się z prędkością 100. Samodzielnie zmień parametr move: Shift daje 200 px/s, bez Shift 100. Nie kopiuj logiki kierunku.
+- Polecenie: Gotowy gracz porusza się z prędkością 100. Samodzielnie zmień parametr move: przytrzymany Shift daje 200 px/s, bez Shift 100. Nie kopiuj logiki kierunku.
 - Cel: Przekazywać zmienny parametr bez kopiowania logiki ruchu.
 - Kryteria (widok ucznia):
-  - D+Shift przez 0.5 s ze startu x=100 daje x=200.
-  - D przez kolejne 0.5 s po puszczeniu Shift daje x=250.
-  - W+D+Shift przez 0.5 s daje dystans 100 px.
+  - Shift podwaja prędkość ruchu do 200 px/s.
+  - Po puszczeniu Shift prędkość wraca do 100 px/s.
+  - Sprint na ukos nie jest szybszy — składowe pozostają wyrównane.
   - Sam Shift nie porusza postaci.
 
-**g2d.input.independent** (independent / Rozbudowa) — Jedna akcja na naciśnięcie
-- Polecenie: Ruch jest gotowy. Uzupełnij ActionCounter tak, aby jedno nowe naciśnięcie Space zwiększało actions raz. Przytrzymanie nie może naliczać kolejnych akcji.
+**g2d.input.independent** (independent / Rozbudowa) — Jedna akcja — jeden pocisk
+- Polecenie: Ruch jest gotowy, a komponent ActionShooter obserwuje licznik: co 10 aktualizacji sprawdza, czy actions wynosi 1 — wtedy wystrzeliwuje Fireball w ostatnim kierunku postaci i zeruje licznik. Uzupełnij ActionCounter tak, aby jedno nowe naciśnięcie Space zwiększało actions raz. Przytrzymanie nie może naliczać kolejnych akcji — wtedy licznik przekroczy 1 i strzał nie wypadnie.
 - Cel: Obsłużyć zbocze klawisza w osobnym komponencie.
 - Kryteria (widok ucznia):
-  - Trzymanie Space przez 10 kolejnych aktualizacji daje actions=1.
-  - Puszczenie na jedną aktualizację i ponowne naciśnięcie daje actions=2.
-  - Działa jednoczesny ruch z D i akcja Space; prędkość pozostaje 120 px/s.
-  - Ponowne wejście focus do planszy nie tworzy fikcyjnego naciśnięcia ani zablokowanego klawisza.
+  - Jedno naciśnięcie Space daje dokładnie jeden Fireball w ciągu 10 aktualizacji.
+  - Po strzale licznik actions wraca do 0; kolejny strzał wymaga nowego naciśnięcia.
+  - Trzymanie Space nie strzela wielokrotnie — licznik rośnie tylko na zboczu klawisza.
+  - Ruch z D działa równocześnie; pocisk startuje z pozycji postaci.
 
 ## Lekcja 3 — g2d.collisions „Collidery, przeszkody i granice świata"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 403)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 503)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki jeszcze niewyjaśnione w kursie. Edytuj wyłącznie miejsce TODO; pliki pomocnicze możesz obejrzeć.
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -146,7 +147,7 @@ Scaffolding: Gotowa baza: infrastruktura i mechaniki jeszcze niewyjaśnione w ku
   - Krok 0.1 s przy speed=600 nie przenosi gracza na drugą stronę ściany.
 
 ## Lekcja 4 — g2d.enemy-ai „Pierwszy przeciwnik i pościg"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 404)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 504)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki jeszcze niewyjaśnione w kursie. Edytuj wyłącznie miejsce TODO; pliki pomocnicze możesz obejrzeć.
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -192,7 +193,7 @@ x: 100 → 130 [Ściana może zatrzymać ruch] | shared/lab-game-v2/editor/lesso
   - FleeAI jednego wroga nie zmienia parametrów EnemyAI drugiego; do jednego obiektu podłączony jest tylko jeden aktywny autor kierunku ruchu.
 
 ## Lekcja 5 — g2d.projectiles „Pociski, HP i pierwsza pętla walki"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 405)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 505)
 Scaffolding: Gotowe Health, FireWeapon, ContactDamage i EnemyAI pozwalają grać. W tej lekcji zmieniasz trafienie; Health rozbudujesz w lekcji 10, Weapon w 11, AI w 14, a efekty w 19.
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -240,7 +241,7 @@ Scaffolding: Gotowe Health, FireWeapon, ContactDamage i EnemyAI pozwalają grać
   - Trzy trafienia po 1 obrażeniu pokonują przeciwnika z HP=3; kontakt wroga odbiera HP graczowi z ochroną między trafieniami.
 
 ## Lekcja 6 — g2d.components „Własna klasa komponentu i cykl życia"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 406)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 506)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -283,7 +284,7 @@ usunięcie reakcji [1 raz na końcu] | shared/lab-game-v2/editor/lessonVisuals.j
   - Zniszczony Spark nie jest aktualizowany ani rysowany.
 
 ## Lekcja 7 — g2d.time „Czas, wektory i stała prędkość"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 407)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 507)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -323,7 +324,7 @@ Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. U
   - Zmiana kierunku na przeciwny odwraca ruch bez zmiany jego prędkości.
 
 ## Lekcja 8 — g2d.graphics „Sprite, kafelki, odbicie i warstwy"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 408)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 508)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -363,7 +364,7 @@ Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. U
   - Tło nadal składa się z jednego obiektu TileMap.
 
 ## Lekcja 9 — g2d.waves „Fale, konfiguracja i powtarzalny spawn"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 409)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 509)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -409,7 +410,7 @@ spawn: 1 s i 2 s / Powtórzenie tego planu: ten sam seed + te same dane
   - Restart z seed=42 odtwarza pierwszą sekwencję bez użycia czasu systemowego.
 
 ## Lekcja 10 — g2d.health „Health, obrażenia i nietykalność gracza"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 410)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 510)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -453,7 +454,7 @@ Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. U
   - W stanie Game nie ma współdzielonego pola sterującego nietykalnością wszystkich graczy; pomiar dwóch instancji potwierdza niezależność.
 
 ## Lekcja 11 — g2d.weapons „Weapon, cooldown i automatyczny atak"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 411)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 511)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -499,7 +500,7 @@ ID 1 [Pomijamy] | shared/lab-game-v2/editor/lessonVisuals.js + src/data/gameConc
   - Pocisk jedynie celuje przy wystrzale; HP zmniejsza rzeczywisty kontakt z rozdziału 12.
 
 ## Lekcja 12 — g2d.triggers „Triggery, monety i własny Wallet"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 412)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 512)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -543,7 +544,7 @@ Wallet = 5 [Moneta usunięta; brak drugiej nagrody] | shared/lab-game-v2/editor/
   - Dwie skrzynie mają niezależne opened i razem dają 40 złota.
 
 ## Lekcja 13 — g2d.loot-xp „Śmierć przeciwnika, łup i doświadczenie"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 413)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 513)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -590,7 +591,7 @@ nowy próg: 7 [1 < 7: koniec pętli] | shared/lab-game-v2/editor/lessonVisuals.j
   - PendingChoices nie jest automatycznie kasowane przez następny update ani przez kolejne XP.
 
 ## Lekcja 14 — g2d.enemy-tactics „AI: wykrywanie, flankowanie i ucieczka"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 414)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 514)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -626,7 +627,7 @@ Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. U
   - Po sekundzie Slime ma x=180; poza zasięgiem 120 stoi.
 
 ## Lekcja 15 — g2d.camera „Kamera i przestrzenie współrzędnych"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 415)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 515)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -668,7 +669,7 @@ Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. U
   - Marker nie przesuwa kamery ani gracza; kliknięcie UI w późniejszych rozdziałach może być odfiltrowane bez zmiany przeliczenia.
 
 ## Lekcja 16 — g2d.canvas-ui „Canvas, ręczne rysowanie i HUD"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 416)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 516)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -710,7 +711,7 @@ Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. U
   - Tekst akapitu rozpoczyna się w x=20 dzięki jawnemu align=left; po ruchu kamery położenie HUD nie zmienia się.
 
 ## Lekcja 17 — g2d.ui-flow „Pauza i działające menu"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 417)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 517)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -755,7 +756,7 @@ Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. U
   - Po zamknięciu menu jego focus nie przechwytuje klawiatury gry; po ponownym otwarciu focus jest przewidywalny i widoczny.
 
 ## Lekcja 18 — g2d.upgrades „Wybór ulepszenia i własne reguły zakupów"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 418)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 518)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -803,7 +804,7 @@ obrażenia: 1 → 1 [Nie kupiono — nic nie zmieniaj] | shared/lab-game-v2/edit
   - Trzymanie przycisku zakupu i podwójny event UI nie dokonują ponownej transakcji.
 
 ## Lekcja 19 — g2d.feedback „Feedback trafienia, tweeny i floating text"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 419)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 519)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -852,7 +853,7 @@ tylko B zapisuje pozycję [Jedna właściwość, jeden aktywny efekt] | shared/l
   - Włączenie lub wyłączenie losowego shake nie zmienia sekwencji typów/pozycji spawnów, ponieważ efekty mają oddzielny RNG.
 
 ## Lekcja 20 — g2d.projectile-types „Pociski naprowadzane i przebijające"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 420)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 520)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -890,7 +891,7 @@ Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. U
   - hitLayers=2 pomija sojusznika na linii lotu; pocisk nie rani właściciela.
 
 ## Lekcja 21 — g2d.composition „Kompozycja, fabryki i wyposażenie"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 421)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 521)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -941,7 +942,7 @@ damage: 1 → 2 [Nie twórz drugiej broni] | shared/lab-game-v2/editor/lessonVis
   - Bronie odczytują pozycję i Health właściciela przez referencję; parametrów obu broni nie przenosi się do globalnych pól Game.
 
 ## Lekcja 22 — g2d.run-state „Start, przegrana, zwycięstwo i restart"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 422)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 522)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -990,7 +991,7 @@ wynik: LOST [Zakończ rundę tylko raz] | shared/lab-game-v2/editor/lessonVisual
   - Ponowny start z seed=42 odtwarza pierwsze pozycje spawnów; restart gry nie resetuje zapisanych prac ani zaliczeń kursu.
 
 ## Lekcja 23 — g2d.performance „Wydajność, testowanie i zapis projektu"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 423)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 523)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |
@@ -1035,7 +1036,7 @@ Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. U
   - Eksport zawiera wszystkie pliki, język i wersję API; po imporcie projekt uruchamia się.
 
 ## Lekcja 24 — g2d.survivor „Projekt końcowy: Łąka przetrwania"
-Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 424)
+Definicja lekcji: shared/lab-game-v2/course/manifest.js → src/data/lessons/gameDevCourse.js (track game-dev, order 524)
 Scaffolding: Gotowa baza: infrastruktura i mechaniki z wcześniejszych lekcji. Uzupełniasz wyłącznie logikę tego zadania; pliki pomocnicze możesz obejrzeć. (domyślne)
 
 | Page | Tytuł | Treść | Miejsce w kodzie |

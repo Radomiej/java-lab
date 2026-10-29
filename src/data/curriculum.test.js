@@ -12,12 +12,15 @@ describe("Java Lab curriculum", () => {
     expect(()=>numberLessons([...full,{id:'overflow',track:'fundamentals'}])).toThrow();
   });
   it("allocates an independent hundred-number block to each track", () => {
-    expect(trackOrder).toHaveLength(5);
-    expect(Object.keys(tracks)).toHaveLength(5);
-    expect(courseLessons).toHaveLength(36);
+    expect(trackOrder).toHaveLength(6);
+    expect(Object.keys(tracks)).toHaveLength(6);
+    expect(courseLessons).toHaveLength(56);
     expect(allLessons.map((lesson) => lesson.order)).toEqual(
-      [101,102,103,104,201,202,203,204,301,302,303,304,...Array.from({length:24},(_,i)=>401+i),501],
+      [101,102,103,104,201,202,203,204,301,302,303,304,...Array.from({length:20},(_,i)=>401+i),...Array.from({length:24},(_,i)=>501+i),601],
     );
+    const algorithms = allLessons.filter(lesson => lesson.track === 'algorithms');
+    expect(algorithms).toHaveLength(20);
+    expect(trackOrder.indexOf('algorithms')).toBe(3);
   });
 
   it("gives every lesson a step-by-step starter task", () => {

@@ -77,6 +77,13 @@
       "title": "Wyjątek prowadzi do obsługi błędu",
       "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Wyjątek prowadzi do obsługi błędu\". Explain exactly this concept in 3 simple connected panels: buy(-4) → throw IllegalArgumentException → pasujący catch → komunikat Zła cena → dalszy program. Nie wykonuje Kupiono. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
       "asset": "public/course-assets/java-concepts/inheritance-12.png"
+    },
+    {
+      "id": "algorithms-01",
+      "title": "Sortowanie bąbelkowe: sąsiedzi zamieniają się miejscami",
+      "prompt": "Use case: scientific-educational. Asset type: Polish beginner Java course infographic. Create one calm precise educational diagram, landscape, white background, muted teal/navy/orange, spacious typography, no characters, no mascots, no decoration. Title \"Sortowanie bąbelkowe: sąsiedzi zamieniają się miejscami\". Explain exactly this concept in 3 simple connected panels: int[] values = {9, 1, 5, 2} → para 9 i 1 zamienia się przez temp → posortowane {1, 2, 5, 9}. Use minimal Polish labels, exact valid Java identifiers and arrows. One concept only, no extra examples.",
+      "asset": "public/course-assets/java-concepts/algorithms-01.png",
+      "note": "Wygenerowane skryptowo w PIL (zgodne z paletą serii), bo narzędzie image_gen nie było dostępne w tej sesji."
     }
   ]
 }

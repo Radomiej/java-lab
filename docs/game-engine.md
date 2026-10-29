@@ -211,7 +211,7 @@ Tweens.scale(enemy,2,2,0.5).easing="smooth";
 
 ## Kurs, pliki i testy
 
-Zakresy: 101–199 podstawy, 201–299 obiekty, 301–399 dziedziczenie, 401–499 gry. Game Dev ma osiem lekcji i 24 zadania. Lekcje 407–408 rozszerzają walkę z 405 o skrzynki i wybór ulepszenia. IDs konsolowe są stabilne; stare wybory gry są mapowane bez przenoszenia starych zaliczeń na nowe wymagania. Zapisany kod ucznia nie jest nadpisywany po aktualizacji przykładów; przycisk „Przywróć start” pobiera bieżący kod startowy.
+Zakresy: 101–199 podstawy, 201–299 obiekty, 301–399 dziedziczenie, 401–499 algorytmy, 501–599 gry, 601 playground. Game Dev ma 24 lekcje i 72 zadania. Lekcje 507–508 rozszerzają walkę z 505 o skrzynki i wybór ulepszenia. IDs konsolowe są stabilne; stare wybory gry są mapowane bez przenoszenia starych zaliczeń na nowe wymagania. Zapisany kod ucznia nie jest nadpisywany po aktualizacji przykładów; przycisk „Przywróć start” pobiera bieżący kod startowy.
 
 Pliki startowe i engine są chronione. Własne pliki usuwa przycisk „Usuń plik” z potwierdzeniem; operacja usuwa zapis pliku i zaliczenie zadania. Przed usunięciem skopiuj potrzebny kod — nie ma kosza.
 

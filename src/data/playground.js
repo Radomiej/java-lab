@@ -20,4 +20,4 @@ export const playgroundProject={version:1,engineApiVersion:'2.0.0',mainClass:'Ga
     }
 }
 `}};
-export const playgroundLesson={id:'playground-game',track:'playground',order:501,title:'Własna gra',summary:'Własny projekt Java i pełne API silnika.',theory:[],tips:[],tasks:[{id:'playground-game-project',mode:'playground',title:'Własny projekt',engine:true,mainClass:'GameMain',runMode:'game',starterFiles:playgroundProject.files,checks:[],outputChecks:[]}]};
+export const playgroundLesson={id:'playground-game',track:'playground',order:601,title:'Własna gra',summary:'Własny projekt Java i pełne API silnika.',theory:[],tips:[],tasks:[{id:'playground-game-project',mode:'playground',title:'Własny projekt',engine:true,mainClass:'GameMain',runMode:'game',starterFiles:playgroundProject.files,checks:[],outputChecks:[]}]};

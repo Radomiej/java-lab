@@ -5,8 +5,8 @@ import {templates} from '../../shared/assignments/catalog.js';
 import {generateAssignment,publicAssignment} from '../../shared/assignments/generator.js';
 const lessons=allLessons.filter(lesson=>lesson.track!=='playground');
 describe('complete Java learning modules',()=>{
-  it('covers all 36 lessons with explanations, quizzes and independent work',()=>{
-    expect(lessons).toHaveLength(36);
+  it('covers all 56 lessons with explanations, quizzes and independent work',()=>{
+    expect(lessons).toHaveLength(56);
     for(const lesson of lessons){
       expect(lessonQuizPages(lesson).length,lesson.id).toBeGreaterThan(0);
       expect(lesson.tasks.filter(task=>task.mode!=='guided').length,lesson.id).toBeGreaterThanOrEqual(2);

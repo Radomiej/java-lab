@@ -5,7 +5,7 @@ import { checkSource, mergeCompilationResult } from "../services/lessonChecker.j
 describe("console task execution contracts", () => {
   const tasks = allLessons.flatMap((lesson) => lesson.tasks).filter((task) => task.runMode === "console");
   it("covers every console task without source-pattern grading", () => {
-    expect(tasks).toHaveLength(36);
+    expect(tasks).toHaveLength(96);
     for (const task of tasks) {
       expect(task.checks).toEqual([]);
       expect(task.outputChecks[0].values.length).toBeGreaterThan(0);

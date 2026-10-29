@@ -7,8 +7,8 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { allLessons } from '../data/curriculum.js';
 
 describe('concrete Java teaching illustrations', () => {
-  it('covers all twelve Java lessons without abstract concept maps', () => {
-    expect(Object.keys(javaConceptPages)).toHaveLength(12);
+  it('covers all Java concept lessons without abstract concept maps', () => {
+    expect(Object.keys(javaConceptPages)).toHaveLength(32);
     for (const pages of Object.values(javaConceptPages)) for (const page of pages) {
       expect(page.code).toBeTruthy();
       expect(page.result).toBeTruthy();
@@ -33,9 +33,9 @@ describe('concrete Java teaching illustrations', () => {
       }
     }
   });
-  it('renders every page of all 36 course lessons with concrete, valid illustrations', () => {
+  it('renders every page of all 56 course lessons with concrete, valid illustrations', () => {
     const lessons = allLessons.filter(l => l.id !== 'playground-game');
-    expect(lessons).toHaveLength(36);
+    expect(lessons).toHaveLength(56);
     let count = 0;
     for (const lesson of lessons) for (const page of conceptPages(lesson)) {
       const markup = renderToStaticMarkup(<ConceptPreview page={page} />);

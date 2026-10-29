@@ -112,9 +112,10 @@ Panel ścieżek można schować przyciskiem nad edytorem.
 Lista klas i pól, cykl klatki, ograniczenia kolizji oraz diagramy Mermaid:
 [Silnik Java Lab](docs/game-engine.md).
 
-Ścieżki mają osobne zakresy 101–199, 201–299, 301–399, 401–499.
+Ścieżki mają osobne zakresy: 101–199 fundamenty, 201–299 obiekty, 301–399
+dziedziczenie, 401–499 algorytmy, 501–599 game-dev i 601 playground.
 Game Dev obejmuje ruch/odbicie, trawę, monety/HUD, AI, pociski, tweeny,
-skrzynki (407) i wybór ulepszeń (408). Każda lekcja ma trzy zadania,
+skrzynki (507) i wybór ulepszeń (508). Każda lekcja ma trzy zadania,
 w tym dwa samodzielne bez podpowiedzi. `Sprite.flipX` odbija lewo/prawo,
 a `Sprite.flipY` góra/dół. Kierunek strzału daje `CharacterController2D.getDirection()` — pamięta ostatni niezerowy kierunek ruchu.
 
@@ -138,7 +139,7 @@ window.__JAVA_LAB_FEATURE_FLAGS__ = { "game-dev.enabled": false };
 window.dispatchEvent(new Event("java-lab-feature-flags-changed"));
 ```
 
-Po wyłączeniu ścieżka 04 znika z nawigacji, a zapisany wybór wraca do
+Po wyłączeniu ścieżka 05 znika z nawigacji, a zapisany wybór wraca do
 dostępnej lekcji.
 
 Analityka Umami używa flagi `analytics.enabled`. Włącza się automatycznie w
