@@ -187,8 +187,8 @@ body.is-resizing-panels, body.is-resizing-panels * { cursor: col-resize !importa
 .game-win { right: 12px; color: #ffe28f; }
 .game-input-status { position: absolute !important; inset: auto 12px 10px !important; display: block !important; color: #9bb8c8; font-size: 9px; text-align: center; opacity: .9; }
 .lab-console { display: flex; justify-content: center; margin-top: 14px; }
-.lab-console-shell { width: min(100%, 430px, calc(100dvh - 170px)); padding: 16px 16px 20px; border-radius: 20px 20px 56px 20px; background: linear-gradient(165deg, #4d587f, #333a5e 55%, #252a48); box-shadow: inset 0 2px 0 rgb(255 255 255 / 14%), inset 0 -3px 0 rgb(0 0 0 / 35%), 0 14px 32px rgb(6 10 24 / 50%); }
-.lab-console .game-stage { aspect-ratio: 1/1; min-height: 0; margin-top: 0; border-color: #10142a; }
+.lab-console-shell { width: min(100%, 430px, calc((100dvh - 170px) * 4 / 3)); padding: 16px 16px 20px; border-radius: 20px 20px 56px 20px; background: linear-gradient(165deg, #4d587f, #333a5e 55%, #252a48); box-shadow: inset 0 2px 0 rgb(255 255 255 / 14%), inset 0 -3px 0 rgb(0 0 0 / 35%), 0 14px 32px rgb(6 10 24 / 50%); }
+.lab-console .game-stage { aspect-ratio: 4/3; min-height: 0; margin-top: 0; border-color: #10142a; }
 .lab-console-stats { display: flex; align-items: center; gap: 12px; margin: 12px 4px 0; padding: 6px 10px; border-radius: 8px; background: #141a33; color: #7d8abc; font: 10px var(--mono); letter-spacing: .04em; }
 .lab-console-stats b { color: #e9edff; font-weight: 700; }
 .lab-console-keys { margin-left: auto; overflow: hidden; color: #ffd166; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }

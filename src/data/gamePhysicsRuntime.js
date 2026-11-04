@@ -35,6 +35,18 @@ public final class Physics2D {
         }
         return Math.abs(dx)<=extent(a,true)+extent(b,true)+margin&&Math.abs(dy)<=extent(a,false)+extent(b,false)+margin;
     }
+    /** Signed surface distance: positive = gap, negative = penetration depth. */
+    private static double separation(GameObject a,GameObject b) {
+        double dx=a.transform.x-b.transform.x,dy=a.transform.y-b.transform.y;
+        if(circle(a)&&circle(b))return Math.hypot(dx,dy)-(extent(a,true)+extent(b,true));
+        if(circle(a)||circle(b)) {
+            GameObject c=circle(a)?a:b,box=circle(a)?b:a;
+            double x=c.transform.x-clamp(c.transform.x,box.transform.x-extent(box,true),box.transform.x+extent(box,true));
+            double y=c.transform.y-clamp(c.transform.y,box.transform.y-extent(box,false),box.transform.y+extent(box,false));
+            return Math.hypot(x,y)-extent(c,true);
+        }
+        return Math.max(Math.abs(dx)-(extent(a,true)+extent(b,true)),Math.abs(dy)-(extent(a,false)+extent(b,false)));
+    }
     private static boolean body(GameObject o) {
         Collider2D c=collider(o);CharacterController2D v=o.getComponent(CharacterController2D.class);
         return c!=null?c.enabled&&c.created:v!=null&&v.enabled&&v.created;
@@ -108,7 +120,7 @@ public final class Physics2D {
                 double movement=axis==0?dx:dy;if(movement==0)continue;double mx=axis==0?movement:0,my=axis==1?movement:0,travel=1;
                 java.util.ArrayList<GameObject> targets=new java.util.ArrayList<>();java.util.HashMap<GameObject,Double> times=new java.util.HashMap<>();
                 for(GameObject other:around(grid,o,mx,my)){game.physics.candidates++;game.physics.stats.candidates++;if(other==o||!ready(other)||!masks(o,other)||ignored(o,other))continue;Projectile2D q=other.getComponent(Projectile2D.class);if(q!=null&&q.enabled)continue;
-                    game.physics.narrowPhaseTests++;game.physics.stats.narrowPhaseTests++;double origin=axis==0?o.transform.x:o.transform.y;if(axis==0)o.transform.x+=Math.signum(movement)*4e-6;else o.transform.y+=Math.signum(movement)*4e-6;boolean entering=overlaps(o,other,-1e-6);if(axis==0)o.transform.x=origin;else o.transform.y=origin;
+                    game.physics.narrowPhaseTests++;game.physics.stats.narrowPhaseTests++;double origin=axis==0?o.transform.x:o.transform.y,before=separation(o,other);if(axis==0)o.transform.x+=Math.signum(movement)*4e-6;else o.transform.y+=Math.signum(movement)*4e-6;boolean entering=overlaps(o,other,-1e-6)&&separation(o,other)<before-1e-9;if(axis==0)o.transform.x=origin;else o.transform.y=origin;
                     double t=hit(o,other,mx,my);if(t>1||t==0&&!entering)continue;targets.add(other);times.put(other,t);if(!trigger(o)&&!trigger(other))travel=Math.min(travel,t);
                 }
                 if(axis==0)o.transform.x+=movement*travel;else o.transform.y+=movement*travel;

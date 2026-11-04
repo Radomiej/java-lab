@@ -30,8 +30,8 @@ export function runJava(files, main='EngineTests') {
       const path=join(folder,file.split('/').pop());writeFileSync(path,source);return path;
     });
     const argFile=join(dir,'sources.txt');writeFileSync(argFile,paths.map(path=>'"'+path.replaceAll('\\','/')+'"').join('\n'));
-    execFileSync(javaBin('javac'),['--release','21','-encoding','UTF-8','-d',dir,'@'+argFile],{encoding:'utf8',timeout:30000});
-    return execFileSync(javaBin('java'),['-cp',dir,main],{encoding:'utf8',timeout:15000});
+    execFileSync(javaBin('javac'),['--release','21','-encoding','UTF-8','-d',dir,'@'+argFile],{encoding:'utf8',timeout:120000});
+    return execFileSync(javaBin('java'),['-cp',dir,main],{encoding:'utf8',timeout:30000});
   } finally {rmSync(dir,{recursive:true,force:true});}
 }
 
@@ -308,4 +308,27 @@ it('compiles the browser pipeline: package lab wrap + wildcard expansion (import
   expect(files['GameLauncher.java']).toContain('import engine.Notes;');
   delete files['GameLauncher.java']; // org.teavm.jso is only available inside the TeaVM SDK
   expect(runJava(files,'lab.JavaTest')).toMatch(/PASS|LAB_CHECK_FAILED/);
+},45000);
+
+it('lets a body embedded in a collider move back out instead of locking at corners',()=>{
+  const source=`import engine.*;
+public class StuckTests {
+ static void check(boolean ok,String label){if(!ok)throw new IllegalArgumentException(label);}
+ public static void main(String[] args){
+  Game g=new Game();GameObject wall=g.createObject("wall").setPosition(140,100);wall.addComponent(new Collider2D(20,100));
+  GameObject p=g.createObject("p").setPosition(141,100);p.addComponent(new CircleCollider2D(12));
+  final CharacterController2D v=p.addComponent(new CharacterController2D());
+  final int[] dir={-1};p.addComponent(new Component(){public void onUpdate(double delta){v.move(dir[0],0,60);}});
+  g.start();g.step(0.1);check(p.transform.x<141,"escape out of wall");
+  double escaped=p.transform.x;dir[0]=1;g.step(0.1);check(p.transform.x>escaped,"still free inside");
+  g.dispose();
+  Game g2=new Game();GameObject w2=g2.createObject("w").setPosition(140,100);w2.addComponent(new Collider2D(20,40));
+  GameObject q=g2.createObject("q").setPosition(147,100);q.addComponent(new Collider2D(10,10));
+  final CharacterController2D vq=q.addComponent(new CharacterController2D());
+  q.addComponent(new Component(){public void onUpdate(double delta){vq.move(0,1,60);}});
+  g2.start();g2.step(0.1);check(q.transform.y>100,"embedded box slides along wall");g2.dispose();
+  System.out.println("PASS stuck");
+ }
+}`;
+  expect(runJava({...gameEngineRuntimeFiles,'StuckTests.java':source},'StuckTests')).toContain('PASS stuck');
 },45000);

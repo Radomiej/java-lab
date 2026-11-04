@@ -156,7 +156,7 @@ export default function GamePreview({ runner }) {
         <div className="lab-console-shell">
           <div className="game-stage" ref={stageRef} role="application" aria-label="Plansza gry. Kliknij, aby przechwycić klawisze.">
             <canvas ref={canvasRef} className="game-canvas" aria-label="Canvas gry" />
-            <div className={`lab-view${viewOverlay ? ' on' : ''}`} aria-hidden="true"><span className="lab-view-tl">{Math.round(cameraView.x)}, {Math.round(cameraView.y)}</span><span className="lab-view-tr">x: {Math.round(cameraView.x + 600)}</span><span className="lab-view-br">y: {Math.round(cameraView.y + 600)}</span></div>
+            <div className={`lab-view${viewOverlay ? ' on' : ''}`} aria-hidden="true"><span className="lab-view-tl">{Math.round(cameraView.x)}, {Math.round(cameraView.y)}</span><span className="lab-view-tr">x: {Math.round(cameraView.x + 640)}</span><span className="lab-view-br">y: {Math.round(cameraView.y + 480)}</span></div>
             {!isReady && <div className="lab-boot"><span className="lab-boot-logo">LAB·BOY</span><span className="lab-boot-bar"><i /></span><small>{runner.stage || "Uruchom program, aby zobaczyć scenę."}</small></div>}
           </div>
           <div className="lab-console-stats">

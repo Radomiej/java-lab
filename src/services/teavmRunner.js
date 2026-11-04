@@ -171,7 +171,7 @@ export function createTeaVMRunner({ workerFactory = defaultWorkerFactory, timeou
         pending.set(id, { resolve, reject, timeoutId, onStage, onGameCommand });
         worker.postMessage({ command: "compile-and-run", id, ...payload, frameAcknowledgements: true });
         const canvas = document.querySelector(".game-canvas");
-        if (canvas) worker.postMessage({ command: "game-resize", width: 600, height: 600 });
+        if (canvas) worker.postMessage({ command: "game-resize", width: 640, height: 480 });
       });
     },
     dispose() {

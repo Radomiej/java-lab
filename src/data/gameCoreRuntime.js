@@ -275,8 +275,8 @@ public final class GameCanvas {
     private GameCanvas() {}
     private static final StringBuilder frame = new StringBuilder();
     private static final StringBuilder audio = new StringBuilder();
-    private static double width = 600;
-    private static double height = 600;
+    private static double width = 640;
+    private static double height = 480;
     public static double getWidth() { return width; }
     public static double getHeight() { return height; }
     public static void setSize(double nextWidth, double nextHeight) { width = nextWidth; height = nextHeight; }
@@ -479,7 +479,7 @@ export const gameCoreApiDescription = [
   { name: "CharacterController2D", methods: "move, velocity, constrainToBounds, onAfterMove, enabled", description: "move normalizuje kierunek; prędkość w px/s. Granice świata ustawia game.setWorldBounds." },
   { name: "Transform", methods: "x, y, rotation, scale, visualOffset", description: "Pozycja środka świata, obrót w radianach i skala obrazu. Skala grafiki nie zmienia collidera." },
   { name: "Game", methods: "createObject, find, getObjects, getObjectsWith, getObjectsWithTag, pause, resume, isPaused, setWorldBounds, time, input, physics, canvas", description: "Scena i cykl życia onCreate/onUpdate/onDrawUI/onDestroy. getObjectsWith(Player.class, Collider2D.class) zwraca kopię wyników indeksu." },
-  { name: "GameCanvas", methods: "clear, drawRect, drawText, drawCenteredText, drawSprite, getWidth, getHeight", description: "Rysowanie i rozmiar planszy. Stała rozdzielczość logiczna 600×600 px; ekran skaluje ją letterboxem." },
+  { name: "GameCanvas", methods: "clear, drawRect, drawText, drawCenteredText, drawSprite, getWidth, getHeight", description: "Rysowanie i rozmiar planszy. Stała rozdzielczość logiczna 640×480 px; ekran skaluje ją letterboxem." },
   { name: "Audio", methods: "game.audio.play(song, loop), game.audio.playNote(\"C4\", beats, wave), game.audio.stop()", description: "Syntezator. Nuty C4, C#4, Db4; pauza \"-\"; czas w taktach; fale square, triangle, sine, sawtooth, noise." },
   { name: "Song / Sequencer", methods: "new Song(tempo).sequencer(\"square\").notes(\"C4:1 E4:0.5 -:2\")", description: "Utwór z tempem BPM i równoległymi śladami. sequencer() zwraca ścieżkę: note, rest, notes, duration." },
   { name: "GameObject", methods: "id, setPosition, addComponent, getComponent, getComponents, hasComponent, requireComponent, removeComponent, removeComponents, onComponentChange, addTag, removeTag, hasTag, getTags, destroy", description: "Obiekt sceny ze stabilnym ID. Brak komponentu oznacza null; listy wyników są kopiami." },

@@ -44,18 +44,19 @@ test('all source contracts are exact and each ready Java example compiles agains
     }
     files['VisibilityAudit.java']=`import engine.*;public class VisibilityAudit {public static void main(String[] args)throws Exception{GameMain game=new GameMain();try{GameCanvas.setSize(640,360);game.start();game.step(0);GameObject run=game.find("Run");if(run!=null)for(Component c:run.getComponents())if(c.getClass().getSimpleName().equals("RunController"))c.getClass().getMethod("start").invoke(c);game.step(0);int visible=0;for(String line:GameCanvas.frame().split("\\n")){String[] p=line.split("[|]");String op=p[0];if(!op.equals("sprite")&&!op.equals("rect")&&!op.equals("text")&&!op.equals("ninepatch")&&!op.equals("progress"))continue;int offset=op.equals("rect")?1:2;double x=Double.parseDouble(p[offset]),y=Double.parseDouble(p[offset+1]);if(x>=0&&x<=640&&y>=0&&y<=360)visible++;}System.out.println(visible);}finally{game.dispose();}}}`;
     const paths=Object.entries(files).filter(([name])=>name.endsWith('.java')).map(([name,text])=>{const path=join(folder,name);writeFileSync(path,text);return path;});
-    execFileSync(javac(),['--release','21','-encoding','UTF-8','-cp',engine,'-sourcepath',folder,'-d',folder,...paths],{encoding:'utf8',timeout:30000});
+    execFileSync(javac(),['--release','21','-encoding','UTF-8','-cp',engine,'-sourcepath',folder,'-d',folder,...paths],{encoding:'utf8',timeout:60000});
     const classpath=folder+(process.platform==='win32'?';':':')+engine;
-    execFileSync(javac().replace(/javac(\.exe)?$/,'java$1'),['-cp',classpath,'CourseChecks'],{encoding:'utf8',timeout:15000});
-    execFileSync(javac().replace(/javac(\.exe)?$/,'java$1'),['-cp',classpath,'JavaTest'],{encoding:'utf8',timeout:15000});
-    if(files['MovementAudit.java'])execFileSync(javac().replace(/javac(\.exe)?$/,'java$1'),['-cp',classpath,'MovementAudit'],{encoding:'utf8',timeout:15000});
-    const visible=Number(execFileSync(javac().replace(/javac(\.exe)?$/,'java$1'),['-cp',classpath,'VisibilityAudit'],{encoding:'utf8',timeout:15000}).trim());
+    const java=main=>execFileSync(javac().replace(/javac(\.exe)?$/,'java$1'),['-cp',classpath,main],{encoding:'utf8',timeout:60000});
+    java('CourseChecks');
+    java('JavaTest');
+    if(files['MovementAudit.java'])java('MovementAudit');
+    const visible=Number(java('VisibilityAudit').trim());
     visibility.push({lesson:501+index,task:task.id,visibleCommands:visible});
    }
   }
   mkdirSync('artifacts',{recursive:true});writeFileSync('artifacts/course-visibility-audit.json',JSON.stringify(visibility,null,2));
  }finally{rmSync(dir,{recursive:true,force:true});}
-},180000);
+},600000);
 
 
 

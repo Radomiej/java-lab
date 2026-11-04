@@ -3,7 +3,7 @@ import { assetManifest } from '../../shared/lab-game-v2/assets/Assets.js';
 import { createLabAudio } from '../../shared/lab-game-v2/audio.js';
 import { createFrameStats } from '../../shared/lab-game-v2/stats.js';
 import { Keys } from '../../shared/lab-game-v2/keys.js';
-const LOGICAL_WIDTH = 600, LOGICAL_HEIGHT = 600;
+const LOGICAL_WIDTH = 640, LOGICAL_HEIGHT = 480;
 const CONTROL_KEYS = new Set([Keys.UP, Keys.DOWN, Keys.LEFT, Keys.RIGHT, Keys.W, Keys.A, Keys.S, Keys.D, " "]); 
 const normalizeKey = (key) => key === " " ? "Space" : key.length === 1 ? key.toLowerCase() : key;
 let activeAssetsReady=Promise.resolve();
