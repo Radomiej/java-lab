@@ -11,7 +11,12 @@ describe('complete Java learning modules',()=>{
       expect(lessonQuizPages(lesson).length,lesson.id).toBeGreaterThan(0);
       expect(lesson.tasks.filter(task=>task.mode!=='guided').length,lesson.id).toBeGreaterThanOrEqual(2);
       const questions=createLessonQuiz(lesson);expect(questions.length,lesson.id).toBeGreaterThanOrEqual(2);
-      for(const question of questions){expect(question.choices).toHaveLength(3);expect(new Set(question.choices).size).toBe(3);expect(question.choices[question.correct]).toBeTruthy();}
+      const optionSets=new Set(questions.map(question=>question.choices.slice().sort().join('')))
+      expect(optionSets.size,lesson.id+' repeats one option set across questions').toBe(questions.length);
+      for(const question of questions){
+        expect(question.choices).toHaveLength(3);expect(new Set(question.choices).size).toBe(3);expect(question.choices[question.correct]).toBeTruthy();
+        if(question.prompt==='Które pojęcie uzupełnia ten opis?')expect(question.code,lesson.id+' '+question.title).toContain('____');
+      }
     }
   });
   it('reconstructs every lesson quiz server-side without exposing keys',()=>{
