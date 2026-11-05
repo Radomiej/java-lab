@@ -52,6 +52,31 @@ export default function PageDiagram({ page }) {
   }
   let content;
   switch (kind) {
+    case 'flee-range': content = <>
+      <path d="M112 61H244V237Z" fill="#edf5e7" stroke="#83a792" strokeWidth="3"/>
+      <Sprite asset="slime" x={88} y={37}/>
+      <Sprite x={220} y={213}/>
+      <Label x={112} y={28}>Slime</Label>
+      <Label x={244} y={288}>Gracz</Label>
+      <Label x={178} y={46}>dx = 72 px</Label>
+      <Label x={306} y={154}>dy = 96 px</Label>
+      <Label x={111} y={182}>120 px</Label>
+    </>; break;
+    case 'chase-motion': content = <>
+      <rect x="10" y="45" width="420" height="226" rx="12" fill="#edf5e7" stroke="#a2bd9d"/>
+      <Label x={106} y={80}>Slime: pościg</Label>
+      <Label x={322} y={80}>Gracz: klawisz D</Label>
+      <path d="M28 185H412" stroke="#b5cdb0" strokeDasharray="5 5"/>
+      <Sprite asset="slime" x={40} y={137} size={48} opacity={0.4}/>
+      <Sprite asset="slime" x={103} y={137} size={48}/>
+      <Sprite x={222} y={137} size={48} opacity={0.4}/>
+      <Sprite x={348} y={137} size={48}/>
+      {arrow(64,207,127,207,'#a65d24')}
+      {arrow(246,207,372,207)}
+      <Label x={96} y={239} color="#a65d24">30 px</Label>
+      <Label x={309} y={239}>60 px</Label>
+      <Label x={220} y={305}>Ruch obu postaci przez 0,5 s</Label>
+    </>; break;
     case 'component-appearance': content=<>
       <rect x="35" y="55" width="165" height="145" rx="12" fill="#fff" stroke="#90aaa0" strokeDasharray="5 5"/>
       <circle cx="118" cy="125" r="4" fill="#d85158"/>

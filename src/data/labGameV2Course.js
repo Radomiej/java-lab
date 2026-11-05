@@ -2,7 +2,7 @@ import {guidedStarter} from '../../shared/lab-game-v2/course/guidedStarters.js';
 import {earlyStarter} from '../../shared/lab-game-v2/course/earlyStarters.js';
 // Course source is deliberately separate from either editor's project adapter.
 // A missing recipe remains visibly unfinished; it must never masquerade as a solution.
-export function buildCourseProject(language, chapter, mode, solved = true) {
+export function buildCourseProject(language, chapter, mode, solved = true, includeFleeArena = true) {
   if(!solved) {
     const solution=buildCourseProject(language,chapter,mode,true);
     const scaffold=earlyStarter(language,chapter==='projectile-types'&&mode==='independent'?'projectiles':chapter,mode,solution);
@@ -53,7 +53,7 @@ export function buildCourseProject(language, chapter, mode, solved = true) {
     return {files,ready:solution.ready};
   }
   if(chapter==='enemy-tactics') {
-    const project=buildCourseProject(language,'enemy-ai',mode,true),java=language==='java',ext=java?'java':'js';
+    const project=buildCourseProject(language,'enemy-ai',mode,true,false),java=language==='java',ext=java?'java':'js';
     if(mode!=='independent') {
       const file=`EnemyAI.${ext}`;
       if(mode==='guided')project.files[file]=project.files[file].replace(java?'requireComponent(CharacterController2D.class).move':'this.requireComponent(GameLab.CharacterController2D).move',`if(Math.hypot(dx,dy)>150)return; ${java?'requireComponent(CharacterController2D.class).move':'this.requireComponent(GameLab.CharacterController2D).move'}`);
@@ -267,6 +267,13 @@ public Runnable onDamage(Runnable fn) { damageListeners.add(fn);return ()->damag
       else draw=`${declare('double','width','200 * 3.0 / 5.0')}\ncanvas.drawRect(20+width/2,40,width,12,"#70c994");\ncanvas.drawText("Zdrowie: 3 / 5",20,70,18,"#ffffff","left","middle");`;
       break;
     case 'enemy-ai': {
+      if (java && mode === 'independent' && includeFleeArena) {
+        const wallColor = '#728890';
+        object('LeftWall', 10, 180, [shape(20, 360, wallColor), 'Collider2D(20,360)']);
+        object('RightWall', 630, 180, [shape(20, 360, wallColor), 'Collider2D(20,360)']);
+        object('TopWall', 320, 10, [shape(640, 20, wallColor), 'Collider2D(640,20)']);
+        object('BottomWall', 320, 350, [shape(640, 20, wallColor), 'Collider2D(640,20)']);
+      }
       player(300,100);
       component('EnemyAI',`constructor(target,speed=60) { super(); this.target=target; this.speed=speed; } onUpdate() { if(!this.target || this.target.destroyed)return; const dx=this.target.transform.x-this.transform.x,dy=this.target.transform.y-this.transform.y; ${mode==='independent'?'if(Math.hypot(dx,dy)>=120)return;':''} this.requireComponent(GameLab.CharacterController2D).move(${mode==='independent'?'-':''}dx,${mode==='independent'?'-':''}dy,this.speed); }`,`public GameObject target; public double speed; public EnemyAI(GameObject target,double speed) { this.target=target; this.speed=speed; } @Override public void onUpdate(double delta) { if(target==null || target.destroyed)return; double dx=target.transform.x-transform.x,dy=target.transform.y-transform.y; ${mode==='independent'?'if(Math.hypot(dx,dy)>=120)return;':''} requireComponent(CharacterController2D.class).move(${mode==='independent'?'-':''}dx,${mode==='independent'?'-':''}dy,speed); }`);
       object('Slime',mode==='independent'?240:100,100,[sprite('SLIME'),'CircleCollider2D(12)','CharacterController2D()',`EnemyAI(player,${mode==='modified'?40:60})`]);

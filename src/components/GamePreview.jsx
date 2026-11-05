@@ -133,7 +133,12 @@ export default function GamePreview({ runner }) {
         <div><h2 id="game-preview-title" className="preview-title--game">Podgląd gry</h2></div>
         <div className="game-preview-actions">
           <div className="preview-settings">
-            <button className="button button--ghost game-settings-button" type="button" aria-label="Ustawienia podglądu" aria-expanded={settingsOpen} onClick={()=>setSettingsOpen(value=>!value)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 0 0 12 8.5Zm9 3.5-.9 3.2-2.3-.7a7.4 7.4 0 0 1-1.4 1.4l.7 2.3-3.2.9a7.4 7.4 0 0 1-1.9-1.9L9.8 19l-.9-3.2 2.3-.7a7.4 7.4 0 0 1 0-2.8l-2.3-.7.9-3.2 3.2-.9a7.4 7.4 0 0 1 1.4-1.4l-.7-2.3 3.2-.9a7.4 7.4 0 0 1 1.9 1.9Z"/></svg></button>
+            <button className="button button--ghost game-settings-button" type="button" title="Ustawienia podglądu" aria-label="Ustawienia podglądu" aria-expanded={settingsOpen} onClick={()=>setSettingsOpen(value=>!value)}>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10 3h4l.6 2.6 1.2.7 2.6-.8 2 3.5-2 1.8v1.4l2 1.8-2 3.5-2.6-.8-1.2.7L14 20h-4l-.6-2.6-1.2-.7-2.6.8-2-3.5 2-1.8v-1.4l-2-1.8 2-3.5 2.6.8 1.2-.7z" transform="translate(0 .5)"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
             {settingsOpen && <div className="preview-settings-menu" role="group" aria-label="Ustawienia podglądu">
               <label className="preview-switch" title="Rogi ekranu pokazują zakres świata widziany przez kamerę">
                 <input type="checkbox" role="switch" checked={viewOverlay} onChange={event=>setViewOverlay(event.target.checked)} />

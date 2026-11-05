@@ -5,7 +5,6 @@ export const gameConceptScenes = {
   'components:2': [hero('Powstaje bohater', 'onCreate()\nHP ustawione na 8', '1 raz'), hero('Bohater żyje', 'onUpdate(delta)\nsprawdza ruch', 'co klatkę'), hero('Bohater znika', 'onDestroy()\nusunięcie reakcji', '1 raz na końcu')],
   'triggers:2': [hero('Pierwszy kontakt z monetą', 'claimed: false → true\nWallet: 4 → 5', '+1 złota'), hero('Następna aktualizacja', 'claimed = true\nWallet = 5', 'Moneta usunięta; brak drugiej nagrody')],
   'health:2': [hero('Ostatni cios', 'HP: 1 → 0', 'onDeath: łup i usunięcie'), hero('Następna aktualizacja', 'jednostka już martwa', 'Nie tworzy drugiego łupu')],
-  'enemy-ai:2': [hero('Wróg w (100, 150)', 'EnemyAI:\ncel (160, 150)\nkierunek w prawo', '', 'rogue'), hero('Wróg rusza', 'Kontroler:\n60 px/s × 0.5 s\nx: 100 → 130', 'Ściana może zatrzymać ruch', 'rogue')],
   'weapons:0': [hero('Cel A: żywy', 'odległość 40\nID 2', 'Wybrany', 'rogue'), hero('Cel B: żywy', 'odległość 80\nID 3', 'Za daleko', 'ranger'), hero('Cel C: martwy', 'odległość 10\nID 1', 'Pomijamy', 'wizard')],
   'loot-xp:0': [hero('Pokonany wróg', 'HP = 0\norb: 2 XP', 'Łup zostaje w miejscu wroga', 'rogue'), hero('Gracz zbiera orb', 'Experience: 1 → 3 XP', 'Orb znika', 'knight')],
   'loot-xp:2': [hero('Nagroda +12 XP', 'XP: 0 → 12\npróg: 5', '', 'wizard'), hero('Awans pierwszy', '12 − 5 = 7 XP\nnowy próg: 6', '+1 poziom', 'wizard'), hero('Awans drugi', '7 − 6 = 1 XP\nnowy próg: 7', '1 < 7: koniec pętli', 'wizard')],

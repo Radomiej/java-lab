@@ -186,7 +186,7 @@ export const courseManifest = {
           "id": "g2d.enemy-ai.guided",
           "mode": "guided",
           "title": "Pościg za graczem",
-          "prompt": "Gracz, Slime, cel i obliczenie dx oraz dy są gotowe. Dopisz jedno wywołanie move(dx, dy, speed) w EnemyAI. Przeciwnik ma ruszyć w pościg z prędkością 60 px/s.",
+          "prompt": "W GameMain obiekt Slime ma już komponent CharacterController2D. Otwórz EnemyAI i znajdź TODO w metodzie onUpdate. Kierunek (dx, dy), prędkość speed i zmienna controller są przygotowane. Wywołaj metodę move na controller, przekazując kolejno dx, dy i speed. Uruchom grę i sprawdź, czy Slime rusza za graczem.",
           "objective": "Uruchomić pościg w komponencie EnemyAI.",
           "criteria": [
             "Po sekundzie Slime znajduje się w pozycji (160, 100) na pustej scenie.",
@@ -215,7 +215,7 @@ export const courseManifest = {
           "id": "g2d.enemy-ai.independent",
           "mode": "independent",
           "title": "Przeciwnik utrzymuje dystans",
-          "prompt": "Masz gotową scenę, ruch gracza i komponent FleeAI. Samodzielnie napisz ucieczkę: gdy odległość od gracza jest mniejsza niż 120 px, oddalaj się z prędkością 60 px/s; poza tym zasięgiem stój w miejscu.",
+          "prompt": "W FleeAI oblicz różnice dx i dy między pozycją gracza a pozycją Slime’a. Oblicz odległość w linii prostej, korzystając z czwartej strony teorii. Gdy odległość jest mniejsza niż 120 px, odwróć kierunek i uciekaj z prędkością 60 px/s. Przy 120 px i dalej Slime stoi w miejscu.",
           "objective": "Samodzielnie zaprogramować regułę ucieczki AI.",
           "criteria": [
             "Dla celu w (300, 100) i przeciwnika w (250, 100) po 0.5 s przeciwnik znajduje się w (220, 100).",

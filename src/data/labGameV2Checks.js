@@ -187,6 +187,30 @@ export function courseJavaTest(chapter,mode) {
     body+=`check(${condition},${JSON.stringify(label+': oczekiwano '+String(value)+', otrzymano ')}+(${expression}));\n`;
   }
   if(chapter==='projectiles' && mode==='modified')body+='game.dispose();game=new GameMain();game.start();game.step(0);game.find("Enemy").setPosition(1000,100);for(int i=0;i<6;i++)game.step(.1);check(game.find("Projectile")==null,"Chybiony pocisk znika po 0.5 s");\n';
+  if(chapter==='enemy-ai' && mode==='independent')body+=`
+GameObject slime=object(game,"Slime"),player=object(game,"Player");
+slime.setPosition(250,150);
+player.setPosition(286,198);
+game.step(.1);
+check(Math.abs(slime.transform.x-246.4)<=0.02 && Math.abs(slime.transform.y-145.2)<=0.02,"Przy odległości 60 px Slime powinien oddalić się po przekątnej o 6 px.");
+
+slime.setPosition(250,150);
+player.setPosition(322,246);
+game.step(.1);
+check(Math.abs(slime.transform.x-250)<=0.02 && Math.abs(slime.transform.y-150)<=0.02,"Przy odległości dokładnie 120 px Slime powinien stać w miejscu.");
+
+slime.setPosition(250,150);
+player.setPosition(340,270);
+game.step(.1);
+check(Math.abs(slime.transform.x-250)<=0.02 && Math.abs(slime.transform.y-150)<=0.02,"Przy odległości 150 px Slime powinien stać w miejscu.");
+
+if(game.find("LeftWall")!=null) {
+    slime.setPosition(60,100);
+    player.setPosition(105,100);
+    for(int i=0;i<100;i++)game.step(.01);
+    check(Math.abs(slime.transform.x-32)<=0.02 && Math.abs(slime.transform.y-100)<=0.02,"Podczas ucieczki Slime powinien zatrzymać się przy lewej ścianie.");
+}
+`;
   if(chapter==='camera' && mode==='independent')body+=`
 Camera2D camera=game.find("Camera").getComponent(Camera2D.class);
 GameObject marker=game.find("Marker"),player=game.find("Player");

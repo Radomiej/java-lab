@@ -153,19 +153,16 @@ Scaffolding: Gotowa baza: infrastruktura i mechaniki jeszcze niewyjaśnione w ku
 | Page | Tytuł | Treść | Miejsce w kodzie |
 |---|---|---|---|
 | 1 | Wektor od przeciwnika do celu | Kierunek wyznaczamy jako pozycja celu minus pozycja przeciwnika. Dla przeciwnika (100,150) i celu (160,150) otrzymujemy (60,0), czyli w prawo. | shared/lab-game-v2/editor/lessonVisuals.js |
-| 2 | Stała prędkość pościgu | Znormalizuj różnicę pozycji, zanim pomnożysz ją przez prędkość. Dzięki temu odległy cel nie powoduje szybszego ruchu. Obsłuż brak celu i odległość zero. | shared/lab-game-v2/editor/lessonVisuals.js |
-| 3 | Decyzja i wykonanie ruchu | EnemyAI wybiera kierunek. Kontroler wykonuje ruch i uwzględnia przeszkody. Parametry pozwalają uzyskać różne zachowania tej samej klasy.<br><br>nota: Nie kopiuj całej klasy tylko po to, aby zmienić prędkość.<br>scenka: Wróg w (100, 150): EnemyAI:
-cel (160, 150)
-kierunek w prawo / Wróg rusza: Kontroler:
-60 px/s × 0.5 s
-x: 100 → 130 [Ściana może zatrzymać ruch] | shared/lab-game-v2/editor/lessonVisuals.js + src/data/gameConceptScenes.js (enemy-ai:2) |
+| 2 | Stała prędkość pościgu | Jeśli postać w jednym kroku przesunie się o 1 piksel w prawo, pokona 1 piksel. Jeśli jednocześnie przesunie się o 1 piksel w prawo i o 1 piksel w dół, pokona po przekątnej √2 ≈ 1,41 piksela. W tym samym czasie poruszy się więc o około 41% szybciej. Normalizacja dzieli obie składowe przez długość wektora. W silniku metoda normalized() zwraca nowy wektor o długości 1, a dla wektora zerowego zwraca (0, 0). Pomnóż znormalizowany kierunek przez prędkość pościgu, żeby uzyskać prędkość ruchu. | shared/lab-game-v2/editor/lessonVisuals.js |
+| 3 | Decyzja i wykonanie ruchu | Gracz porusza się po naciśnięciu klawisza D. Slime ma w gotowej scenie dwa komponenty związane z pościgiem. EnemyAI oblicza kierunek do gracza. CharacterController2D wykonuje ruch i uwzględnia przeszkody. Metoda move sama normalizuje kierunek i używa prędkości podanej w pikselach na sekundę.<br><br>Rysunek pokazuje przesunięcie gracza i Slime’a po 0,5 s. | shared/lab-game-v2/editor/lessonVisuals.js + shared/lab-game-v2/editor/PageDiagram.jsx |
+| 4 | Kiedy Slime zaczyna uciekać? | Oblicz dx i dy, odejmując pozycję Slime’a od pozycji gracza w każdej osi. Odległość to długość tego wektora, czyli √(dx² + dy²). Na rysunku różnice wynoszą 72 px i 96 px, więc odległość to dokładnie 120 px. Slime ucieka tylko wtedy, gdy odległość jest mniejsza niż 120 px. Żeby pobiec od gracza, odwróć oba znaki kierunku. | shared/lab-game-v2/editor/lessonVisuals.js |
 | teoria | Decyzja AI, potem ruch | EnemyAI jest Twoim komponentem. Kierunek do celu to pozycja celu minus pozycja przeciwnika. Normalizacja daje sam kierunek niezależny od odległości. Kontroler odpowiada za ruch i przeszkody. Zmiana kierunku lub prędkości daje różne zachowania bez kopiowania całej klasy. | src/data/gameDevTeaching.js |
 | wskazówka | Zapamiętaj | Obsłuż brak celu i zerową odległość przed obliczeniem ruchu. | src/data/gameDevTeaching.js |
 
 ### Zadania lekcji 4
 
 **g2d.enemy-ai.guided** (guided / Z przykładem) — Pościg za graczem
-- Polecenie: Gracz, Slime, cel i obliczenie dx oraz dy są gotowe. Dopisz jedno wywołanie move(dx, dy, speed) w EnemyAI. Przeciwnik ma ruszyć w pościg z prędkością 60 px/s.
+- Polecenie: W GameMain obiekt Slime ma już komponent CharacterController2D. Otwórz EnemyAI i znajdź TODO w metodzie onUpdate. Kierunek (dx, dy), prędkość speed i zmienna controller są przygotowane. Wywołaj metodę move na controller, przekazując kolejno dx, dy i speed. Uruchom grę i sprawdź, czy Slime rusza za graczem.
 - Cel: Uruchomić pościg w komponencie EnemyAI.
 - Wyjaśnienie rozwiązania: Cel, kierunek i kontroler są gotowe. Wywołanie move(dx, dy, speed) uruchamia pościg. Kierunek liczymy jako pozycja celu minus pozycja przeciwnika; kontroler sam normalizuje wektor.
 - Kryteria (widok ucznia):
@@ -184,7 +181,7 @@ x: 100 → 130 [Ściana może zatrzymać ruch] | shared/lab-game-v2/editor/lesso
   - Oba sprite’y pozostają ustawione pionowo (rotation = 0), a kierunek poziomy może być odzwierciedlany przez flipX.
 
 **g2d.enemy-ai.independent** (independent / Rozbudowa) — Przeciwnik utrzymuje dystans
-- Polecenie: Masz gotową scenę, ruch gracza i komponent FleeAI. Samodzielnie napisz ucieczkę: gdy odległość od gracza jest mniejsza niż 120 px, oddalaj się z prędkością 60 px/s; poza tym zasięgiem stój w miejscu.
+- Polecenie: W FleeAI oblicz różnice dx i dy między pozycją gracza a pozycją Slime’a. Oblicz odległość w linii prostej, korzystając z czwartej strony teorii. Gdy odległość jest mniejsza niż 120 px, odwróć kierunek i uciekaj z prędkością 60 px/s. Przy 120 px i dalej Slime stoi w miejscu.
 - Cel: Samodzielnie zaprogramować regułę ucieczki AI.
 - Kryteria (widok ucznia):
   - Dla celu w (300, 100) i przeciwnika w (250, 100) po 0.5 s przeciwnik znajduje się w (220, 100).

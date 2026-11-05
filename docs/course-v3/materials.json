@@ -181,7 +181,7 @@
             "id": "g2d.enemy-ai.guided",
             "mode": "guided",
             "title": "Pościg za graczem",
-            "prompt": "Gracz, Slime, cel i obliczenie dx/dy są gotowe. Dopisz jedno wywołanie move(dx,dy,speed) w EnemyAI. Wróg ma zacząć pościg z prędkością 60.",
+            "prompt": "W GameMain obiekt Slime ma już komponent CharacterController2D. Otwórz EnemyAI i znajdź TODO w metodzie onUpdate. Kierunek (dx, dy), prędkość speed i zmienna controller są przygotowane. Wywołaj metodę move na controller, przekazując kolejno dx, dy i speed. Uruchom grę i sprawdź, czy Slime rusza za graczem.",
             "objective": "Napisać własny komponent pościgu.",
             "criteria": [
               "Po sekundzie Slime ma pozycję (160,100) na pustej scenie.",
@@ -210,7 +210,7 @@
             "id": "g2d.enemy-ai.independent",
             "mode": "independent",
             "title": "Przeciwnik utrzymuje dystans",
-            "prompt": "Masz gotową scenę, ruch gracza i komponent FleeAI. Samodzielnie napisz ucieczkę: przy odległości <120 oddalaj się z prędkością 60; poza zasięgiem stój.",
+            "prompt": "W FleeAI oblicz różnice dx i dy między pozycją gracza a pozycją Slime’a. Oblicz odległość w linii prostej, korzystając z czwartej strony teorii. Gdy odległość jest mniejsza niż 120 px, odwróć kierunek i uciekaj z prędkością 60 px/s. Przy 120 px i dalej Slime stoi w miejscu.",
             "objective": "Samodzielnie zaprogramować prostą regułę AI.",
             "criteria": [
               "Dla target=(300,100),enemy=(250,100) po 0.5 s wróg znajduje się w (220,100).",
@@ -1675,7 +1675,7 @@
           "id": "g2d.enemy-ai.guided",
           "mode": "guided",
           "title": "Pościg za graczem",
-          "prompt": "Gracz, Slime, cel i obliczenie dx/dy są gotowe. Dopisz jedno wywołanie move(dx,dy,speed) w EnemyAI. Wróg ma zacząć pościg z prędkością 60.",
+          "prompt": "W GameMain obiekt Slime ma już komponent CharacterController2D. Otwórz EnemyAI i znajdź TODO w metodzie onUpdate. Kierunek (dx, dy), prędkość speed i zmienna controller są przygotowane. Wywołaj metodę move na controller, przekazując kolejno dx, dy i speed. Uruchom grę i sprawdź, czy Slime rusza za graczem.",
           "objective": "Napisać własny komponent pościgu.",
           "criteria": [
             "Po sekundzie Slime ma pozycję (160,100) na pustej scenie.",
@@ -1704,7 +1704,7 @@
           "id": "g2d.enemy-ai.independent",
           "mode": "independent",
           "title": "Przeciwnik utrzymuje dystans",
-          "prompt": "Masz gotową scenę, ruch gracza i komponent FleeAI. Samodzielnie napisz ucieczkę: przy odległości <120 oddalaj się z prędkością 60; poza zasięgiem stój.",
+          "prompt": "W FleeAI oblicz różnice dx i dy między pozycją gracza a pozycją Slime’a. Oblicz odległość w linii prostej, korzystając z czwartej strony teorii. Gdy odległość jest mniejsza niż 120 px, odwróć kierunek i uciekaj z prędkością 60 px/s. Przy 120 px i dalej Slime stoi w miejscu.",
           "objective": "Samodzielnie zaprogramować prostą regułę AI.",
           "criteria": [
             "Dla target=(300,100),enemy=(250,100) po 0.5 s wróg znajduje się w (220,100).",
@@ -1723,6 +1723,7 @@
         {
           "title": "Wektor od przeciwnika do celu",
           "text": "Kierunek wyznaczamy jako pozycja celu minus pozycja przeciwnika. Dla przeciwnika (100,150) i celu (160,150) otrzymujemy (60,0), czyli w prawo.",
+          "code": {"java":"Vector2 slimePosition = new Vector2(100, 150);\nVector2 targetPosition = new Vector2(160, 150);\nVector2 direction = new Vector2();\ndirection.x = targetPosition.x - slimePosition.x;\ndirection.y = targetPosition.y - slimePosition.y;\n// direction ma teraz wartości (60, 0)."},
           "visual": {
             "kind": "motion",
             "variant": 3,
@@ -1731,7 +1732,8 @@
         },
         {
           "title": "Stała prędkość pościgu",
-          "text": "Znormalizuj różnicę pozycji, zanim pomnożysz ją przez prędkość. Dzięki temu odległy cel nie powoduje szybszego ruchu. Obsłuż brak celu i odległość zero.",
+          "text": "Jeśli postać w jednym kroku przesunie się o 1 piksel w prawo, pokona 1 piksel. Jeśli jednocześnie przesunie się o 1 piksel w prawo i o 1 piksel w dół, pokona po przekątnej √2 ≈ 1,41 piksela. W tym samym czasie poruszy się więc o około 41% szybciej. Normalizacja dzieli obie składowe przez długość wektora. W silniku metoda normalized() zwraca nowy wektor o długości 1, a dla wektora zerowego zwraca (0, 0). Pomnóż znormalizowany kierunek przez prędkość pościgu, żeby uzyskać prędkość ruchu.",
+          "code": {"java":"Vector2 direction = new Vector2();\ndirection.x = 1;\ndirection.y = 1;\n\nVector2 unitDirection = direction.normalized();\n// unitDirection ≈ (0,707; 0,707)\n// direction nadal ma wartości (1, 1)."},
           "visual": {
             "kind": "motion",
             "variant": 1,
@@ -1740,15 +1742,28 @@
         },
         {
           "title": "Decyzja i wykonanie ruchu",
-          "text": "EnemyAI wybiera kierunek. Kontroler wykonuje ruch i uwzględnia przeszkody. Parametry pozwalają uzyskać różne zachowania tej samej klasy.",
+          "text": "Gracz porusza się po naciśnięciu klawisza D. Slime ma w gotowej scenie dwa komponenty związane z pościgiem. EnemyAI oblicza kierunek do gracza. CharacterController2D wykonuje ruch i uwzględnia przeszkody. Metoda move sama normalizuje kierunek i używa prędkości podanej w pikselach na sekundę.",
+          "codeContext": {"java":"W GameMain.onCreate() kontroler i EnemyAI są już dodane do tego samego obiektu Slime. Dlatego requireComponent(CharacterController2D.class) w EnemyAI pobiera kontroler Slime’a. W zadaniu 1 masz już zmienną controller. W miejscu TODO wywołaj na niej metodę move, przekazując dx, dy i speed."},
+          "code": {"java":"if (target == null || target.destroyed) return;\n\ndouble dx = target.transform.x - transform.x;\ndouble dy = target.transform.y - transform.y;\nCharacterController2D controller =\n    requireComponent(CharacterController2D.class);\ncontroller.move(dx, dy, speed);\n\n// requireComponent zgłasza wyjątek, gdy komponentu brakuje.\n// Dla opcjonalnego komponentu użyj getComponent, które może zwrócić null:\n// CharacterController2D controller = getComponent(CharacterController2D.class);\n// if (controller != null) {\n//     controller.move(dx, dy, speed);\n// }"},
           "visual": {
-            "kind": "flow",
-            "nodes": [
-              "cel",
-              "EnemyAI: kierunek",
-              "kontroler: ruch"
-            ],
-            "note": "Nie kopiuj całej klasy tylko po to, aby zmienić prędkość."
+            "kind": "chase-motion",
+            "variant": 0,
+            "note": ""
+          }
+        },
+        {
+          "title": "Kiedy Slime zaczyna uciekać?",
+          "text": "Oblicz dx i dy, odejmując pozycję Slime’a od pozycji gracza w każdej osi. Odległość to długość tego wektora, czyli √(dx² + dy²). Na rysunku różnice wynoszą 72 px i 96 px, więc odległość to dokładnie 120 px. Slime ucieka tylko wtedy, gdy odległość jest mniejsza niż 120 px. Żeby pobiec od gracza, odwróć oba znaki kierunku.",
+          "visual": {
+            "kind": "flee-range",
+            "variant": 0,
+            "note": ""
+          },
+          "codeContext": {
+            "java": "Fragment FleeAI.onUpdate(delta). Pole target wskazuje gracza."
+          },
+          "code": {
+            "java": "if (target == null || target.destroyed) return;\n\ndouble dx = target.transform.x - transform.x;\ndouble dy = target.transform.y - transform.y;\ndouble distance = Math.hypot(dx, dy);\nif (distance >= 120) return;\n\nrequireComponent(CharacterController2D.class).move(-dx, -dy, speed);"
           }
         }
       ],
