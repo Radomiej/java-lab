@@ -1,7 +1,7 @@
 function independentTask(lessonId, suffix, definition) {
   return {
     id: `${lessonId}-${suffix}`,
-    mode: "independent",
+    mode: definition.mode || "independent",
     title: definition.title,
     prompt: definition.prompt,
     steps: definition.steps,
@@ -231,6 +231,51 @@ const additionalTasks = {
   ],
   "algorithms-01": [
     independentTask("algorithms-01", "independent-1", {
+      mode: "modified",
+      title: "Najmniejszy wynik",
+      prompt: "Kod z zadania 1 znajduje największy wynik. Zmień go tak, aby zwracał najmniejszą liczbę w tablicy: zamień nazwę metody na findMin, zmienną na min i odwróć porównanie.",
+      steps: ["Zmień nazwę metody na findMin i zmienna max na min.", "Odwróć warunek: values[i] < min.", "Uruchom — program wypisuje najmniejszy wynik."],
+      starter: `public class Main {
+    static int findMax(int[] values) {
+        // TODO: zamień na wyszukiwanie minimum (findMin, min, <)
+        int max = values[0];
+        for (int i = 1; i < values.length; i++) {
+            if (values[i] > max) {
+                max = values[i];
+            }
+        }
+        return max;
+    }
+
+    public static void main(String[] args) {
+        int[] scores = {4, 9, 2, 7};
+        System.out.println(findMax(scores));
+    }
+}
+`,
+      solution: `public class Main {
+    static int findMin(int[] values) {
+        int min = values[0];
+        for (int i = 1; i < values.length; i++) {
+            if (values[i] < min) {
+                min = values[i];
+            }
+        }
+        return min;
+    }
+
+    public static void main(String[] args) {
+        int[] scores = {4, 9, 2, 7};
+        System.out.println(findMin(scores));
+    }
+}
+`,
+      checks: [
+        { kind: "contains", file: "Main.java", value: "findMin", label: "Metoda minimum" },
+        { kind: "contains", file: "Main.java", value: "values[i] < min", label: "Porównanie z dotychczasowym minimum" },
+      ],
+    }),
+    independentTask("algorithms-01", "independent-2", {
       title: "Suma elementów",
       prompt: "Uzupełnij metodę sum tak, aby zwracała sumę wszystkich elementów tablicy.",
       steps: ["Zmienna sum zaczyna się od 0.", "W pętli dodawaj values[i] do sum.", "Zwróć sum za pętlą."],
@@ -266,67 +311,45 @@ const additionalTasks = {
         { kind: "contains", file: "Main.java", value: "values[i]", label: "Odczyt elementu" },
       ],
     }),
-    independentTask("algorithms-01", "independent-2", {
-      title: "Zlicz większe od progu",
-      prompt: "Uzupełnij metodę countAbove tak, aby zwracała liczbę elementów większych od limit.",
-      steps: ["Licznik bigger zaczyna się od 0.", "W pętli sprawdzaj if (values[i] > limit) i zwiększaj licznik.", "Zwróć licznik."],
-      starter: `public class Main {
-    static int countAbove(int[] values, int limit) {
-        // TODO: zlicz elementy powyżej limit
-        return 0;
-    }
-
-    public static void main(String[] args) {
-        int[] scores = {3, 8, 2, 9};
-        System.out.println(countAbove(scores, 5));
-    }
-}
-`,
-      solution: `public class Main {
-    static int countAbove(int[] values, int limit) {
-        int bigger = 0;
-        for (int i = 0; i < values.length; i++) {
-            if (values[i] > limit) {
-                bigger++;
-            }
-        }
-        return bigger;
-    }
-
-    public static void main(String[] args) {
-        int[] scores = {3, 8, 2, 9};
-        System.out.println(countAbove(scores, 5));
-    }
-}
-`,
-      checks: [
-        { kind: "contains", file: "Main.java", value: "values[i] > limit", label: "Warunek progu" },
-        { kind: "contains", file: "Main.java", value: "bigger++", label: "Zwiększanie licznika" },
-      ],
-    }),
   ],
   "algorithms-02": [
     independentTask("algorithms-02", "independent-1", {
+      mode: "modified",
       title: "Bąbelkowe z wczesnym wyjściem",
-      prompt: "Uzupełnij metodę bubbleSortEarly tak, aby kończyła przejścia, gdy w jednym z nich nie było żadnej zamiany.",
-      steps: ["Zewnętrzna pętla powtarza przejścia; flaga swapped startuje false.", "Wewnętrzna zamiana ustawia swapped na true.", "Gdy po przejściu swapped jest false — przerwij pętlę break."],
+      prompt: "Kod z zadania 1 sortuje poprawnie i liczy przejścia. Dodaj wczesne wyjście: gdy przejście nie wykona żadnej zamiany, przerwij pętlę — liczba przejść dla tej tablicy spadnie z 3 do 2.",
+      steps: ["Przed wewnętrzną pętlą ustaw boolean swapped = false.", "Po zamianie ustaw swapped = true.", "Po wewnętrznej pętli: if (!swapped) break."],
       starter: `public class Main {
-    static void bubbleSortEarly(int[] values) {
-        // TODO: przejścia bąbelkowe z flagą swapped
+    static int bubbleSortEarly(int[] values) {
+        int passes = 0;
+        for (int pass = 0; pass < values.length - 1; pass++) {
+            passes++;
+            // TODO: flaga swapped — przerwij, gdy przejście nic nie zamieni
+            for (int i = 0; i < values.length - 1 - pass; i++) {
+                if (values[i] > values[i + 1]) {
+                    int temp = values[i];
+                    values[i] = values[i + 1];
+                    values[i + 1] = temp;
+                }
+            }
+        }
+        return passes;
     }
 
     public static void main(String[] args) {
-        int[] scores = {2, 4, 1, 3};
-        bubbleSortEarly(scores);
+        int[] scores = {1, 3, 2, 4};
+        int passes = bubbleSortEarly(scores);
         for (int i = 0; i < scores.length; i++) {
             System.out.println(scores[i]);
         }
+        System.out.println(passes);
     }
 }
 `,
       solution: `public class Main {
-    static void bubbleSortEarly(int[] values) {
+    static int bubbleSortEarly(int[] values) {
+        int passes = 0;
         for (int pass = 0; pass < values.length - 1; pass++) {
+            passes++;
             boolean swapped = false;
             for (int i = 0; i < values.length - 1 - pass; i++) {
                 if (values[i] > values[i + 1]) {
@@ -340,14 +363,16 @@ const additionalTasks = {
                 break;
             }
         }
+        return passes;
     }
 
     public static void main(String[] args) {
-        int[] scores = {2, 4, 1, 3};
-        bubbleSortEarly(scores);
+        int[] scores = {1, 3, 2, 4};
+        int passes = bubbleSortEarly(scores);
         for (int i = 0; i < scores.length; i++) {
             System.out.println(scores[i]);
         }
+        System.out.println(passes);
     }
 }
 `,
@@ -404,6 +429,65 @@ const additionalTasks = {
   ],
   "algorithms-03": [
     independentTask("algorithms-03", "independent-1", {
+      mode: "modified",
+      title: "Wybór w stronę malejącą",
+      prompt: "Kod z zadania 1 sortuje rosnąco wybierając minimum. Zmień go tak, aby sortował malejąco — w każdym kroku wybieraj maksimum z nieposortowanej części.",
+      steps: ["Zamień minIndex na maxIndex.", "Odwróć porównanie: values[i] > values[maxIndex].", "Uruchom — program wypisuje wyniki od największego."],
+      starter: `public class Main {
+    static void selectionSort(int[] values) {
+        for (int start = 0; start < values.length - 1; start++) {
+            int minIndex = start;
+            // TODO: wybieraj maksimum zamiast minimum
+            for (int i = start + 1; i < values.length; i++) {
+                if (values[i] < values[minIndex]) {
+                    minIndex = i;
+                }
+            }
+            int temp = values[start];
+            values[start] = values[minIndex];
+            values[minIndex] = temp;
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] scores = {4, 2, 7, 3};
+        selectionSort(scores);
+        for (int i = 0; i < scores.length; i++) {
+            System.out.println(scores[i]);
+        }
+    }
+}
+`,
+      solution: `public class Main {
+    static void selectionSort(int[] values) {
+        for (int start = 0; start < values.length - 1; start++) {
+            int maxIndex = start;
+            for (int i = start + 1; i < values.length; i++) {
+                if (values[i] > values[maxIndex]) {
+                    maxIndex = i;
+                }
+            }
+            int temp = values[start];
+            values[start] = values[maxIndex];
+            values[maxIndex] = temp;
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] scores = {4, 2, 7, 3};
+        selectionSort(scores);
+        for (int i = 0; i < scores.length; i++) {
+            System.out.println(scores[i]);
+        }
+    }
+}
+`,
+      checks: [
+        { kind: "contains", file: "Main.java", value: "int maxIndex = start", label: "Kandydat na maksimum" },
+        { kind: "contains", file: "Main.java", value: "values[i] > values[maxIndex]", label: "Szukanie maksimum" },
+      ],
+    }),
+    independentTask("algorithms-03", "independent-2", {
       title: "Indeks minimum",
       prompt: "Uzupełnij metodę minIndex tak, aby zwracała indeks najmniejszego elementu w zakresie od indeksu from.",
       steps: ["minIndex zaczyna się jako from.", "Pętla od from + 1 porównuje values[i] z values[minIndex].", "Zwróć minIndex."],
@@ -441,18 +525,30 @@ const additionalTasks = {
         { kind: "contains", file: "Main.java", value: "values[i] < values[minIndex]", label: "Nowe minimum" },
       ],
     }),
-    independentTask("algorithms-03", "independent-2", {
-      title: "Wybór w stronę malejącą",
-      prompt: "Uzupełnij metodę selectionDescending tak, aby sortowała tablicę malejąco wybierając maksima.",
-      steps: ["Te same dwie pętle co w wersji rosnącej.", "maxIndex zapamiętuje pozycję największej wartości.", "Zamień values[start] z values[maxIndex]."],
+  ],
+  "algorithms-04": [
+    independentTask("algorithms-04", "independent-1", {
+      mode: "modified",
+      title: "Wstawianie malejąco",
+      prompt: "Kod z zadania 1 sortuje rosnąco przez wstawianie. Zmień go tak, aby sortował malejąco — w prawo mają przesuwać się elementy mniejsze od klucza.",
+      steps: ["Odwróć warunek pętli while: values[j] < key.", "Wstawianie klucza zostaje bez zmian.", "Uruchom — program wypisuje wyniki od największego."],
       starter: `public class Main {
-    static void selectionDescending(int[] values) {
-        // TODO: wybieraj maksimum na start
+    static void insertionSort(int[] values) {
+        for (int i = 1; i < values.length; i++) {
+            int key = values[i];
+            int j = i - 1;
+            // TODO: przesuwaj elementy mniejsze od key
+            while (j >= 0 && values[j] > key) {
+                values[j + 1] = values[j];
+                j--;
+            }
+            values[j + 1] = key;
+        }
     }
 
     public static void main(String[] args) {
-        int[] scores = {4, 2, 7, 3};
-        selectionDescending(scores);
+        int[] scores = {5, 1, 8, 2};
+        insertionSort(scores);
         for (int i = 0; i < scores.length; i++) {
             System.out.println(scores[i]);
         }
@@ -460,23 +556,21 @@ const additionalTasks = {
 }
 `,
       solution: `public class Main {
-    static void selectionDescending(int[] values) {
-        for (int start = 0; start < values.length - 1; start++) {
-            int maxIndex = start;
-            for (int i = start + 1; i < values.length; i++) {
-                if (values[i] > values[maxIndex]) {
-                    maxIndex = i;
-                }
+    static void insertionSort(int[] values) {
+        for (int i = 1; i < values.length; i++) {
+            int key = values[i];
+            int j = i - 1;
+            while (j >= 0 && values[j] < key) {
+                values[j + 1] = values[j];
+                j--;
             }
-            int temp = values[start];
-            values[start] = values[maxIndex];
-            values[maxIndex] = temp;
+            values[j + 1] = key;
         }
     }
 
     public static void main(String[] args) {
-        int[] scores = {4, 2, 7, 3};
-        selectionDescending(scores);
+        int[] scores = {5, 1, 8, 2};
+        insertionSort(scores);
         for (int i = 0; i < scores.length; i++) {
             System.out.println(scores[i]);
         }
@@ -484,13 +578,11 @@ const additionalTasks = {
 }
 `,
       checks: [
-        { kind: "contains", file: "Main.java", value: "int maxIndex = start", label: "Kandydat na maksimum" },
-        { kind: "contains", file: "Main.java", value: "values[i] > values[maxIndex]", label: "Szukanie maksimum" },
+        { kind: "contains", file: "Main.java", value: "values[j] < key", label: "Przesuwanie mniejszych" },
+        { kind: "contains", file: "Main.java", value: "values[j + 1] = key", label: "Wstawienie klucza" },
       ],
     }),
-  ],
-  "algorithms-04": [
-    independentTask("algorithms-04", "independent-1", {
+    independentTask("algorithms-04", "independent-2", {
       title: "Wstawianie na innej tablicy",
       prompt: "Uzupełnij metodę insertionSort tak, aby posortowała nową tablicę {7, 3, 9, 1} wstawianiem.",
       steps: ["Pętla od i = 1 pobiera key = values[i].", "while przesuwa w prawo elementy większe od key.", "Wstaw key do values[j + 1]."],
@@ -535,54 +627,78 @@ const additionalTasks = {
         { kind: "contains", file: "Main.java", value: "values[j + 1] = key", label: "Wstawienie" },
       ],
     }),
-    independentTask("algorithms-04", "independent-2", {
-      title: "Wstawianie malejąco",
-      prompt: "Uzupełnij metodę insertionDescending tak, aby sortowała tablicę malejąco wstawianiem.",
-      steps: ["Klucz key = values[i] i wskaźnik j = i - 1.", "Przesuwaj w prawo elementy mniejsze od key (values[j] < key).", "Wstaw key do values[j + 1]."],
-      starter: `public class Main {
-    static void insertionDescending(int[] values) {
-        // TODO: wstawianie malejąco
+  ],
+  "algorithms-05": [
+    independentTask("algorithms-05", "independent-1", {
+      mode: "modified",
+      title: "Scalanie malejąco",
+      prompt: "Metoda merge z zadania 1 działa. Napisz obok niej mergeDesc, która scala dwie tablice posortowane malejąco w jedną malejącą — wystarczy odwrócić porównanie czołowych elementów.",
+      steps: ["Skopiuj trzy indeksy i, j, k z metody merge.", "Porównanie odwrotne: wybieraj większą wartość (a[i] >= b[j]).", "Po głównej pętli przepisz pozostałe elementy jak w merge."],
+      starter: `import java.util.Arrays;
+
+public class Main {
+    static int[] merge(int[] a, int[] b) {
+        int[] result = new int[a.length + b.length];
+        int i = 0, j = 0, k = 0;
+        while (i < a.length && j < b.length) {
+            if (a[i] <= b[j]) { result[k++] = a[i++]; }
+            else { result[k++] = b[j++]; }
+        }
+        while (i < a.length) { result[k++] = a[i++]; }
+        while (j < b.length) { result[k++] = b[j++]; }
+        return result;
+    }
+
+    static int[] mergeDesc(int[] a, int[] b) {
+        // TODO: scal malejąco jak merge, ale bierz większą wartość
+        return new int[0];
     }
 
     public static void main(String[] args) {
-        int[] scores = {5, 1, 8, 2};
-        insertionDescending(scores);
-        for (int i = 0; i < scores.length; i++) {
-            System.out.println(scores[i]);
-        }
+        int[] merged = mergeDesc(new int[]{5, 3}, new int[]{4, 2, 1});
+        System.out.println(Arrays.toString(merged));
     }
 }
 `,
-      solution: `public class Main {
-    static void insertionDescending(int[] values) {
-        for (int i = 1; i < values.length; i++) {
-            int key = values[i];
-            int j = i - 1;
-            while (j >= 0 && values[j] < key) {
-                values[j + 1] = values[j];
-                j--;
-            }
-            values[j + 1] = key;
+      solution: `import java.util.Arrays;
+
+public class Main {
+    static int[] merge(int[] a, int[] b) {
+        int[] result = new int[a.length + b.length];
+        int i = 0, j = 0, k = 0;
+        while (i < a.length && j < b.length) {
+            if (a[i] <= b[j]) { result[k++] = a[i++]; }
+            else { result[k++] = b[j++]; }
         }
+        while (i < a.length) { result[k++] = a[i++]; }
+        while (j < b.length) { result[k++] = b[j++]; }
+        return result;
+    }
+
+    static int[] mergeDesc(int[] a, int[] b) {
+        int[] result = new int[a.length + b.length];
+        int i = 0, j = 0, k = 0;
+        while (i < a.length && j < b.length) {
+            if (a[i] >= b[j]) { result[k++] = a[i++]; }
+            else { result[k++] = b[j++]; }
+        }
+        while (i < a.length) { result[k++] = a[i++]; }
+        while (j < b.length) { result[k++] = b[j++]; }
+        return result;
     }
 
     public static void main(String[] args) {
-        int[] scores = {5, 1, 8, 2};
-        insertionDescending(scores);
-        for (int i = 0; i < scores.length; i++) {
-            System.out.println(scores[i]);
-        }
+        int[] merged = mergeDesc(new int[]{5, 3}, new int[]{4, 2, 1});
+        System.out.println(Arrays.toString(merged));
     }
 }
 `,
       checks: [
-        { kind: "contains", file: "Main.java", value: "values[j] < key", label: "Przesuwanie mniejszych" },
-        { kind: "contains", file: "Main.java", value: "values[j + 1] = key", label: "Wstawienie klucza" },
+        { kind: "contains", file: "Main.java", value: "a[i] >= b[j]", label: "Porównanie malejące" },
+        { kind: "contains", file: "Main.java", value: "while (j < b.length)", label: "Przepisanie pozostałych elementów" },
       ],
     }),
-  ],
-  "algorithms-05": [
-    independentTask("algorithms-05", "independent-1", {
+    independentTask("algorithms-05", "independent-2", {
       title: "Merge sort całej tablicy",
       prompt: "Uzupełnij metodę mergeSort tak, aby sortowała tablicę rekurencyjnie przez dzielenie na połowy i scalanie.",
       steps: ["Warunek stopu: v.length < 2 kończy wywołanie.", "Podziel v na left i right przez Arrays.copyOfRange i posortuj rekurencyjnie.", "Scal wyniki metodą merge i przepisz do v."],
@@ -655,55 +771,12 @@ public class Main {
         { kind: "contains", file: "Main.java", value: "merge(left, right)", label: "Scalanie wyników" },
       ],
     }),
-    independentTask("algorithms-05", "independent-2", {
-      title: "Scalanie malejąco",
-      prompt: "Uzupełnij metodę mergeDesc tak, aby scalała dwie tablice posortowane malejąco w jedną malejącą.",
-      steps: ["Takie same trzy indeksy i, j, k jak w metodzie merge.", "Porównanie odwrotne: wybieraj większą wartość (a[i] >= b[j]).", "Po głównej pętli przepisz pozostałe elementy drugiej tablicy."],
-      starter: `import java.util.Arrays;
-
-public class Main {
-    static int[] mergeDesc(int[] a, int[] b) {
-        // TODO: scal malejąco
-        return new int[0];
-    }
-
-    public static void main(String[] args) {
-        int[] merged = mergeDesc(new int[]{5, 3}, new int[]{4, 2, 1});
-        System.out.println(Arrays.toString(merged));
-    }
-}
-`,
-      solution: `import java.util.Arrays;
-
-public class Main {
-    static int[] mergeDesc(int[] a, int[] b) {
-        int[] result = new int[a.length + b.length];
-        int i = 0, j = 0, k = 0;
-        while (i < a.length && j < b.length) {
-            if (a[i] >= b[j]) { result[k++] = a[i++]; }
-            else { result[k++] = b[j++]; }
-        }
-        while (i < a.length) { result[k++] = a[i++]; }
-        while (j < b.length) { result[k++] = b[j++]; }
-        return result;
-    }
-
-    public static void main(String[] args) {
-        int[] merged = mergeDesc(new int[]{5, 3}, new int[]{4, 2, 1});
-        System.out.println(Arrays.toString(merged));
-    }
-}
-`,
-      checks: [
-        { kind: "contains", file: "Main.java", value: "a[i] >= b[j]", label: "Porównanie malejące" },
-        { kind: "contains", file: "Main.java", value: "while (j < b.length)", label: "Przepisanie pozostałych elementów" },
-      ],
-    }),
   ],
   "algorithms-06": [
     independentTask("algorithms-06", "independent-1", {
+      mode: "modified",
       title: "Quick sort całej tablicy",
-      prompt: "Uzupełnij metodę quickSort tak, aby sortowała rekurencyjnie przez partition. Metoda partition jest już napisana.",
+      prompt: "Metoda partition z zadania 1 działa. Uzupełnij quickSort tak, aby sortowała rekurencyjnie przez partition — podziel i wywołaj siebie na obu stronach pivota.",
       steps: ["Warunek: tylko gdy lo < hi cokolwiek robimy.", "int p = partition(v, lo, hi) ustawia pivot.", "Wywołaj quickSort na lo..p-1 i p+1..hi."],
       starter: `public class Main {
     static int partition(int[] v, int lo, int hi) {
@@ -831,30 +904,18 @@ public class Main {
   ],
   "algorithms-07": [
     independentTask("algorithms-07", "independent-1", {
-      title: "Zliczanie w małym zakresie",
-      prompt: "Uzupełnij metodę countingSort tak, aby sortowała wartości z zakresu 0..5 przez zliczanie.",
-      steps: ["Tablica count ma 6 elementów (dla wartości 0..5).", "Zlicz wystąpienia pętlą for-each.", "Wpisz każdą wartość v do tablicy tyle razy, ile wynosi count[v]."],
+      mode: "modified",
+      title: "Zliczanie malejąco",
+      prompt: "Kod z zadania 1 sortuje rosnąco przez zliczanie. Zmień go tak, aby sortował malejąco — pętla po licznikach ma iść od największej wartości do zera.",
+      steps: ["Zmień pętlę po licznikach: for (int v = count.length - 1; v >= 0; v--).", "Zapisywanie wartości wg licznika zostaje bez zmian.", "Uruchom — program wypisuje liczby od największej."],
       starter: `public class Main {
     static void countingSort(int[] values) {
-        // TODO: tablica liczników dla zakresu 0..5
-    }
-
-    public static void main(String[] args) {
-        int[] scores = {3, 0, 3, 2};
-        countingSort(scores);
-        for (int v : scores) {
-            System.out.println(v);
-        }
-    }
-}
-`,
-      solution: `public class Main {
-    static void countingSort(int[] values) {
-        int[] count = new int[6];
+        int[] count = new int[10];
         for (int v : values) {
             count[v]++;
         }
         int k = 0;
+        // TODO: iteruj po licznikach od końca (malejąco)
         for (int v = 0; v < count.length; v++) {
             while (count[v] > 0) {
                 values[k++] = v;
@@ -872,8 +933,32 @@ public class Main {
     }
 }
 `,
+      solution: `public class Main {
+    static void countingSort(int[] values) {
+        int[] count = new int[10];
+        for (int v : values) {
+            count[v]++;
+        }
+        int k = 0;
+        for (int v = count.length - 1; v >= 0; v--) {
+            while (count[v] > 0) {
+                values[k++] = v;
+                count[v]--;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] scores = {3, 0, 3, 2};
+        countingSort(scores);
+        for (int v : scores) {
+            System.out.println(v);
+        }
+    }
+}
+`,
       checks: [
-        { kind: "contains", file: "Main.java", value: "new int[6]", label: "Tablica liczników zakresu 0..5" },
+        { kind: "contains", file: "Main.java", value: "count.length - 1", label: "Iteracja od końca" },
         { kind: "contains", file: "Main.java", value: "while (count[v] > 0)", label: "Zapisywanie wartości" },
       ],
     }),
@@ -918,6 +1003,65 @@ public class Main {
   ],
   "algorithms-08": [
     independentTask("algorithms-08", "independent-1", {
+      mode: "modified",
+      title: "Odstępy malejąco",
+      prompt: "Kod z zadania 1 sortuje odstępami rosnąco. Zmień go tak, aby sortował malejąco — w prawo mają przesuwać się elementy mniejsze od klucza.",
+      steps: ["Odwróć warunek przesuwania: values[j - gap] < key.", "Odstępy gap i wstawianie klucza zostają bez zmian.", "Uruchom — program wypisuje liczby od największej."],
+      starter: `public class Main {
+    static void shellSort(int[] values) {
+        for (int gap = values.length / 2; gap > 0; gap /= 2) {
+            for (int i = gap; i < values.length; i++) {
+                int key = values[i];
+                int j = i;
+                // TODO: przesuwaj elementy mniejsze od key
+                while (j >= gap && values[j - gap] > key) {
+                    values[j] = values[j - gap];
+                    j -= gap;
+                }
+                values[j] = key;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] scores = {8, 3, 7, 1, 5};
+        shellSort(scores);
+        for (int v : scores) {
+            System.out.println(v);
+        }
+    }
+}
+`,
+      solution: `public class Main {
+    static void shellSort(int[] values) {
+        for (int gap = values.length / 2; gap > 0; gap /= 2) {
+            for (int i = gap; i < values.length; i++) {
+                int key = values[i];
+                int j = i;
+                while (j >= gap && values[j - gap] < key) {
+                    values[j] = values[j - gap];
+                    j -= gap;
+                }
+                values[j] = key;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] scores = {8, 3, 7, 1, 5};
+        shellSort(scores);
+        for (int v : scores) {
+            System.out.println(v);
+        }
+    }
+}
+`,
+      checks: [
+        { kind: "contains", file: "Main.java", value: "values[j - gap] < key", label: "Przesuwanie mniejszych" },
+        { kind: "contains", file: "Main.java", value: "j -= gap", label: "Skok o odstęp" },
+      ],
+    }),
+    independentTask("algorithms-08", "independent-2", {
       title: "Sortowanie przez kopcowanie",
       prompt: "Uzupełnij metodę heapSort tak, aby sortowała tablicę przez kopiec: najpierw budowa, potem zdejmowanie korzenia. siftDown jest napisane.",
       steps: ["Pierwsza pętla: dla i od v.length / 2 - 1 w dół do 0 wołaj siftDown.", "Druga pętla: end od ostatniego do 1 — zamień korzeń z końcem i siftDown na end.", "Metoda siftDown naprawia kopiec od indeksu i."],
@@ -984,65 +1128,28 @@ public class Main {
         { kind: "contains", file: "Main.java", value: "siftDown(v, end, 0)", label: "Naprawa po zdjęciu" },
       ],
     }),
-    independentTask("algorithms-08", "independent-2", {
-      title: "Sortowanie gnomowe (gnome sort)",
-      prompt: "Uzupełnij metodę gnomeSort tak, aby sortowała tablicę: gdy sąsiednie elementy stoją w złej kolejności, zamienia je i cofa się o krok; w przeciwnym razie idzie o krok do przodu.",
-      steps: ["Indeks i zaczyna się od 1.", "Gdy values[i-1] <= values[i] — i++ do przodu.", "Gdy większe — zamień i cofnij i (ale nie poniżej 1)."],
-      starter: `public class Main {
-    static void gnomeSort(int[] values) {
-        // TODO: krok do przodu albo zamiana i cofnięcie
-    }
-
-    public static void main(String[] args) {
-        int[] scores = {5, 2, 8, 1};
-        gnomeSort(scores);
-        for (int v : scores) {
-            System.out.println(v);
-        }
-    }
-}
-`,
-      solution: `public class Main {
-    static void gnomeSort(int[] values) {
-        int i = 1;
-        while (i < values.length) {
-            if (values[i - 1] <= values[i]) {
-                i++;
-            } else {
-                int temp = values[i];
-                values[i] = values[i - 1];
-                values[i - 1] = temp;
-                i--;
-                if (i == 0) {
-                    i = 1;
-                }
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        int[] scores = {5, 2, 8, 1};
-        gnomeSort(scores);
-        for (int v : scores) {
-            System.out.println(v);
-        }
-    }
-}
-`,
-      checks: [
-        { kind: "contains", file: "Main.java", value: "values[i - 1] <= values[i]", label: "Sprawdzenie sąsiada" },
-        { kind: "contains", file: "Main.java", value: "i--", label: "Cofnięcie po zamianie" },
-      ],
-    }),
   ],
   "algorithms-09": [
     independentTask("algorithms-09", "independent-1", {
+      mode: "modified",
       title: "Pierwsze wystąpienie",
-      prompt: "Uzupełnij metodę firstIndex tak, aby w posortowanej tablicy z powtórzeniami zwracała indeks pierwszego wystąpienia celu albo -1.",
-      steps: ["Ustaw low, high i mid tak jak w metodzie findIndex.", "Gdy znajdziesz szukaną wartość, zapamiętaj found = mid i szukaj dalej w lewej połowie: high = mid - 1.", "Zwróć found po pętli."],
+      prompt: "Kod z zadania 1 znajduje jakiekolwiek wystąpienie celu. Zmień go tak, aby zwracał indeks pierwszego wystąpienia — po trafieniu zapamiętaj found i szukaj dalej w lewej połowie.",
+      steps: ["Dodaj zmienną found = -1 i zwracaj ją po pętli.", "Przy trafieniu: found = mid i high = mid - 1 zamiast return.", "Uruchom — program wypisuje indeks pierwszej dwójki."],
       starter: `public class Main {
     static int firstIndex(int[] sorted, int target) {
-        // TODO: pierwsze wystąpienie binarnie
+        // TODO: po trafieniu zapamiętaj found i szukaj w lewo
+        int low = 0;
+        int high = sorted.length - 1;
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            if (sorted[mid] == target) {
+                return mid;
+            } else if (sorted[mid] < target) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
         return -1;
     }
 
@@ -1127,6 +1234,43 @@ public class Main {
   ],
   "algorithms-10": [
     independentTask("algorithms-10", "independent-1", {
+      mode: "modified",
+      title: "Rekurencyjna suma",
+      prompt: "Kod z zadania 1 liczy silnię rekurencyjnie. Zmień go tak, aby metoda sumTo zwracała sumę liczb od 1 do n: zamień nazwę i mnożenie na dodawanie.",
+      steps: ["Zmień nazwę metody na sumTo i wywołanie w main.", "Zamień n * factorial(n - 1) na n + sumTo(n - 1).", "Uruchom — program wypisuje sumTo(6)."],
+      starter: `public class Main {
+    static int factorial(int n) {
+        // TODO: zamień na rekurencyjną sumę (sumTo, +)
+        if (n <= 1) {
+            return 1;
+        }
+        return n * factorial(n - 1);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(factorial(6));
+    }
+}
+`,
+      solution: `public class Main {
+    static int sumTo(int n) {
+        if (n <= 1) {
+            return 1;
+        }
+        return n + sumTo(n - 1);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(sumTo(6));
+    }
+}
+`,
+      checks: [
+        { kind: "contains", file: "Main.java", value: "sumTo", label: "Metoda sumy" },
+        { kind: "contains", file: "Main.java", value: "n + sumTo(n - 1)", label: "Krok rekurencyjny sumy" },
+      ],
+    }),
+    independentTask("algorithms-10", "independent-2", {
       title: "Szybkie potęgowanie",
       prompt: "Uzupełnij metodę power tak, aby liczyła potęgę rekurencyjnie, poławiąc wykładnik.",
       steps: ["Warunek stopu: exp == 0 zwraca 1.", "half = power(base, exp / 2) liczy połowę wykładnika.", "Parzyste exp: half * half; nieparzyste: dodatkowo * base."],
@@ -1163,76 +1307,48 @@ public class Main {
         { kind: "contains", file: "Main.java", value: "half * half", label: "Kwadrat połowy" },
       ],
     }),
-    independentTask("algorithms-10", "independent-2", {
-      title: "Suma cyfr rekurencyjnie",
-      prompt: "Uzupełnij metodę digitSum tak, aby zwracała sumę cyfr liczby przez rekurencję.",
-      steps: ["Warunek stopu: liczba < 10 zwraca samą siebie.", "Ostatnia cyfra to number % 10.", "Reszta liczby to number / 10 — sumuj cyfrę z wywołaniem rekurencyjnym."],
-      starter: `public class Main {
-    static int digitSum(int number) {
-        // TODO: ostatnia cyfra + rekurencja
-        return 0;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(digitSum(1234));
-    }
-}
-`,
-      solution: `public class Main {
-    static int digitSum(int number) {
-        if (number < 10) {
-            return number;
-        }
-        return number % 10 + digitSum(number / 10);
-    }
-
-    public static void main(String[] args) {
-        System.out.println(digitSum(1234));
-    }
-}
-`,
-      checks: [
-        { kind: "contains", file: "Main.java", value: "number % 10", label: "Ostatnia cyfra" },
-        { kind: "contains", file: "Main.java", value: "digitSum(number / 10)", label: "Rekurencja na reszcie" },
-      ],
-    }),
   ],
   "algorithms-11": [
     independentTask("algorithms-11", "independent-1", {
-      title: "Fibonacci iteracyjnie",
-      prompt: "Uzupełnij metodę fibLoop tak, aby zwracała n-ty wyraz ciągu pętlą z dwiema zapamiętanymi wartościami.",
-      steps: ["a = 0 i b = 1 to dwa ostatnie wyrazy.", "W pętli od 2 do n: next = a + b, potem a = b i b = next.", "Zwróć n dla n <= 1, inaczej b."],
+      mode: "modified",
+      title: "Ile razy fib woła siebie?",
+      prompt: "Kod z zadania 1 liczy fib rekurencyjnie. Dodaj statyczny licznik calls zwiększany na początku fib i wypisz go po wyniku — zobaczysz, ile wywołań kosztuje jedno fib(7).",
+      steps: ["Dodaj pole static int calls = 0.", "Na początku fib zwiększ calls++.", "W main wypisz calls po wypisaniu wyniku."],
       starter: `public class Main {
-    static int fibLoop(int n) {
-        // TODO: dwa ostatnie wyrazy w pętli
-        return 0;
+    static int fib(int n) {
+        // TODO: licznik wywołań calls
+        if (n <= 1) {
+            return n;
+        }
+        return fib(n - 1) + fib(n - 2);
     }
 
     public static void main(String[] args) {
-        System.out.println(fibLoop(10));
+        System.out.println(fib(7));
+        // TODO: wypisz calls
     }
 }
 `,
       solution: `public class Main {
-    static int fibLoop(int n) {
-        int a = 0;
-        int b = 1;
-        for (int i = 2; i <= n; i++) {
-            int next = a + b;
-            a = b;
-            b = next;
+    static int calls = 0;
+
+    static int fib(int n) {
+        calls++;
+        if (n <= 1) {
+            return n;
         }
-        return n <= 1 ? n : b;
+        return fib(n - 1) + fib(n - 2);
     }
 
     public static void main(String[] args) {
-        System.out.println(fibLoop(10));
+        System.out.println(fib(7));
+        System.out.println(calls);
     }
 }
 `,
       checks: [
-        { kind: "contains", file: "Main.java", value: "int next = a + b", label: "Następny wyraz" },
-        { kind: "contains", file: "Main.java", value: "b = next", label: "Przesunięcie pary" },
+        { kind: "contains", file: "Main.java", value: "calls++", label: "Licznik wywołań" },
+        { kind: "contains", file: "Main.java", value: "static int calls", label: "Pole licznika" },
       ],
     }),
     independentTask("algorithms-11", "independent-2", {
@@ -1277,8 +1393,9 @@ public class Main {
   ],
   "algorithms-12": [
     independentTask("algorithms-12", "independent-1", {
+      mode: "modified",
       title: "Najmniejsza wspólna wielokrotność",
-      prompt: "Uzupełnij metodę lcm tak, aby zwracała NWW przez wzór a * b / gcd(a, b). gcd jest napisane.",
+      prompt: "Metoda gcd z zadania 1 działa. Uzupełnij lcm tak, aby zwracała NWW przez wzór a * b / gcd(a, b).",
       steps: ["gcd jest dostępne w tej samej klasie.", "Zwróć a * b / gcd(a, b).", "Uruchom — main wypisuje lcm(6, 8)."],
       starter: `public class Main {
     static int gcd(int a, int b) {

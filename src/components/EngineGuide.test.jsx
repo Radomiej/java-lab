@@ -1,6 +1,7 @@
 import {afterEach,beforeEach,expect,it} from 'vitest';
 import {cleanup,fireEvent,render,screen} from '@testing-library/react';
 import EngineGuide from './EngineGuide.jsx';
+import GameDevTerms from './GameDevTerms.jsx';
 import {engineGuide} from '../data/engineGuide.js';
 import {gameEngineRuntimeFiles} from '../data/gameEngineRuntime.js';
 
@@ -34,4 +35,23 @@ it('closes through native Escape/cancel without losing the current exercise',()=
   fireEvent.click(screen.getByRole('button',{name:'Dokumentacja silnika'}));
   fireEvent(screen.getByRole('dialog'),new Event('cancel',{bubbles:true,cancelable:true}));
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+});
+
+it('previews an inline term and opens the corresponding documentation', () => {
+  render(<><EngineGuide /><GameDevTerms text="GameObject i EnemyAI" /></>);
+  const term = screen.getByRole('button', {name: 'Dokumentacja: GameObject'});
+  expect(term).toHaveAttribute('title', 'Pojemnik na obiekt gry, któremu nadajesz rolę przez dodanie komponentów.');
+  expect(term).toHaveAccessibleDescription(term.title);
+  expect(screen.getByText('EnemyAI').tagName).toBe('SPAN');
+  fireEvent.click(term);
+  expect(screen.getByRole('searchbox')).toHaveValue('GameObject');
+  expect(screen.getByText(/Transform określa pozycję X i Y w świecie gry/)).toBeVisible();
+  fireEvent.click(screen.getByRole('button', {name: 'Zamknij dokumentację'}));
+  expect(term).toHaveFocus();
+});
+it('highlights identifiers without splitting Polish words', () => {
+  const { container } = render(<GameDevTerms text="Każdy obiekt ma dx i dy. Pozycja Slime’a." />);
+  expect(container).toHaveTextContent('Każdy obiekt ma dx i dy. Pozycja Slime’a.');
+  expect(Array.from(container.querySelectorAll('.pilot-term'), term => term.textContent))
+    .toEqual(['dx', 'dy', 'Slime']);
 });

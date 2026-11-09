@@ -9,16 +9,34 @@ export default function EngineGuide() {
   const [section,setSection]=useState('concept');
   const [query,setQuery]=useState('');
   const dialogRef=useRef(null), triggerRef=useRef(null);
+  const returnFocus = useRef(null);
+  useEffect(() => {
+    const openEntry = ({ detail }) => {
+      returnFocus.current = detail.trigger;
+      setSection('components');
+      setQuery(detail.entry);
+      setOpen(true);
+    };
+    window.addEventListener('java-lab-open-engine-guide', openEntry);
+    return () => window.removeEventListener('java-lab-open-engine-guide', openEntry);
+  }, []);
   useEffect(()=>{
     if(!open)return;
     const dialog=dialogRef.current;
     const previousOverflow=document.body.style.overflow;
     document.body.style.overflow='hidden';
     dialog.showModal();
-    return ()=>{dialog.close();document.body.style.overflow=previousOverflow;triggerRef.current?.focus();};
+    return ()=>{
+      dialog.close();
+      document.body.style.overflow=previousOverflow;
+      const target = returnFocus.current;
+      (target?.isConnected ? target : triggerRef.current)?.focus();
+      returnFocus.current = null;
+    };
   },[open]);
   const search=query.trim().toLocaleLowerCase('pl');
-  const entries=engineGuide.filter(item=>`${item.name} ${item.group} ${item.description} ${item.fields}`.toLocaleLowerCase('pl').includes(search));
+  const exactEntry = engineGuide.find(item => item.name.toLocaleLowerCase('pl') === search);
+  const entries = exactEntry ? [exactEntry] : engineGuide.filter(item=>`${item.name} ${item.group} ${item.description} ${item.fields}`.toLocaleLowerCase('pl').includes(search));
   return <>
     <button ref={triggerRef} type="button" className="button button--ghost engine-guide-trigger" title="Dokumentacja silnika" aria-label="Dokumentacja silnika" aria-haspopup="dialog" onClick={()=>setOpen(true)}>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M12 5v15M12 5C9 3 5 3 2 4v15c3-1 7-1 10 1 3-2 7-2 10-1V4c-3-1-7-1-10 1Z"/></svg>
@@ -33,7 +51,7 @@ export default function EngineGuide() {
         <div className="engine-guide-content">
           {section==='concept'&&<>
             <h3>Obiekt + komponenty = zachowanie</h3>
-            <p><code>GameMain extends Game</code> tworzy scenę. Każdy <code>GameObject</code> ma pozycję i listę komponentów. Dodajesz tylko to, czego obiekt potrzebuje.</p>
+            <p><code>GameMain extends Game</code> tworzy scenę. <code>GameObject</code> to pojemnik na obiekt gry. Jego <code>Transform</code> określa pozycję X i Y w świecie gry, obrót i skalę. Komponenty nadają obiektowi rolę, na przykład gracza albo ściany.</p>
             <div className="engine-guide-composition"><strong>Gracz</strong><span>Sprite → wygląd</span><span>CharacterController2D → ruch</span><span>CircleCollider2D → kolizje</span><span>PlayerController → Twoje sterowanie</span></div>
             <pre><code><Code code={'GameObject player = createObject("Gracz").setPosition(180, 120);\nplayer.addComponent(new Sprite("player"));\nplayer.addComponent(new CharacterController2D());\nplayer.addComponent(new CircleCollider2D(12));\nplayer.addComponent(new PlayerController());'}/></code></pre>
             <h3>Co daje silnik, a co piszesz sam?</h3>

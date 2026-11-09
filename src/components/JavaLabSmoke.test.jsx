@@ -40,7 +40,8 @@ describe("Java Lab workspace", () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
     fireEvent.click(screen.getByRole('tab',{name:/Game Dev w Javie/i}));
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
+    // Lekcje Game Dev używają układu pilota — edytor jest widoczny bez etapów.
+    expect(screen.getByRole('textbox',{name:'Kod pliku GameMain.java'})).toBeInTheDocument();
     expect(screen.queryByRole('button',{name:'Usuń plik'})).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button',{name:'+ Dodaj plik'}));
     fireEvent.change(screen.getByRole('textbox',{name:'Nazwa nowej klasy'}),{target:{value:'Enemy'}});
@@ -57,7 +58,6 @@ describe("Java Lab workspace", () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
     fireEvent.click(screen.getByRole('tab',{name:/Game Dev w Javie/i}));
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
     expect(screen.getByRole('tab',{name:/GameMain.java/})).toBeInTheDocument();
     expect(screen.queryByRole('tab',{name:/^J Main\.java$/})).not.toBeInTheDocument();
     expect(screen.queryByRole('tab',{name:/Sprite.java/})).not.toBeInTheDocument();
@@ -87,8 +87,8 @@ describe("Java Lab workspace", () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
     fireEvent.click(screen.getByRole('tab',{name:/Game Dev w Javie/i}));
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
-    fireEvent.click(screen.getByRole('button',{name:'Pokaż podgląd'}));
+    // W pilocie podgląd gry jest w osi edytora — bez przycisku „Pokaż podgląd".
+    expect(screen.queryByRole('button',{name:'Pokaż podgląd'})).not.toBeInTheDocument();
     const canvas=document.querySelector('.game-canvas');
     fireEvent.click(screen.getByRole('button',{name:'Pełny ekran gry'}));
     expect(screen.getByRole('dialog',{name:'Podgląd gry'})).toContainElement(canvas);
@@ -114,6 +114,25 @@ describe("Java Lab workspace", () => {
 
     expect(screen.getByText(/Komunikat misji/i)).toBeInTheDocument();
     expect(screen.queryByText(/Podpowiedź:/i)).not.toBeInTheDocument();
+  });
+
+  it("shows the pilot layout on algorithm lesson 402 and the stage nav on 413", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
+    fireEvent.click(screen.getByRole('tab',{name:/Algorytmy/i}));
+
+    fireEvent.click(screen.getByRole('button',{name:/Sortowanie bąbelkowe/i}));
+    expect(screen.queryByRole('button',{name:'1. Nauka'})).not.toBeInTheDocument();
+    expect(screen.getByText(/Teoria pod ręką/)).toBeInTheDocument();
+    fireEvent.click(screen.getByText(/Przewidź i sprawdź/));
+    expect(screen.getByRole('button',{name:/Następny krok/})).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button',{name:/Następny krok/}));
+    expect(screen.getByText('Krok 2 / 11')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button',{name:/Liczby pierwsze/i}));
+    expect(screen.getByRole('button',{name:'1. Nauka'})).toBeInTheDocument();
+    expect(screen.getByRole('button',{name:'2. Quiz'})).toBeInTheDocument();
+    expect(screen.getByRole('button',{name:'3. Zadanie'})).toBeInTheDocument();
   });
 
   it("pokazuje ścieżkę 04 Game Dev i pozwala schować lewy panel", () => {

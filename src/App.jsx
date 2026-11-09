@@ -20,9 +20,17 @@ import {gameEditorFiles} from './services/gameWorkspace.js';
 import { formatJavaSource } from './components/javaEditorCommands.js';
 import { createTaskFocusTracker, setUmamiAnalyticsEnabled, trackUmamiEvent, trackUmamiPageview } from "./services/umamiAnalytics.js";
 import {useSessionTelemetry} from './hooks/useSessionTelemetry.js';
+import { taskLearningFor } from './data/taskLearning.js';
 
 const emptyReport = { passed: false, score: 0, total: 0, results: [], summary: "Uruchom sprawdzanie, aby zobaczyć wyniki." };
 const emptyRunner = { status: "idle", output: "", error: null, stage: "", diagnostics: [], classVersions: [] };
+
+function taskEntryFile(task) {
+  if (task && taskLearningFor(task.id)) {
+    return Object.keys(task.starterFiles).find(name => task.starterFiles[name].includes('TODO:')) ?? (task.engine ? 'GameMain.java' : 'Main.java');
+  }
+  return task?.engine ? 'GameMain.java' : 'Main.java';
+}
 
 function diagnosticsText(diagnostics = []) {
   return diagnostics.map((diagnostic) => {
@@ -54,7 +62,7 @@ export default function App() {
   const [previewOpen,setPreviewOpen]=useState(false);
   useEffect(()=>setPreviewOpen(false),[selectedLesson.id]);
   const [learningStage,setLearningStage]=useState('learn');
-  const [activeFile, setActiveFile] = useState("Main.java");
+  const [activeFile, setActiveFile] = useState(() => taskEntryFile(selectedLesson.tasks[0]));
   const [checkReport, setCheckReport] = useState(emptyReport);
   const [runner, setRunner] = useState(emptyRunner);
   const teavmRunner = useMemo(() => createTeaVMRunner(), []);
@@ -103,13 +111,14 @@ export default function App() {
   useEffect(() => {
     if (!selectedLesson.tasks.some((task) => task.id === activeTaskId)) {
       setActiveTaskId(selectedLesson.tasks[0]?.id);
-      setActiveFile(selectedLesson.track === 'game-dev' ? 'GameMain.java' : 'Main.java');
+      setActiveFile(taskEntryFile(selectedLesson.tasks[0]));
       setCheckReport(emptyReport);
       setRunner(emptyRunner);
     }
   }, [activeTaskId, selectedLesson]);
 
   const activeTask = selectedLesson.tasks.find((task) => task.id === activeTaskId) || selectedLesson.tasks[0];
+  const taskLearning = taskLearningFor(activeTask.id);
   useEffect(() => {
     setLabContext({track_id:selectedLesson.track, lesson_id:selectedLesson.id, lesson_number:selectedLesson.order, task_id:activeTask.id});
     trackLabEvent('task_open');
@@ -167,7 +176,7 @@ export default function App() {
     executionVersion.current++;
     teavmRunner.stopGame();
     setActiveTaskId(taskId);
-    setActiveFile(selectedLesson.track === 'game-dev' ? 'GameMain.java' : 'Main.java');
+    setActiveFile(taskEntryFile(selectedLesson.tasks.find(task => task.id === taskId)));
     setCheckReport(emptyReport);
     setRunner(emptyRunner);
   };
@@ -178,7 +187,7 @@ export default function App() {
     teavmRunner.stopGame();
     progress.selectLesson(target.lesson.id);
     setActiveTaskId(target.task.id);
-    setActiveFile(target.lesson.track==='game-dev'?'GameMain.java':'Main.java');
+    setActiveFile(taskEntryFile(target.task));
     setCheckReport(emptyReport);setRunner(emptyRunner);
   });
 
@@ -253,7 +262,7 @@ export default function App() {
     executionVersion.current++;
     teavmRunner.stopGame();
     progress.resetTask(activeTask.id);
-    setActiveFile(activeTask.engine ? 'GameMain.java' : 'Main.java');
+    setActiveFile(taskEntryFile(activeTask));
     setCheckReport(emptyReport);
     setRunner(emptyRunner);
   };
@@ -281,6 +290,8 @@ export default function App() {
       lesson={selectedLesson}
       onNextLesson={visibleLessons[visibleLessons.indexOf(selectedLesson)+1] ? ()=>changeLesson(visibleLessons[visibleLessons.indexOf(selectedLesson)+1].id) : undefined}
       onStageChange={handleStageChange}
+      taskLearning={taskLearning}
+      inlinePreview={taskLearning && activeTask.engine ? <GamePreview runner={runner} /> : undefined}
       previewOpen={previewOpen}
       onPreviewToggle={()=>setPreviewOpen(open=>!open)}
       activeTask={activeTask}
@@ -312,7 +323,7 @@ export default function App() {
     />
   );
 
-  const inspector = activeTask.engine && (isPlayground || learningStage==='task') && previewOpen ? <GamePreview runner={runner} /> : null;
+  const inspector = !taskLearning && activeTask.engine && (isPlayground || learningStage==='task') && previewOpen ? <GamePreview runner={runner} /> : null;
 
   return <><AppShell sidebar={sidebar} main={main} inspector={inspector} />{isPlayground&&gameDevEnabled&&<GameTutor key={playground.revision} project={playground.project} projectRevision={playground.revision} onApply={(proposal,snapshot)=>{if(snapshot.revision!==playground.revision)throw new Error('Projekt został zastąpiony. Poproś o nową propozycję.');const next=applyTutorProposal(playground.project,snapshot.project,proposal);stopForEdit();if(proposal.operation==='delete')playground.deleteFile(proposal.path);else playground.setFiles(next.files);setActiveFile(proposal.operation==='delete'?'GameMain.java':proposal.path);}}/>}</>;
 }

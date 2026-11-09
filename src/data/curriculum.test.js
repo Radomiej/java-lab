@@ -37,7 +37,8 @@ describe("Java Lab curriculum", () => {
   it("gives every lesson one guided task and two independent tasks", () => {
     for (const lesson of courseLessons) {
       expect(lesson.tasks).toHaveLength(3);
-      expect(lesson.tasks.map((task) => task.mode)).toEqual(lesson.track==='game-dev'?["guided", "modified", "independent"]:["guided", "independent", "independent"]);
+      const pilotModes = lesson.track === 'game-dev' || (lesson.track === 'algorithms' && lesson.order <= 412);
+      expect(lesson.tasks.map((task) => task.mode)).toEqual(pilotModes?["guided", "modified", "independent"]:["guided", "independent", "independent"]);
       expect(lesson.tasks.slice(1).every((task) => !task.hints || task.hints.length === 0)).toBe(true);
     }
   });

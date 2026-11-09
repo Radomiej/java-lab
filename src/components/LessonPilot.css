@@ -1,0 +1,207 @@
+.lesson-workspace.lesson-workspace--pilot {
+  container-type: inline-size;
+  max-width: 1240px;
+}
+
+.pilot-task-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.pilot-task-choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 9px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+  background: var(--paper);
+  color: var(--ink-900);
+  font: inherit;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pilot-task-choice > span:first-child {
+  display: grid;
+  flex: 0 0 25px;
+  height: 25px;
+  place-items: center;
+  border-radius: 6px;
+  background: #e4eef2;
+  color: #174a53;
+}
+
+.pilot-task-choice[aria-current] {
+  border-color: #006b70;
+  background: #006b70;
+  color: white;
+}
+
+.pilot-learning {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.pilot-disclosure, .pilot-task {
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+
+.pilot-disclosure > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.pilot-disclosure > summary::-webkit-details-marker { display: none; }
+
+.pilot-disclosure > summary::after {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-left: auto;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: translateY(-3px) rotate(45deg);
+}
+
+.pilot-disclosure[open] > summary::after { transform: rotate(225deg); }
+.pilot-disclosure > summary > span { color: var(--ink-700); }
+.pilot-disclosure small { border-radius: 12px; background: #eaf0f4; padding: 3px 8px; }
+.pilot-disclosure-body { border-top: 1px solid var(--line); padding: 14px 16px; }
+.pilot-disclosure-body h2, .pilot-disclosure-body h3 { margin: 0; }
+.pilot-disclosure-body p { margin: 7px 0 12px; }
+
+.pilot-theory-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-items: start;
+  gap: 16px;
+}
+
+.pilot-theory-grid > * { min-width: 0; }
+.pilot-theory-grid .page-diagram { margin: 0; }
+.pilot-theory-grid .page-diagram svg { max-height: 230px; }
+
+.pilot-return {
+  display: block;
+  margin: 8px 0 0 auto;
+  padding: 5px;
+  border: 0;
+  background: transparent;
+  color: #00646c;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.pilot-observation summary, .pilot-criteria summary { cursor: pointer; }
+.pilot-task { padding: clamp(14px, 2vw, 24px); }
+.pilot-task-heading, .pilot-next { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pilot-next { justify-content: flex-end; }
+
+.pilot-start-label {
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #006b70;
+  color: white;
+  font-size: .85rem;
+  font-weight: 700;
+}
+
+.pilot-task > h2 { margin: 8px 0; font-size: clamp(1.2rem, 3vw, 1.85rem); scroll-margin-top: 18px; }
+.pilot-prompt { margin: 0 0 12px; line-height: 1.5; }
+.pilot-term {
+  padding: .06em .28em;
+  border-radius: 4px;
+  background: #eef1f7;
+  color: #33466a;
+  font: 600 .92em var(--mono);
+  overflow-wrap: anywhere;
+}
+
+.pilot-term--docs {
+  border: 0;
+  background: #e5f3f2;
+  color: #00565e;
+  text-decoration: underline;
+  text-underline-offset: .15em;
+  cursor: pointer;
+}
+
+.pilot-term--docs:hover { background: #cce9e7; }
+.pilot-term--docs:focus-visible { outline: 2px solid #006b70; outline-offset: 2px; }
+.pilot-term--docs:focus-visible:not([data-summary-dismissed])::after {
+  content: attr(data-summary);
+  position: fixed;
+  z-index: 10;
+  inset-inline: 12px;
+  bottom: 16px;
+  width: fit-content;
+  max-width: calc(100vw - 24px);
+  margin-inline: auto;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #17324a;
+  color: white;
+  font: 500 .9rem/1.4 system-ui, sans-serif;
+  pointer-events: none;
+}
+
+.pilot-criteria { margin-bottom: 16px; color: var(--ink-700); }
+.pilot-criteria li + li { margin-top: 5px; }
+.pilot-cheatsheet { margin-bottom: 16px; }
+.pilot-cheatsheet-alternatives > summary { margin-top: 10px; cursor: pointer; }
+.pilot-platform-trial > svg { display: block; width: min(100%, 530px); margin-bottom: 12px; }
+.pilot-trial-play { display: inline-flex; align-items: center; gap: 8px; }
+.pilot-vector-board > svg { display: block; width: 100%; border-radius: 10px; background: #10263a; user-select: none; }
+.pilot-vector-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.pilot-vector-actor { cursor: grab; touch-action: none; outline: none; }
+.pilot-vector-actor[data-dragging] { cursor: grabbing; }
+.pilot-vector-actor:is(:focus-visible, [data-dragging]) > circle { stroke: #66e1cd; stroke-width: 4px; }
+.pilot-vector-actor text { pointer-events: none; }
+.pilot-vector-label { fill: #f8dd90; stroke: #10263a; stroke-width: 4px; paint-order: stroke; font: 700 15px var(--mono); pointer-events: none; }
+.pilot-vector-label--move { fill: #66e1cd; }
+.pilot-vector-values { width: 100%; margin: 10px 0; border-collapse: collapse; text-align: left; }
+.pilot-vector-values :is(th, td) { padding: 5px 9px; border-bottom: 1px solid var(--line); }
+.pilot-vector-values thead { background: #ffdb74; color: #302000; }
+.pilot-vector-values td { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.pilot-prediction-code { max-width: 530px; }
+.pilot-trial-moving { transition: transform .35s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .pilot-trial-moving { transition: none; }
+}
+
+.pilot-workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+}
+
+.pilot-workbench > * { min-width: 0; margin-top: 0; }
+
+@container (max-width: 720px) {
+  .pilot-workbench, .pilot-theory-grid { grid-template-columns: minmax(0, 1fr); }
+  .pilot-task-choice { align-items: flex-start; }
+}
+
+@container (max-width: 490px) {
+  .pilot-task-picker { grid-template-columns: minmax(0, 1fr); }
+  .pilot-task-choice { align-items: center; min-height: 42px; }
+  .pilot-disclosure > summary { gap: 7px; flex-wrap: wrap; }
+  .pilot-disclosure > summary > span { order: 1; width: 100%; }
+}
