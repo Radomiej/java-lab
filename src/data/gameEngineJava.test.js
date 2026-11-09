@@ -92,10 +92,10 @@ public class EngineTests {
   public static void main(String[] args) {
     Game g=new Game();
     GameObject a=circle(g,"a",100,100,10),b=circle(g,"b",120,100,10);
-    check(Physics2D.overlaps(a,b),"circle tangent");b.transform.x=121;check(!Physics2D.overlaps(a,b),"circle gap");
+    check(g.physics.overlaps(a,b),"circle tangent");b.transform.x=121;check(!g.physics.overlaps(a,b),"circle gap");
     GameObject box=g.createObject("box").setPosition(150,150);box.addComponent(new Sprite("stone",20,20));box.addComponent(new Collider2D(20,20));
-    a.setPosition(132,132);check(!Physics2D.overlaps(a,box),"rounded corner rejects AABB false positive");
-    a.setPosition(135,145);check(Physics2D.overlaps(a,box),"circle box edge");
+    a.setPosition(132,132);check(!g.physics.overlaps(a,box),"rounded corner rejects AABB false positive");
+    a.setPosition(135,145);check(g.physics.overlaps(a,box),"circle box edge");
     boolean rejected=false;try { new CircleCollider2D(0); } catch(IllegalArgumentException e){rejected=true;}check(rejected,"invalid radius");
     g.dispose();
     Game ai=new Game();GameObject target=ai.createObject("target").setPosition(200,100);
@@ -319,16 +319,59 @@ public class StuckTests {
   GameObject p=g.createObject("p").setPosition(141,100);p.addComponent(new CircleCollider2D(12));
   final CharacterController2D v=p.addComponent(new CharacterController2D());
   final int[] dir={-1};p.addComponent(new Component(){public void onUpdate(double delta){v.move(dir[0],0,60);}});
-  g.start();g.step(0.1);check(p.transform.x<141,"escape out of wall");
-  double escaped=p.transform.x;dir[0]=1;g.step(0.1);check(p.transform.x>escaped,"still free inside");
+  g.start();g.step(0.1);check(p.transform.x<=118.001,"embedded circle ejected to face");
+  double escaped=p.transform.x;g.step(0.1);check(p.transform.x<escaped,"moves away freely");
   g.dispose();
   Game g2=new Game();GameObject w2=g2.createObject("w").setPosition(140,100);w2.addComponent(new Collider2D(20,40));
   GameObject q=g2.createObject("q").setPosition(147,100);q.addComponent(new Collider2D(10,10));
   final CharacterController2D vq=q.addComponent(new CharacterController2D());
   q.addComponent(new Component(){public void onUpdate(double delta){vq.move(0,1,60);}});
   g2.start();g2.step(0.1);check(q.transform.y>100,"embedded box slides along wall");g2.dispose();
+  Game g3=new Game();GameObject e1=g3.createObject("e1").setPosition(0,0);e1.addComponent(new CircleCollider2D(12));
+  final CharacterController2D v1=e1.addComponent(new CharacterController2D());
+  GameObject e2=g3.createObject("e2").setPosition(18,0);e2.addComponent(new CircleCollider2D(12));
+  final CharacterController2D v2=e2.addComponent(new CharacterController2D());
+  e1.addComponent(new Component(){public void onUpdate(double d){v1.move(1,0,60);}});
+  e2.addComponent(new Component(){public void onUpdate(double d){v2.move(-1,0,60);}});
+  g3.start();for(int i=0;i<10;i++)g3.step(0.1);
+  double d=Math.hypot(e1.transform.x-e2.transform.x,e1.transform.y-e2.transform.y);
+  check(d>=23.99,"glued controllers separate, dist="+d);check(e2.transform.x>e1.transform.x,"split order");
+  g3.dispose();
   System.out.println("PASS stuck");
  }
 }`;
   expect(runJava({...gameEngineRuntimeFiles,'StuckTests.java':source},'StuckTests')).toContain('PASS stuck');
+},45000);
+
+it('exposes the unified collider API: asTrigger, bounds, Layers and guarded overlaps',()=>{
+  const source=`import engine.*;
+public class ColliderApiTests {
+ static void check(boolean ok,String label){if(!ok)throw new AssertionError(label);}
+ public static void main(String[] args){
+  Game g=new Game();
+  GameObject wall=g.createObject("wall").setPosition(100,100);Collider2D box=wall.addComponent(new Collider2D(40,20));
+  GameObject coin=g.createObject("coin").setPosition(200,100);CircleCollider2D circle=coin.addComponent(new CircleCollider2D(10).asTrigger());
+  GameObject ghost=g.createObject("ghost").setPosition(130,300);ghost.addComponent(new CharacterController2D());
+  GameObject mover=g.createObject("mover").setPosition(100,300);mover.addComponent(new Collider2D(20,20));
+  final CharacterController2D v=mover.addComponent(new CharacterController2D());
+  mover.addComponent(new Component(){public void onUpdate(double d){v.move(1,0,400);}});
+  g.start();
+  check(Layers.DEFAULT==1&&Layers.ENEMY==2&&Layers.PLAYER==4&&Layers.PROJECTILE==8&&Layers.PICKUP==16&&Layers.WALL==32&&Layers.ALL==0x7fffffff,"layers");
+  check(box.layer==Layers.DEFAULT&&box.mask==Layers.ALL,"layer defaults");
+  check(!box.isTrigger&&box.asTrigger()==box&&box.isTrigger,"asTrigger fluent");box.isTrigger=false;
+  check(circle.isTrigger,"covariant asTrigger");
+  check(circle.width==20&&circle.height==20,"circle size from radius");
+  Bounds wb=box.getBounds();check(wb.left==80&&wb.top==90&&wb.right==120&&wb.bottom==110,"rect bounds");
+  Bounds cb=circle.getBounds();check(cb.left==190&&cb.top==90&&cb.right==210&&cb.bottom==110,"circle bounds");
+  check(new Projectile2D(1,0,100,1,null).hitLayers==Layers.ALL,"hitLayers default");
+  check(!g.physics.overlaps(wall,coin),"apart");
+  coin.setPosition(100,100);check(g.physics.overlaps(wall,coin),"touching");
+  check(!g.physics.overlaps(wall,ghost),"controller-only never collides");
+  box.enabled=false;check(!g.physics.overlaps(wall,coin),"disabled collider never collides");box.enabled=true;
+  coin.setPosition(200,100);
+  g.step(0.1);check(mover.transform.x==140,"ghost does not block");
+  g.dispose();System.out.println("PASS collider api");
+ }
+}`;
+  expect(runJava({...gameEngineRuntimeFiles,'ColliderApiTests.java':source},'ColliderApiTests')).toContain('PASS collider api');
 },45000);

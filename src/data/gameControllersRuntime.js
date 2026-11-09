@@ -63,7 +63,7 @@ public class PlatformerCharacterController2D extends TopDownCharacterController2
             for(GameObject other:getGame().physics.queryRadius(gameObject.transform.x,gameObject.transform.y,radius,0x7fffffff)) {
                 Collider2D collider=other.getComponent(Collider2D.class);
                 if(other!=gameObject && other.active && !other.destroyed && collider!=null && collider.enabled
-                    && !collider.isTrigger && !(collider instanceof Trigger2D) && Physics2D.overlaps(gameObject,other)) return true;
+                    && !collider.isTrigger && getGame().physics.overlaps(gameObject,other)) return true;
             }
             return false;
         } finally { gameObject.transform.y=original; }

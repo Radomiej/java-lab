@@ -21,10 +21,14 @@ public final class Physics2D {
     }
     private static boolean circle(GameObject o){return collider(o) instanceof CircleCollider2D;}
     private static double clamp(double x,double min,double max){return Math.max(min,Math.min(max,x));}
-    public static boolean overlaps(GameObject a,GameObject b) {
-        return overlaps(a,b,1e-6);
+    /** An object without an enabled collider never collides. */
+    public boolean overlaps(GameObject a,GameObject b) {
+        Collider2D x=collider(a),y=collider(b);return x!=null&&x.enabled&&y!=null&&y.enabled&&touching(a,b);
     }
-    private static boolean overlaps(GameObject a,GameObject b,double margin) {
+    private static boolean touching(GameObject a,GameObject b) {
+        return touching(a,b,1e-6);
+    }
+    private static boolean touching(GameObject a,GameObject b,double margin) {
         double dx=a.transform.x-b.transform.x,dy=a.transform.y-b.transform.y;
         if(circle(a)&&circle(b)){double r=extent(a,true)+extent(b,true)+margin;return dx*dx+dy*dy<=r*r;}
         if(circle(a)||circle(b)) {
@@ -47,11 +51,7 @@ public final class Physics2D {
         }
         return Math.max(Math.abs(dx)-(extent(a,true)+extent(b,true)),Math.abs(dy)-(extent(a,false)+extent(b,false)));
     }
-    private static boolean body(GameObject o) {
-        Collider2D c=collider(o);CharacterController2D v=o.getComponent(CharacterController2D.class);
-        return c!=null?c.enabled&&c.created:v!=null&&v.enabled&&v.created;
-    }
-    private static boolean trigger(GameObject o){Collider2D c=collider(o);return c!=null&&(c.isTrigger||c instanceof Trigger2D);}
+    private static boolean trigger(GameObject o){Collider2D c=collider(o);return c!=null&&c.isTrigger;}
     private static boolean ignored(GameObject a,GameObject b){Projectile2D p=a.getComponent(Projectile2D.class),q=b.getComponent(Projectile2D.class);return p!=null&&p.owner==b||q!=null&&q.owner==a;}
     private static double circleHit(double sx,double sy,double dx,double dy,double cx,double cy,double r) {
         double x=sx-cx,y=sy-cy,c=x*x+y*y-r*r;if(c<=0)return 0;
@@ -90,6 +90,33 @@ public final class Physics2D {
         return extent(moving,x)+extent(other,x);
     }
     private static boolean masks(GameObject a,GameObject b){Collider2D x=collider(a),y=collider(b);return x!=null&&y!=null&&(x.mask&y.layer)!=0&&(y.mask&x.layer)!=0;}
+    private static boolean movable(GameObject o){CharacterController2D v=o.getComponent(CharacterController2D.class);return v!=null&&v.enabled&&v.created&&!v.destroyed;}
+    private static void constrain(Game game,GameObject o){CharacterController2D v=o.getComponent(CharacterController2D.class);if(v!=null&&v.constrainToBounds&&game.worldBounds!=null){double[] b=game.worldBounds;double w=Math.min(extent(o,true),b[2]/2),h=Math.min(extent(o,false),b[3]/2);o.transform.x=clamp(o.transform.x,b[0]+w,b[0]+b[2]-w);o.transform.y=clamp(o.transform.y,b[1]+h,b[1]+b[3]-h);}}
+    /** Minimal translation that separates a pair: {nx, ny, depth}; n points from b toward a. */
+    private static double[] mtv(GameObject a,GameObject b) {
+        double dx=a.transform.x-b.transform.x,dy=a.transform.y-b.transform.y;
+        if(circle(a)&&circle(b)){double d=Math.hypot(dx,dy),depth=extent(a,true)+extent(b,true)-d;return d>1e-6?new double[]{dx/d,dy/d,depth}:new double[]{1,0,depth};}
+        if(circle(a)||circle(b)) {
+            GameObject c=circle(a)?a:b,r=circle(a)?b:a;double flip=circle(a)?1:-1;
+            double w=extent(r,true),h=extent(r,false);
+            double px=clamp(c.transform.x,r.transform.x-w,r.transform.x+w),py=clamp(c.transform.y,r.transform.y-h,r.transform.y+h);
+            double vx=c.transform.x-px,vy=c.transform.y-py,d=Math.hypot(vx,vy);
+            if(d>1e-6)return new double[]{flip*vx/d,flip*vy/d,extent(c,true)-d};
+            double ox=w+extent(c,true)-Math.abs(c.transform.x-r.transform.x),oy=h+extent(c,false)-Math.abs(c.transform.y-r.transform.y);
+            return ox<oy?new double[]{flip*(Math.signum(c.transform.x-r.transform.x)==0?1:Math.signum(c.transform.x-r.transform.x)),0,ox}:new double[]{0,flip*(Math.signum(c.transform.y-r.transform.y)==0?1:Math.signum(c.transform.y-r.transform.y)),oy};
+        }
+        double ox=extent(a,true)+extent(b,true)-Math.abs(dx),oy=extent(a,false)+extent(b,false)-Math.abs(dy);
+        return ox<oy?new double[]{Math.signum(dx)==0?1:Math.signum(dx),0,ox}:new double[]{0,Math.signum(dy)==0?1:Math.signum(dy),oy};
+    }
+    /** Pushes embedded solid bodies back to touching; controller bodies share the correction. */
+    private static void separate(Game game,SpatialHash2D grid,GameObject a,GameObject b) {
+        if(!touching(a,b,-1e-6))return;
+        boolean ma=movable(a),mb=movable(b);if(!ma&&!mb)return;
+        double[] n=mtv(a,b);if(n[2]<=0)return;double share=ma&&mb?0.5:1;
+        if(ma){a.transform.x+=n[0]*n[2]*share;a.transform.y+=n[1]*n[2]*share;constrain(game,a);grid.update(a);}
+        if(mb){b.transform.x-=n[0]*n[2]*share;b.transform.y-=n[1]*n[2]*share;constrain(game,b);grid.update(b);}
+        game.physics.queryRevision=game.spatialRevision;
+    }
     private static boolean ready(GameObject o){Collider2D c=collider(o);return live(o)&&c!=null&&c.created&&c.enabled;}
     private static SpatialHash2D build(java.util.ArrayList<GameObject> objects){SpatialHash2D grid=new SpatialHash2D();for(GameObject o:objects)if(ready(o))grid.update(o);return grid;}
     private static java.util.ArrayList<GameObject> around(SpatialHash2D grid,GameObject o,double dx,double dy){return grid.query(o.transform.x+Math.min(0,dx)-extent(o,true),o.transform.y+Math.min(0,dy)-extent(o,false),o.transform.x+Math.max(0,dx)+extent(o,true),o.transform.y+Math.max(0,dy)+extent(o,false));}
@@ -120,18 +147,18 @@ public final class Physics2D {
                 double movement=axis==0?dx:dy;if(movement==0)continue;double mx=axis==0?movement:0,my=axis==1?movement:0,travel=1;
                 java.util.ArrayList<GameObject> targets=new java.util.ArrayList<>();java.util.HashMap<GameObject,Double> times=new java.util.HashMap<>();
                 for(GameObject other:around(grid,o,mx,my)){game.physics.candidates++;game.physics.stats.candidates++;if(other==o||!ready(other)||!masks(o,other)||ignored(o,other))continue;Projectile2D q=other.getComponent(Projectile2D.class);if(q!=null&&q.enabled)continue;
-                    game.physics.narrowPhaseTests++;game.physics.stats.narrowPhaseTests++;double origin=axis==0?o.transform.x:o.transform.y,before=separation(o,other);if(axis==0)o.transform.x+=Math.signum(movement)*4e-6;else o.transform.y+=Math.signum(movement)*4e-6;boolean entering=overlaps(o,other,-1e-6)&&separation(o,other)<before-1e-9;if(axis==0)o.transform.x=origin;else o.transform.y=origin;
+                    game.physics.narrowPhaseTests++;game.physics.stats.narrowPhaseTests++;double origin=axis==0?o.transform.x:o.transform.y,before=separation(o,other);if(axis==0)o.transform.x+=Math.signum(movement)*4e-6;else o.transform.y+=Math.signum(movement)*4e-6;boolean entering=touching(o,other,-1e-6)&&separation(o,other)<before-1e-9;if(axis==0)o.transform.x=origin;else o.transform.y=origin;
                     double t=hit(o,other,mx,my);if(t>1||t==0&&!entering)continue;targets.add(other);times.put(other,t);if(!trigger(o)&&!trigger(other))travel=Math.min(travel,t);
                 }
                 if(axis==0)o.transform.x+=movement*travel;else o.transform.y+=movement*travel;
                 targets.sort((a,b)->{int n=Double.compare(times.get(a),times.get(b));return n==0?Integer.compare(a.id,b.id):n;});
                 for(GameObject target:targets)if(times.get(target)<=travel+1e-6)dispatch(game,sent,o,target,trigger(o)||trigger(target));
             }
-            if(live(o)&&v.constrainToBounds&&game.worldBounds!=null){double[] b=game.worldBounds;double w=Math.min(extent(o,true),b[2]/2),h=Math.min(extent(o,false),b[3]/2);o.transform.x=clamp(o.transform.x,b[0]+w,b[0]+b[2]-w);o.transform.y=clamp(o.transform.y,b[1]+h,b[1]+b[3]-h);}
+            if(live(o))constrain(game,o);
             if(ready(o))grid.update(o);else grid.remove(o);game.physics.queryRevision=game.spatialRevision;if(live(o)&&v.enabled)v.onAfterMove(delta);if(game.isDisposed())return;
         }
         for(GameObject a:objects)if(ready(a)&&a.getComponent(Projectile2D.class)==null)for(GameObject b:around(grid,a,0,0)){
-            if(!ready(a)||b.id<=a.id||!ready(b)||!masks(a,b)||ignored(a,b)||b.getComponent(Projectile2D.class)!=null)continue;game.physics.candidates++;game.physics.stats.candidates++;game.physics.narrowPhaseTests++;game.physics.stats.narrowPhaseTests++;if(overlaps(a,b))dispatch(game,sent,a,b,trigger(a)||trigger(b));if(game.isDisposed())return;
+            if(!ready(a)||b.id<=a.id||!ready(b)||!masks(a,b)||ignored(a,b)||b.getComponent(Projectile2D.class)!=null)continue;game.physics.candidates++;game.physics.stats.candidates++;game.physics.narrowPhaseTests++;game.physics.stats.narrowPhaseTests++;if(!trigger(a)&&!trigger(b))separate(game,grid,a,b);if(touching(a,b))dispatch(game,sent,a,b,trigger(a)||trigger(b));if(game.isDisposed())return;
         }
         game.physics.previousContacts=new java.util.HashSet<>(sent);
     }

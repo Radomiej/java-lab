@@ -36,15 +36,23 @@ public class Collider2D extends Component {
     void fireContactEnter(GameObject other){for(ContactListener listener:new java.util.ArrayList<>(contactListeners)){if(removed||gameObject.destroyed||other.destroyed)break;if(other.hasComponent(listener.type))listener.callback.accept(other);}}
     public boolean isTrigger;
     public double width,height;
-    public int layer=1,mask=0x7fffffff;
+    public int layer=Layers.DEFAULT,mask=Layers.ALL;
     public Collider2D() { this(32,32); }
     public Collider2D(double width,double height) { if(!Double.isFinite(width)||!Double.isFinite(height)||width<=0||height<=0)throw new IllegalArgumentException("Niepoprawny collider");this.width=width;this.height=height; }
+    public Collider2D asTrigger(){isTrigger=true;return this;}
+    public Bounds getBounds(){double w=width/2,h=height/2;return new Bounds(transform.x-w,transform.y-h,transform.x+w,transform.y+h);}
 }
 `,
-  "Trigger2D.java": `package engine;
-public class Trigger2D extends Collider2D {
-    public Trigger2D() { this(32,32); }
-    public Trigger2D(double width,double height) { super(width,height);isTrigger=true; }
+  "Bounds.java": `package engine;
+public final class Bounds {
+    public final double left,top,right,bottom;
+    public Bounds(double left,double top,double right,double bottom){this.left=left;this.top=top;this.right=right;this.bottom=bottom;}
+}
+`,
+  "Layers.java": `package engine;
+public final class Layers {
+    private Layers() {}
+    public static final int DEFAULT=1,ENEMY=2,PLAYER=4,PROJECTILE=8,PICKUP=16,WALL=32,ALL=0x7fffffff;
 }
 `,
   "CharacterController2D.java": `package engine;
@@ -241,7 +249,7 @@ public class Game {
                 if(object.active && !object.destroyed && (collider!=null && collider.enabled && collider.created || collider==null && controller!=null && controller.enabled && controller.created))
                     GameCanvas.drawCollider(collider instanceof CircleCollider2D ? "circle" : "rect",
                         object.transform.x-cameraX,object.transform.y-cameraY,Physics2D.extent(object,true)*2,Physics2D.extent(object,false)*2,
-                        collider!=null && (collider.isTrigger || collider instanceof Trigger2D));
+                        collider!=null && collider.isTrigger);
             }
             if(!disposed)onDrawUI();
             if (!disposed) for (GameObject object : getObjects()) for (Component component : object.getComponents())
@@ -474,8 +482,8 @@ public class GameObject {
 
 export const gameCoreApiDescription = [
   { name: "Sprite", methods: "texture, width, height, flipX, flipY, enabled", description: "Tekstura z atlasu; pozycja obiektu oznacza środek sprite’a. flipX odbija lewo/prawo, flipY góra/dół, bez zmiany collidera." },
-  { name: "Collider2D", methods: "width, height, layer, mask, isTrigger, onContactEnter, enabled", description: "Jawna prostokątna bryła, niezależna od grafiki. onContactEnter(Player.class, callback) reaguje raz na wejście w kontakt." },
-  { name: "Trigger2D", methods: "onTrigger, enabled", description: "Kontakt bez blokowania ruchu; regułę kontaktu piszesz we własnym komponencie." },
+  { name: "Collider2D", methods: "width, height, layer, mask, isTrigger, asTrigger, getBounds, onContactEnter, enabled", description: "Jawna prostokątna bryła, niezależna od grafiki. asTrigger() czyni ją wykrywającą bez blokowania; onContactEnter(Player.class, callback) reaguje raz na wejście w kontakt." },
+  { name: "Layers", methods: "DEFAULT, ENEMY, PLAYER, PROJECTILE, PICKUP, WALL, ALL", description: "Nazwane warstwy kolizji dla layer, mask, hitLayers i zapytań physics." },
   { name: "CharacterController2D", methods: "move, velocity, constrainToBounds, onAfterMove, enabled", description: "move normalizuje kierunek; prędkość w px/s. Granice świata ustawia game.setWorldBounds." },
   { name: "Transform", methods: "x, y, rotation, scale, visualOffset", description: "Pozycja środka świata, obrót w radianach i skala obrazu. Skala grafiki nie zmienia collidera." },
   { name: "Game", methods: "createObject, find, getObjects, getObjectsWith, getObjectsWithTag, pause, resume, isPaused, setWorldBounds, time, input, physics, canvas", description: "Scena i cykl życia onCreate/onUpdate/onDrawUI/onDestroy. getObjectsWith(Player.class, Collider2D.class) zwraca kopię wyników indeksu." },

@@ -1,12 +1,14 @@
 export const gameExtrasRuntimeFiles = {
   'CircleCollider2D.java': `package engine;
-/** Koło o promieniu w pikselach świata, niezależnym od skali sprite'a. */
+/** Koło o promieniu w pikselach świata, niezależnym od skali sprite'a. radius jest miarodajny; width i height to jego średnica. */
 public class CircleCollider2D extends Collider2D {
     public double radius;
     public CircleCollider2D(double radius) {
         if (!Double.isFinite(radius) || radius <= 0) throw new IllegalArgumentException("Promien musi byc dodatni i skonczony");
         this.radius = radius;
+        this.width = this.height = 2 * radius;
     }
+    @Override public CircleCollider2D asTrigger(){isTrigger=true;return this;}
 }
 `,
   'TileMap.java': `package engine;
@@ -102,7 +104,7 @@ public class ObstacleAvoidance2D extends Component {
         double radius=lookAhead+Math.max(Physics2D.extent(gameObject,true),Physics2D.extent(gameObject,false))+8;
         for(GameObject other:getGame().physics.queryRadius(gameObject.transform.x,gameObject.transform.y,radius,0x7fffffff)) {
             Collider2D collider=other.getComponent(Collider2D.class);
-            if(other==gameObject || !other.active || other.destroyed || collider==null || !collider.enabled || collider.isTrigger || collider instanceof Trigger2D) continue;
+            if(other==gameObject || !other.active || other.destroyed || collider==null || !collider.enabled || collider.isTrigger) continue;
             double ox=other.transform.x-gameObject.transform.x,oy=other.transform.y-gameObject.transform.y;
             double ahead=ox*dx+oy*dy,side=ox*(-dy)+oy*dx;
             double clearance=Math.abs(dy)*(Physics2D.extent(other,true)+Physics2D.extent(gameObject,true))
@@ -120,7 +122,7 @@ public class ObstacleAvoidance2D extends Component {
   'Projectile2D.java': `package engine;
 /** Lot i czas życia; skutki trafienia piszesz w onTrigger swojej klasy. */
 public class Projectile2D extends Component {
-    public int maxHits=1,hits,hitLayers=0x7fffffff;
+    public int maxHits=1,hits,hitLayers=Layers.ALL;
     final java.util.HashSet<Integer> hitObjects=new java.util.HashSet<>();
     public final Vector2 direction;
     public double speed, remainingLifetime;
@@ -133,7 +135,7 @@ public class Projectile2D extends Component {
     @Override public void onCreate() {
         if(!hasComponent(CharacterController2D.class)) gameObject.addComponent(new CharacterController2D());
         requireComponent(CharacterController2D.class).constrainToBounds=false;
-        if(!hasComponent(Collider2D.class)) { CircleCollider2D collider=gameObject.addComponent(new CircleCollider2D(4));collider.isTrigger=true; }
+        if(!hasComponent(Collider2D.class)) gameObject.addComponent(new CircleCollider2D(4).asTrigger());
     }
     @Override public void onUpdate(double delta) {
         if(!Double.isFinite(speed)||speed<0||!Double.isFinite(remainingLifetime)||remainingLifetime<0) throw new IllegalArgumentException("Niepoprawny pocisk");

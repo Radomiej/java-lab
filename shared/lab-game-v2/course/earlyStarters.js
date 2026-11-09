@@ -15,16 +15,11 @@ export function earlyStarter(language, chapter, mode, solution) {
     else if(mode==='modified') {files[entry]=files[entry].replace(/new (?:GameLab\.)?CircleCollider2D\(12\)/,java?'new Collider2D(32,32)':'new GameLab.Collider2D(32,32)');replace(entry,/player\.transform\.scale\.set\(2,2\);/,'Zamień collider gracza na koło r=12 i podwój skalę grafiki.');}
     else {replace(entry,/(?:this\.)?setWorldBounds\(0,0,640,360\);/,'Ustaw granice świata.');replace(entry,/(?:leftWall|rightWall)\.addComponent\(new (?:GameLab\.)?Collider2D\(20,360\)\);/g,'Dodaj collider ściany 20×360.');}
   } else if(chapter==='enemy-ai' && mode==='guided') {
-    const file=`EnemyAI.${ext}`;
-    const controller=java
-      ? 'CharacterController2D controller = requireComponent(CharacterController2D.class);'
-      : 'const controller = this.requireComponent(GameLab.CharacterController2D);';
-    files[file]=files[file].replace(/ (?:this\.)?requireComponent\([^;]+\.move\([^;]+;/,
-      `\n${controller}\n// TODO: Wywołaj move(dx, dy, speed) na zmiennej controller.\n`);
+    replace(`EnemyAI.${ext}`,/ (?:this\.)?requireComponent\([^;]+\.move\([^;]+;/,'Uruchom pościg: move(dx, dy, speed).');
   } else if(chapter==='projectiles') {
     if(mode==='guided')replace(`ProjectileHit.${ext}`,/hp\.damage\((?:this\.)?damage\);/,'Odejmij celowi damage punktów zdrowia.');
     else if(mode==='modified') {files[entry]=files[entry].replace('ProjectileMotion(1,0,200,0.5)','ProjectileMotion(1,0,200,2)');files[entry]='// TODO: Zmień lifetime pocisku na 0.5 sekundy.\n'+files[entry];}
-    else {replace(entry,/(?:Projectile2D|const) motion = projectile\.addComponent\(new (?:GameLab\.)?Projectile2D\([^\n]+\);/,'Dodaj pociskowi Projectile2D z polecenia.');replace(entry,/motion\.hitLayers=2;/,'Ustaw hitLayers na 2.');}
+    else {replace(entry,/(?:Projectile2D|const) motion = projectile\.addComponent\(new (?:GameLab\.)?Projectile2D\([^\n]+\);/,'Dodaj pociskowi Projectile2D z polecenia.');replace(entry,/motion\.hitLayers=(?:GameLab\.)?Layers\.ENEMY;/,'Ustaw hitLayers na Layers.ENEMY.');}
   } else return null; // The existing method exercise keeps a working scene for advanced tasks.
   return {files,ready:solution.ready};
 }

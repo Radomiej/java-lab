@@ -8,10 +8,10 @@ public class EngineTests {
   public static void main(String[] args) {
     Game g=new Game();
     GameObject a=circle(g,"a",100,100,10),b=circle(g,"b",120,100,10);
-    check(Physics2D.overlaps(a,b),"circle tangent");b.transform.x=121;check(!Physics2D.overlaps(a,b),"circle gap");
+    check(g.physics.overlaps(a,b),"circle tangent");b.transform.x=121;check(!g.physics.overlaps(a,b),"circle gap");
     GameObject box=g.createObject("box").setPosition(150,150);box.addComponent(new Sprite("stone",20,20));box.addComponent(new Collider2D());
-    a.setPosition(132,132);check(!Physics2D.overlaps(a,box),"rounded corner rejects AABB false positive");
-    a.setPosition(135,145);check(Physics2D.overlaps(a,box),"circle box edge");
+    a.setPosition(132,132);check(!g.physics.overlaps(a,box),"rounded corner rejects AABB false positive");
+    a.setPosition(135,145);check(g.physics.overlaps(a,box),"circle box edge");
     boolean rejected=false;try { new CircleCollider2D(0); } catch(IllegalArgumentException e){rejected=true;}check(rejected,"invalid radius");
     g.dispose();
     Game ai=new Game();GameObject target=ai.createObject("target").setPosition(200,100);

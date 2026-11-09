@@ -188,7 +188,7 @@ export const javaGameDevVariants = [
       const coinX = 60 + int(140, 220);
       return {
         title: 'Zbieranie monety',
-        contract: `Obiekt „Coin” z Trigger2D i komponentem Pickup: kontakt z graczem dodaje 1 złoto do komponentu Wallet gracza i niszczy monetę. Klasy: Wallet (public int gold) na „Player”, Pickup z onTrigger(GameObject other) na „Coin”. Scena: „Player” (60, 100) z Collider2D(24,24), CharacterController2D, PlayerController i Wallet; „Coin” (${coinX}, 100) z Trigger2D(20,20) i Pickup.`,
+        contract: `Obiekt „Coin” z triggerem (Collider2D po asTrigger()) i komponentem Pickup: kontakt z graczem dodaje 1 złoto do komponentu Wallet gracza i niszczy monetę. Klasy: Wallet (public int gold) na „Player”, Pickup z onTrigger(GameObject other) na „Coin”. Scena: „Player” (60, 100) z Collider2D(24,24), CharacterController2D, PlayerController i Wallet; „Coin” (${coinX}, 100) z Collider2D(20,20).asTrigger() i Pickup.`,
         components: {
           PlayerController: { focus: false, impl: playerController(120), skeleton: '' },
           Wallet: {
@@ -230,7 +230,7 @@ export const javaGameDevVariants = [
           `GameObject coin = createObject("Coin");`,
           `coin.setPosition(${coinX}, 100);`,
           'coin.addComponent(ShapeRenderer.circle(8, "#ffd166"));',
-          'coin.addComponent(new Trigger2D(20, 20));',
+          'coin.addComponent(new Collider2D(20, 20).asTrigger());',
           'coin.addComponent(new Pickup());',
         ],
         todo: [{ match: 'coin.addComponent(new Pickup());', hint: 'dodaj monecie komponent Pickup' }],
@@ -298,7 +298,7 @@ export const javaGameDevVariants = [
       const damage = int(1, 3), max = int(5, 8);
       return {
         title: 'Kolce zadają obrażenia',
-        contract: `Obiekt „Spike” z Trigger2D i komponentem Spike: wejście w kontakt z graczem zadaje ${damage} obrażeń jego komponentowi Health — raz na wejście (użyj onContactEnter na colliderze). Klasa Spike ma publiczne pole double damage = ${damage} i rejestruje listener w onCreate. Scena: „Player” (100, 100) z Collider2D(24,24), ShapeRenderer i Health(${max}); „Spike” (110, 100) z Trigger2D(24,24) i Spike.`,
+        contract: `Obiekt „Spike” z triggerem (Collider2D po asTrigger()) i komponentem Spike: wejście w kontakt z graczem zadaje ${damage} obrażeń jego komponentowi Health — raz na wejście (użyj onContactEnter na colliderze). Klasa Spike ma publiczne pole double damage = ${damage} i rejestruje listener w onCreate. Scena: „Player” (100, 100) z Collider2D(24,24), ShapeRenderer i Health(${max}); „Spike” (110, 100) z Collider2D(24,24).asTrigger() i Spike.`,
         components: {
           Health: { focus: false, impl: healthImpl, skeleton: '' },
           Spike: {
@@ -331,7 +331,7 @@ export const javaGameDevVariants = [
           'GameObject spike = createObject("Spike");',
           'spike.setPosition(110, 100);',
           'spike.addComponent(new ShapeRenderer(20, 20, "#f87171"));',
-          'spike.addComponent(new Trigger2D(24, 24));',
+          'spike.addComponent(new Collider2D(24, 24).asTrigger());',
           'spike.addComponent(new Spike());',
         ],
         todo: [{ match: 'spike.addComponent(new Spike());', hint: 'dodaj kolcom komponent Spike' }],
@@ -878,7 +878,7 @@ export const javaGameDevVariants = [
     build() {
       return {
         title: 'Przyspieszenie z pickupu',
-        contract: 'Obiekt „Boost” z Trigger2D i komponentem Boost: kontakt z graczem podwaja pole speed jego PlayerController i niszczy pickup. Scena: „Player” (100, 100) z Collider2D, CharacterController2D i PlayerController (speed=120); „Boost” (170, 100) z Trigger2D(20,20) i Boost.',
+        contract: 'Obiekt „Boost” z triggerem (Collider2D po asTrigger()) i komponentem Boost: kontakt z graczem podwaja pole speed jego PlayerController i niszczy pickup. Scena: „Player” (100, 100) z Collider2D, CharacterController2D i PlayerController (speed=120); „Boost” (170, 100) z Collider2D(20,20).asTrigger() i Boost.',
         components: {
           PlayerController: { focus: false, impl: playerController(120), skeleton: '' },
           Boost: {
@@ -911,7 +911,7 @@ export const javaGameDevVariants = [
           'GameObject boost = createObject("Boost");',
           'boost.setPosition(170, 100);',
           'boost.addComponent(ShapeRenderer.circle(8, "#a78bfa"));',
-          'boost.addComponent(new Trigger2D(20, 20));',
+          'boost.addComponent(new Collider2D(20, 20).asTrigger());',
           'boost.addComponent(new Boost());',
         ],
         todo: [{ match: 'boost.addComponent(new Boost());', hint: 'dodaj pickupowi komponent Boost' }],
