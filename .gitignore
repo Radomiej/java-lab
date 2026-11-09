@@ -8,3 +8,4 @@ tools/teavm-javac-java17/
 
 .env.local
 .vercel
+artifacts/

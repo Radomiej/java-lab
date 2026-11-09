@@ -8,10 +8,16 @@ import PageDiagram from '../../shared/lab-game-v2/editor/PageDiagram.jsx';
 import { gameConceptScenes } from '../data/gameConceptScenes.js';
 import { gameIntroPages } from '../../shared/lab-game-v2/editor/gameIntroPages.js';
 import GameIntroDiagram from '../../shared/lab-game-v2/editor/GameIntroDiagram.jsx';
+import { algoIcons, RowIcon, PairIcon, SwapIcon, KeepIcon } from './algoIcons.jsx';
+
+const dynamicIcons = { row: RowIcon, pair: PairIcon, swap: SwapIcon, keep: KeepIcon };
 import './JavaLessonExplanation.css';
 import ConsoleOutput from './ConsoleOutput.jsx';
 
 function Hero({ kind }) {
+  const Dynamic = kind && kind.icon ? dynamicIcons[kind.icon] : null;
+  if (Dynamic) return <Dynamic {...kind} />;
+  if (algoIcons[kind]) return algoIcons[kind];
   if (kind === 'bag') return <svg className="concept-hero" viewBox="0 0 128 128" aria-hidden="true"><path d="M48 32V23h32v9" fill="none" stroke="#684733" strokeWidth="8"/><rect x="28" y="32" width="72" height="76" rx="16" fill="#ad7748" stroke="#684733" strokeWidth="5"/><path d="M28 52h72v16H28z" fill="#d4a364" stroke="#684733" strokeWidth="4"/><rect x="57" y="55" width="14" height="22" rx="3" fill="#f7d779"/><rect x="43" y="82" width="42" height="20" rx="6" fill="#825739"/></svg>;
   const asset = assetManifest.assets.find(item => item.key === kind);
   return <svg className="concept-hero" viewBox={`${asset.frame.x} ${asset.frame.y} ${asset.frame.w} ${asset.frame.h}`} aria-hidden="true">
