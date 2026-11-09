@@ -37,3 +37,29 @@ test('return expressions do not override the declared receiver type',()=>{
   const provider=createJavaCompletionProvider(monaco,()=>({'Hero.java':'class Hero { void dash() {} }'}));
   expect(provider.provideCompletionItems(model('class Main { Hero hero; Hero get(){ return hero.'),{lineNumber:1,column:48}).suggestions.map(s=>s.label)).toContain('dash');
 });
+
+test('suggests local variables and parameters visible at the cursor',()=>{
+  const provider=createJavaCompletionProvider(monaco);
+  const src='class Main { void play(int speed, String title) { int score = 4; double ratio = 0.5; sc';
+  const labels=provider.provideCompletionItems(model(src),{lineNumber:1,column:src.length+1}).suggestions.map(s=>s.label);
+  expect(labels).toContain('score');expect(labels).toContain('speed');
+});
+test('does not suggest locals declared later or inside a closed block',()=>{
+  const provider=createJavaCompletionProvider(monaco);
+  const src='class Main { void play() { { int hidden = 1; } hidd';
+  const labels=provider.provideCompletionItems(model(src),{lineNumber:1,column:src.length+1}).suggestions.map(s=>s.label);
+  expect(labels).not.toContain('hidden');
+});
+test('suggests for-loop variable inside its body but not after it closes',()=>{
+  const provider=createJavaCompletionProvider(monaco);
+  const inside='class Main { void play() { for (int i = 0; i < 9; i++) { i';
+  expect(provider.provideCompletionItems(model(inside),{lineNumber:1,column:inside.length+1}).suggestions.map(s=>s.label)).toContain('i');
+  const after='class Main { void play() { for (int i = 0; i < 9; i++) { x(); } i';
+  expect(provider.provideCompletionItems(model(after),{lineNumber:1,column:after.length+1}).suggestions.map(s=>s.label)).not.toContain('i');
+});
+test('resolves member access on locals and offers length on arrays',()=>{
+  const files={'Hero.java':'class Hero { void dash() {} }'};
+  const provider=createJavaCompletionProvider(monaco,()=>files);
+  expect(provider.provideCompletionItems(model('class Main { void play() { Hero h = new Hero(); h.'),{lineNumber:1,column:52}).suggestions.map(s=>s.label)).toContain('dash');
+  expect(provider.provideCompletionItems(model('class Main { void play() { int[] scores = {}; scores.'),{lineNumber:1,column:62}).suggestions.map(s=>s.label)).toContain('length');
+});
