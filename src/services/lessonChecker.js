@@ -5,6 +5,15 @@ function getFileText(files, file) {
     .join("\n");
 }
 
+// Znaki mnożenia spoza klawiatury traktuj jak zwykłe „x" — uczeń wpisze „x" albo „*".
+function normalizeTextValue(value) {
+  return String(value ?? "").replace(/[×✕✖∗·∙⋅*]/g, "x");
+}
+
+function containsNormalized(haystack, needle) {
+  return normalizeTextValue(haystack).includes(normalizeTextValue(needle));
+}
+
 function pass(label, detail) {
   return { passed: true, label, detail };
 }
@@ -19,22 +28,22 @@ function evaluateCheck(files, check, executionOutput = "") {
   const location = check.file ? ` w pliku ${check.file}` : "";
 
   if (check.kind === "outputContains") {
-    const passed = executionOutput.includes(check.value);
+    const passed = containsNormalized(executionOutput, check.value);
     return passed
       ? pass(label, `Wynik programu zawiera: ${check.value}`)
       : fail(label, `Wynik programu nie zawiera: ${check.value}`);
   }
 
   if (check.kind === "outputEquals") {
-    const passed = executionOutput.trim() === String(check.value).trim();
+    const passed = normalizeTextValue(executionOutput).trim() === normalizeTextValue(check.value).trim();
     return passed
       ? pass(label, "Wynik programu jest poprawny.")
       : fail(label, `Oczekiwano wyniku: ${check.value}`);
   }
 
   if (check.kind === "outputLines") {
-    const actual = executionOutput.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
-    const expected = check.values.map((line) => String(line).trim());
+    const actual = executionOutput.split(/\r?\n/).map((line) => normalizeTextValue(line).trim()).filter(Boolean);
+    const expected = check.values.map((line) => normalizeTextValue(line).trim());
     const passed = actual.length === expected.length && actual.every((line, index) => line === expected[index]);
     return passed
       ? pass(label, "Wszystkie linie wyniku są poprawne.")
@@ -46,14 +55,14 @@ function evaluateCheck(files, check, executionOutput = "") {
   }
 
   if (check.kind === "contains" || check.kind === "fileContains") {
-    const passed = source.includes(check.value);
+    const passed = containsNormalized(source, check.value);
     return passed
       ? pass(label, `Znaleziono wymagany fragment: ${check.value}`)
       : fail(label, `Brakuje fragmentu: ${check.value}`);
   }
 
   if (check.kind === "containsAll") {
-    const missing = check.values.filter((value) => !source.includes(value));
+    const missing = check.values.filter((value) => !containsNormalized(source, value));
     return missing.length === 0
       ? pass(label, "Wszystkie wymagane fragmenty są obecne.")
       : fail(label, `Brakuje: ${missing.join(", ")}`);

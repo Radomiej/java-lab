@@ -52,6 +52,29 @@ describe("lesson source checker", () => {
     expect(result.results[0].detail).toContain("linie");
   });
 
+  it("accepts typable multiplication signs where „×” is expected", () => {
+    const lines = checkSource(
+      { "Main.java": "class Main {}" },
+      [{ kind: "outputLines", values: ["2 × 3 = 6"], label: "Wynik" }],
+      "2 x 3 = 6\n",
+    );
+    expect(lines.passed).toBe(true);
+
+    const star = checkSource(
+      { "Main.java": "class Main {}" },
+      [{ kind: "outputContains", value: "2 × 3 = 6" }],
+      "2 * 3 = 6\n",
+    );
+    expect(star.passed).toBe(true);
+
+    const wrong = checkSource(
+      { "Main.java": "class Main {}" },
+      [{ kind: "outputContains", value: "2 × 3 = 6" }],
+      "2 + 3 = 6\n",
+    );
+    expect(wrong.passed).toBe(false);
+  });
+
   it("rejects an incomplete if when TeaVM reports a compilation error", () => {
     const sourceReport = checkSource(
       { "Main.java": "public class Main { public static void main(String[] args) { if (); } }" },
