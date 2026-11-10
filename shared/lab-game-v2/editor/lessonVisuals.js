@@ -59,27 +59,46 @@ export const gameExplanationPages = {
   'enemy-ai': [
     {
       ...picture('Wektor od przeciwnika do celu', 'Kierunek wyznaczamy jako pozycja celu minus pozycja przeciwnika. Dla przeciwnika (100,150) i celu (160,150) otrzymujemy (60,0), czyli w prawo.', 'motion', 3),
-      code: { java: `Vector2 slimePosition = new Vector2(100, 150);
+      code: {
+        java: `Vector2 slimePosition = new Vector2(100, 150);
 Vector2 targetPosition = new Vector2(160, 150);
 Vector2 direction = new Vector2();
 direction.x = targetPosition.x - slimePosition.x;
 direction.y = targetPosition.y - slimePosition.y;
-// direction ma teraz wartości (60, 0).` },
+// direction ma teraz wartości (60, 0).`,
+        js: `const slimePosition = new GameLab.Vector2(100, 150);
+const targetPosition = new GameLab.Vector2(160, 150);
+const direction = new GameLab.Vector2(
+    targetPosition.x - slimePosition.x,
+    targetPosition.y - slimePosition.y);
+// direction ma teraz wartości (60, 0).`,
+      },
     },
     {
-      ...picture('Stała prędkość pościgu', 'Jeśli postać w jednym kroku przesunie się o 1 piksel w prawo, pokona 1 piksel. Jeśli jednocześnie przesunie się o 1 piksel w prawo i o 1 piksel w dół, pokona po przekątnej √2 ≈ 1,41 piksela. W tym samym czasie poruszy się więc o około 41% szybciej. Normalizacja dzieli obie składowe przez długość wektora. W silniku metoda normalized() zwraca nowy wektor o długości 1, a dla wektora zerowego zwraca (0, 0). Pomnóż znormalizowany kierunek przez prędkość pościgu, żeby uzyskać prędkość ruchu.', 'motion', 1),
-      code: { java: `Vector2 direction = new Vector2();
+      ...picture('Stała prędkość pościgu', 'Jeśli postać w jednym kroku przesunie się o 1 piksel w prawo, pokona 1 piksel. Jeśli jednocześnie przesunie się o 1 piksel w prawo i o 1 piksel w dół, pokona po przekątnej √2 ≈ 1,41 piksela. W tym samym czasie poruszy się więc o około 41% szybciej. Normalizacja dzieli obie składowe przez długość wektora. W silniku metoda normalized() zwraca nowy wektor o długości 1, a dla wektora zerowego zwraca (0, 0). Pomnóż znormalizowany kierunek przez prędkość, żeby uzyskać prędkość ruchu.', 'motion', 1),
+      code: {
+        java: `Vector2 direction = new Vector2();
 direction.x = 1;
 direction.y = 1;
 
 Vector2 unitDirection = direction.normalized();
 // unitDirection ≈ (0,707; 0,707)
-// direction nadal ma wartości (1, 1).` },
+// direction nadal ma wartości (1, 1).`,
+        js: `const direction = new GameLab.Vector2(1, 1);
+
+const unitDirection = direction.normalized();
+// unitDirection ≈ (0.707, 0.707)
+// direction nadal ma wartości (1, 1).`,
+      },
     },
     {
       ...picture('Decyzja i wykonanie ruchu', 'Gracz porusza się po naciśnięciu klawisza D. Slime ma w gotowej scenie dwa komponenty związane z pościgiem. EnemyAI oblicza kierunek do gracza. CharacterController2D wykonuje ruch i uwzględnia przeszkody. Metoda move sama normalizuje kierunek i używa prędkości podanej w pikselach na sekundę.', 'chase-motion'),
-      codeContext: { java: 'W GameMain.onCreate() kontroler i EnemyAI są już dodane do tego samego obiektu Slime. Dlatego requireComponent(CharacterController2D.class) w EnemyAI pobiera kontroler Slime’a. W zadaniu 1 masz już zmienną controller. W miejscu TODO wywołaj na niej metodę move, przekazując dx, dy i speed.' },
-      code: { java: `if (target == null || target.destroyed) return;
+      codeContext: {
+        java: 'W GameMain.onCreate() kontroler i EnemyAI są już dodane do tego samego obiektu Slime. Dlatego requireComponent(CharacterController2D.class) w EnemyAI pobiera kontroler Slime’a. W zadaniu 1 masz już zmienną controller. W miejscu TODO wywołaj na niej metodę move, przekazując dx, dy i speed.',
+        js: 'W MyGame.onCreate() kontroler i EnemyAI są już dodane do tego samego obiektu Slime. Dlatego this.requireComponent(GameLab.CharacterController2D) w EnemyAI pobiera kontroler Slime’a. W zadaniu 1 masz już zmienną controller. W miejscu TODO wywołaj na niej metodę move, przekazując dx, dy i this.speed.',
+      },
+      code: {
+        java: `if (target == null || target.destroyed) return;
 
 double dx = target.transform.x - transform.x;
 double dy = target.transform.y - transform.y;
@@ -92,19 +111,47 @@ controller.move(dx, dy, speed);
 // CharacterController2D controller = getComponent(CharacterController2D.class);
 // if (controller != null) {
 //     controller.move(dx, dy, speed);
-// }` },
+// }`,
+        js: `if (!this.target || this.target.destroyed) return;
+
+const dx = this.target.transform.x - this.transform.x;
+const dy = this.target.transform.y - this.transform.y;
+const controller =
+    this.requireComponent(GameLab.CharacterController2D);
+controller.move(dx, dy, this.speed);
+
+// requireComponent zgłasza błąd, gdy komponentu brakuje.
+// Dla opcjonalnego komponentu użyj getComponent, które może zwrócić null:
+// const controller = this.getComponent(GameLab.CharacterController2D);
+// if (controller) {
+//     controller.move(dx, dy, this.speed);
+// }`,
+      },
     },
     {
       ...picture('Kiedy Slime zaczyna uciekać?', 'Oblicz dx i dy, odejmując pozycję Slime’a od pozycji gracza w każdej osi. Odległość to długość tego wektora, czyli √(dx² + dy²). Na rysunku różnice wynoszą 72 px i 96 px, więc odległość to dokładnie 120 px. Slime ucieka tylko wtedy, gdy odległość jest mniejsza niż 120 px. Żeby pobiec od gracza, odwróć oba znaki kierunku.', 'flee-range'),
-      codeContext: { java: 'Fragment FleeAI.onUpdate(delta). Pole target wskazuje gracza.' },
-      code: { java: `if (target == null || target.destroyed) return;
+      codeContext: {
+        java: 'Fragment FleeAI.onUpdate(delta). Pole target wskazuje gracza.',
+        js: 'Fragment FleeAI.onUpdate(). Pole this.target wskazuje gracza.',
+      },
+      code: {
+        java: `if (target == null || target.destroyed) return;
 
 double dx = target.transform.x - transform.x;
 double dy = target.transform.y - transform.y;
 double distance = Math.hypot(dx, dy);
 if (distance >= 120) return;
 
-requireComponent(CharacterController2D.class).move(-dx, -dy, speed);` },
+requireComponent(CharacterController2D.class).move(-dx, -dy, speed);`,
+        js: `if (!this.target || this.target.destroyed) return;
+
+const dx = this.target.transform.x - this.transform.x;
+const dy = this.target.transform.y - this.transform.y;
+const distance = Math.hypot(dx, dy);
+if (distance >= 120) return;
+
+this.requireComponent(GameLab.CharacterController2D).move(-dx, -dy, this.speed);`,
+      },
     },
   ],
   projectiles: [
