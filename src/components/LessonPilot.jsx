@@ -4,6 +4,9 @@ import PageDiagram from '../../shared/lab-game-v2/editor/PageDiagram.jsx';
 import CopyLessonLink from './CopyLessonLink.jsx';
 import GameDevTerms from './GameDevTerms.jsx';
 import ChaseVectorBoard from './ChaseVectorBoard.jsx';
+import CoordinateBoard from './CoordinateBoard.jsx';
+import ComponentToggleBoard from './ComponentToggleBoard.jsx';
+import KeyPressBoard from './KeyPressBoard.jsx';
 import StepTrial from './StepTrial.jsx';
 import { RowIcon } from './algoIcons.jsx';
 import './LessonPilot.css';
@@ -35,6 +38,9 @@ function TheoryVisual({ learning }) {
   if (learning.board?.kind === 'chase') {
     return <ChaseVectorBoard mode={learning.board.mode} />;
   }
+  if (learning.board?.kind === 'coordinates') return <CoordinateBoard {...learning.board} />;
+  if (learning.board?.kind === 'components') return <ComponentToggleBoard {...learning.board} />;
+  if (learning.board?.kind === 'keypress') return <KeyPressBoard {...learning.board} />;
   if (learning.visual?.kind === 'array') {
     return <figure className="page-diagram pilot-array-visual">
       <figcaption>{learning.title}</figcaption>

@@ -13,10 +13,10 @@ for (const [term, entry, summary] of [
 ]) documented.set(term, { entry, summary });
 
 const projectTerms = new Set([
-  'EnemyAI', 'FleeAI', 'PlayerController', 'ActionCounter', 'ActionShooter',
+  'EnemyAI', 'FleeAI', 'PlayerController', 'BulletShooter', 'SpaceShooter',
   'ProjectileHit', 'Health', 'GameMain', 'Player', 'Slime', 'Bat', 'Enemy',
   'Coin', 'PlatformA', 'PlatformB', 'Fireball', 'dx', 'dy', 'speed',
-  'controller', 'owner', 'lifetime', 'Math.hypot',
+  'controller', 'owner', 'lifetime', 'Math.hypot', 'shoot', 'shots',
 ]);
 const terms = [...new Set([...documented.keys(), ...projectTerms])]
   .sort((first, second) => second.length - first.length)
