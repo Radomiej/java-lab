@@ -3,6 +3,7 @@ import CodeExample from '../../shared/lab-game-v2/editor/CodeExample.jsx';
 import PageDiagram from '../../shared/lab-game-v2/editor/PageDiagram.jsx';
 import CopyLessonLink from './CopyLessonLink.jsx';
 import GameDevTerms from './GameDevTerms.jsx';
+import CanvasDrawBoard from './CanvasDrawBoard.jsx';
 import ChaseVectorBoard from './ChaseVectorBoard.jsx';
 import CoordinateBoard from './CoordinateBoard.jsx';
 import ComponentToggleBoard from './ComponentToggleBoard.jsx';
@@ -41,6 +42,7 @@ function TheoryVisual({ learning }) {
   if (learning.board?.kind === 'coordinates') return <CoordinateBoard {...learning.board} />;
   if (learning.board?.kind === 'components') return <ComponentToggleBoard {...learning.board} />;
   if (learning.board?.kind === 'keypress') return <KeyPressBoard {...learning.board} />;
+  if (learning.board?.kind === 'canvas') return <CanvasDrawBoard {...learning.board} />;
   if (learning.visual?.kind === 'array') {
     return <figure className="page-diagram pilot-array-visual">
       <figcaption>{learning.title}</figcaption>

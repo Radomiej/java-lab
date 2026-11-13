@@ -175,14 +175,14 @@ export const gameDevTaskLearning = {
     'Pocisk zniknie po pół sekundy. Ponieważ nie trafił, zdrowie celu pozostanie bez zmian.',
   ),
   'g2d.projectiles.independent': note(
-    'Jak pocisk wybiera obiekty do trafienia?',
-    'hitLayers to maska warstw. W tym zadaniu wartość 2 pozwala trafić wroga i pominąć sojusznika. Pole owner pozwala silnikowi pominąć strzelającego.',
-    'projectile', 2, 'motion.hitLayers = enemyLayer;',
-    'Co stanie się z sojusznikiem, jeśli pocisk leci przez niego w stronę wroga?',
-    'Sojusznik stoi przed wrogiem i jest w warstwie 1. Wróg jest w warstwie 2.',
-    'motion.hitLayers = 2;',
-    'Uruchom gotową scenę z sojusznikiem na linii strzału. Porównaj wynik trafienia dla obu obiektów w teście.',
-    'Sojusznik zachowa zdrowie. Pocisk przeleci do pierwszego wroga na linii strzału.',
+    'Czym Projectile2D różni się od ProjectileMotion?',
+    'ProjectileMotion z poprzednich zadań tylko przesuwa obiekt. Projectile2D to komponent silnika: sam dokłada collider i przy dużej prędkości wykrywa trafienia na całym odcinku ruchu (sweep), więc cel nie zostaje przeskoczony między klatkami. Argumenty to (kierunek x, kierunek y, prędkość px/s, czas życia w s, właściciel); hitLayers=Layers.ENEMY wybiera warstwy liczące się jako trafienie.',
+    'projectile', 2, 'Projectile2D motion = projectile.addComponent(\n    new Projectile2D(1, 0, 3000, 1, player));\nmotion.hitLayers = Layers.ENEMY;',
+    'Kogo trafi pocisk lecący przez sojusznika?',
+    'Ally stoi przed wrogiem na linii strzału; wrogowie mają collider.layer = Layers.ENEMY.',
+    'motion.hitLayers = Layers.ENEMY;',
+    'Uruchom scenę i sprawdź HP każdego obiektu — Ally, Enemy i EnemyB.',
+    'Ally zachowa HP — maska ENEMY go pomija; obrażenia dostaje pierwszy wróg na odcinku.',
   ),
   'g2d.components.guided': note(
     'Kiedy wykonuje się onUpdate?',
@@ -206,7 +206,7 @@ export const gameDevTaskLearning = {
   ),
   'g2d.components.independent': note(
     'Kiedy wykonuje się onDestroy?',
-    'Komponent Lifetime odejmuje delta od pola remaining. Gdy czas minie, usuwa właściciela. onDestroy uruchamia się dokładnie raz przy usuwaniu obiektu — to miejsce na sprzątanie, np. zwiększenie licznika cleanup.',
+    'Komponent Lifetime odejmuje delta od pola remaining. Gdy czas minie, usuwa właściciela — tylko gameObject.destroy() oznacza obiekt jako zniszczony; samo active=false zostawia go na scenie. onDestroy uruchamia się dokładnie raz przy usuwaniu obiektu — to miejsce na sprzątanie, np. zwiększenie licznika cleanup.',
     'instances', 0, 'remaining -= delta;\nif (remaining <= 1e-9) {\n    gameObject.destroy();\n}',
     'Co wykona się po upływie 0.3 s?',
     'Obiekt Spark ma komponent Lifetime z remaining = 0.3. Gra wykonuje kolejne aktualizacje.',
@@ -257,7 +257,7 @@ export const gameDevTaskLearning = {
   'g2d.graphics.modified': note(
     'Czy flipX odbija też ruch?',
     'flipX odbija wyłącznie grafikę Sprite w poziomie. Pozycja, collider i kierunek ruchu zostają nietknięte. Ustawiasz go dopiero, gdy gracz faktycznie porusza się w bok — po zatrzymaniu postać patrzy w ostatnią stronę.',
-    'flip', 0, 'double x = (getGame().input.isKeyDown("d") ? 1 : 0)\n    - (getGame().input.isKeyDown("a") ? 1 : 0);\nif (x != 0) {\n    requireComponent(Sprite.class).flipX = x < 0;\n}',
+    'flip', 0, 'double x = (getGame().input.isKeyDown("d") ? 1 : 0)\n    - (getGame().input.isKeyDown("a") ? 1 : 0);\nif (x != 0) {\n    requireComponent(Sprite.class).flipX = x > 0;\n}',
     'Jaką teksturę i rozmiar dostanie tło?',
     'FacingVisual czyta klawisze A i D. Bez naciśniętego klawisza x wynosi 0.',
     'ground.addComponent(new TileMap(Assets.SAND, 48));',
@@ -505,6 +505,7 @@ export const gameDevTaskLearning = {
     'canvas.drawRect(80, 90, 40, 30, "#76b9f2");',
     'Narysuj prostokąt i podpis, a potem porównaj ich krawędzie z przewidywanymi.',
     '40 px szerokości i 30 px wysokości, środek w (80, 90). Napisy centrują się na punkcie.',
+    { board: { kind: 'canvas', variant: 'button', api: 'canvas.' } },
   ),
   'g2d.canvas-ui.independent': note(
     'Jak szerokość paska pokazuje ułamek?',
@@ -515,6 +516,7 @@ export const gameDevTaskLearning = {
     'double width = 200 * 3.0 / 5.0;',
     'Zmień wartości current/max i przelicz oczekiwaną szerokość przed spojrzeniem na pasek.',
     '120 px — trzy piąte z dwustu. Lewy brzeg zostaje przy x = 20.',
+    { board: { kind: 'canvas', variant: 'bar', api: 'canvas.' } },
   ),
   'g2d.ui-flow.guided': note(
     'Kto chowa przyciski menu?',

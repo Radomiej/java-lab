@@ -16,93 +16,93 @@
   },
   {
     "lesson": 502,
-    "task": "g2d.input.guided",
-    "visibleCommands": 1
-  },
-  {
-    "lesson": 502,
-    "task": "g2d.input.modified",
-    "visibleCommands": 1
-  },
-  {
-    "lesson": 502,
-    "task": "g2d.input.independent",
-    "visibleCommands": 1
-  },
-  {
-    "lesson": 503,
-    "task": "g2d.collisions.guided",
-    "visibleCommands": 2
-  },
-  {
-    "lesson": 503,
-    "task": "g2d.collisions.modified",
-    "visibleCommands": 2
-  },
-  {
-    "lesson": 503,
-    "task": "g2d.collisions.independent",
-    "visibleCommands": 3
-  },
-  {
-    "lesson": 504,
-    "task": "g2d.enemy-ai.guided",
-    "visibleCommands": 2
-  },
-  {
-    "lesson": 504,
-    "task": "g2d.enemy-ai.modified",
-    "visibleCommands": 3
-  },
-  {
-    "lesson": 504,
-    "task": "g2d.enemy-ai.independent",
-    "visibleCommands": 6
-  },
-  {
-    "lesson": 505,
-    "task": "g2d.projectiles.guided",
-    "visibleCommands": 7
-  },
-  {
-    "lesson": 505,
-    "task": "g2d.projectiles.modified",
-    "visibleCommands": 7
-  },
-  {
-    "lesson": 505,
-    "task": "g2d.projectiles.independent",
-    "visibleCommands": 9
-  },
-  {
-    "lesson": 506,
     "task": "g2d.components.guided",
     "visibleCommands": 1
   },
   {
-    "lesson": 506,
+    "lesson": 502,
     "task": "g2d.components.modified",
     "visibleCommands": 2
   },
   {
-    "lesson": 506,
+    "lesson": 502,
     "task": "g2d.components.independent",
     "visibleCommands": 1
   },
   {
-    "lesson": 507,
+    "lesson": 503,
+    "task": "g2d.input.guided",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 503,
+    "task": "g2d.input.modified",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 503,
+    "task": "g2d.input.independent",
+    "visibleCommands": 1
+  },
+  {
+    "lesson": 504,
     "task": "g2d.time.guided",
     "visibleCommands": 1
   },
   {
-    "lesson": 507,
+    "lesson": 504,
     "task": "g2d.time.modified",
     "visibleCommands": 2
   },
   {
-    "lesson": 507,
+    "lesson": 504,
     "task": "g2d.time.independent",
     "visibleCommands": 1
+  },
+  {
+    "lesson": 505,
+    "task": "g2d.collisions.guided",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 505,
+    "task": "g2d.collisions.modified",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 505,
+    "task": "g2d.collisions.independent",
+    "visibleCommands": 3
+  },
+  {
+    "lesson": 506,
+    "task": "g2d.enemy-ai.guided",
+    "visibleCommands": 2
+  },
+  {
+    "lesson": 506,
+    "task": "g2d.enemy-ai.modified",
+    "visibleCommands": 3
+  },
+  {
+    "lesson": 506,
+    "task": "g2d.enemy-ai.independent",
+    "visibleCommands": 6
+  },
+  {
+    "lesson": 507,
+    "task": "g2d.projectiles.guided",
+    "visibleCommands": 7
+  },
+  {
+    "lesson": 507,
+    "task": "g2d.projectiles.modified",
+    "visibleCommands": 7
+  },
+  {
+    "lesson": 507,
+    "task": "g2d.projectiles.independent",
+    "visibleCommands": 9
   },
   {
     "lesson": 508,
