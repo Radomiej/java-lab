@@ -8,6 +8,8 @@ import ChaseVectorBoard from './ChaseVectorBoard.jsx';
 import CoordinateBoard from './CoordinateBoard.jsx';
 import ComponentToggleBoard from './ComponentToggleBoard.jsx';
 import KeyPressBoard from './KeyPressBoard.jsx';
+import LifecycleBoard from './LifecycleBoard.jsx';
+import SprintBoard from './SprintBoard.jsx';
 import StepTrial from './StepTrial.jsx';
 import { RowIcon } from './algoIcons.jsx';
 import './LessonPilot.css';
@@ -43,6 +45,8 @@ function TheoryVisual({ learning }) {
   if (learning.board?.kind === 'components') return <ComponentToggleBoard {...learning.board} />;
   if (learning.board?.kind === 'keypress') return <KeyPressBoard {...learning.board} />;
   if (learning.board?.kind === 'canvas') return <CanvasDrawBoard {...learning.board} />;
+  if (learning.board?.kind === 'lifecycle') return <LifecycleBoard {...learning.board} />;
+  if (learning.board?.kind === 'sprint') return <SprintBoard {...learning.board} />;
   if (learning.visual?.kind === 'array') {
     return <figure className="page-diagram pilot-array-visual">
       <figcaption>{learning.title}</figcaption>

@@ -12,10 +12,10 @@ export const playgroundProject={version:1,engineApiVersion:'2.0.0',mainClass:'Ga
 `,
   'PlayerController.java':`public class PlayerController extends Component {
     @Override public void onUpdate(double delta) {
-        double x = (getGame().input.isKeyDown("D") || getGame().input.isKeyDown("ArrowRight") ? 1 : 0)
-                 - (getGame().input.isKeyDown("A") || getGame().input.isKeyDown("ArrowLeft") ? 1 : 0);
-        double y = (getGame().input.isKeyDown("S") || getGame().input.isKeyDown("ArrowDown") ? 1 : 0)
-                 - (getGame().input.isKeyDown("W") || getGame().input.isKeyDown("ArrowUp") ? 1 : 0);
+        double x = (getGame().input.isKeyDown(Keys.D) || getGame().input.isKeyDown(Keys.RIGHT) ? 1 : 0)
+                 - (getGame().input.isKeyDown(Keys.A) || getGame().input.isKeyDown(Keys.LEFT) ? 1 : 0);
+        double y = (getGame().input.isKeyDown(Keys.S) || getGame().input.isKeyDown(Keys.DOWN) ? 1 : 0)
+                 - (getGame().input.isKeyDown(Keys.W) || getGame().input.isKeyDown(Keys.UP) ? 1 : 0);
         requireComponent(TopDownCharacterController2D.class).move(x, y);
     }
 }

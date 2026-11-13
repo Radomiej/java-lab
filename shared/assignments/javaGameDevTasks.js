@@ -12,7 +12,7 @@ const LEVEL_LINE = [
 const playerController = speed => `public class PlayerController extends Component {
     public double speed = ${speed};
     @Override public void onUpdate(double delta) {
-        double x = (getGame().input.isKeyDown("d") || getGame().input.isKeyDown("ArrowRight")) ? 1 : 0;
+        double x = (getGame().input.isKeyDown(Keys.D) || getGame().input.isKeyDown(Keys.RIGHT)) ? 1 : 0;
         requireComponent(CharacterController2D.class).move(x, 0, speed);
     }
 }
@@ -50,7 +50,7 @@ export const javaGameDevVariants = [
             skeleton: `public class PlayerController extends Component {
     public double speed = ${speed};
     @Override public void onUpdate(double delta) {
-        // TODO: odczytaj klawisz "d"/"ArrowRight" i wywołaj move(x, 0, speed)
+        // TODO: odczytaj klawisz Keys.D/Keys.RIGHT i wywołaj move(x, 0, speed)
     }
 }
 `,
@@ -361,7 +361,7 @@ export const javaGameDevVariants = [
     public double speed = ${speed}, cooldown = 0.4, timer;
     @Override public void onUpdate(double delta) {
         timer = Math.max(0, timer - delta);
-        if (timer == 0 && getGame().input.isKeyPressed("Space")) {
+        if (timer == 0 && getGame().input.isKeyPressed(Keys.SPACE)) {
             GameObject shot = getGame().createObject("Projectile");
             shot.setPosition(transform.x + 20, transform.y);
             shot.addComponent(new Projectile2D(1, 0, speed, ${lifetime}, gameObject));
@@ -373,7 +373,7 @@ export const javaGameDevVariants = [
             skeleton: `public class Weapon extends Component {
     public double speed = ${speed}, cooldown = 0.4, timer;
     @Override public void onUpdate(double delta) {
-        // TODO: odliczaj timer; na isKeyPressed("Space") utwórz "Projectile" z Projectile2D(1, 0, speed, ${lifetime}, gameObject) i ustaw timer
+        // TODO: odliczaj timer; na isKeyPressed(Keys.SPACE) utwórz "Projectile" z Projectile2D(1, 0, speed, ${lifetime}, gameObject) i ustaw timer
     }
 }
 `,
@@ -1051,9 +1051,9 @@ export const javaGameDevVariants = [
             impl: `public class RunController extends Component {
     public String state = "READY";
     @Override public void onUpdate(double delta) {
-        if ("READY".equals(state) && getGame().input.isKeyPressed("Enter")) {
+        if ("READY".equals(state) && getGame().input.isKeyPressed(Keys.ENTER)) {
             state = "RUNNING";
-        } else if ("RUNNING".equals(state) && getGame().input.isKeyPressed("Escape")) {
+        } else if ("RUNNING".equals(state) && getGame().input.isKeyPressed(Keys.ESCAPE)) {
             state = "PAUSED";
             getGame().pause();
         }

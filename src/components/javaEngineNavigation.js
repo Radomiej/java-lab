@@ -44,7 +44,7 @@ const docs = {
 };
 
 const classDocs={
-  KeyPressed:'Callback Runnable raz na początek naciśnięcia. new KeyPressed("W", () -> getGame().debug = true). W/w są równoważne. enabled=false wyłącza binding.',
+  KeyPressed:'Callback Runnable raz na początek naciśnięcia. new KeyPressed(Keys.W, () -> getGame().debug = true). W/w są równoważne. enabled=false wyłącza binding.',
   KeyDoublePressed:'Callback Runnable po dwóch naciśnięciach z puszczeniem klawisza pomiędzy. maxDelaySeconds=0.3 s czasu gry. Udana para resetuje licznik.',
   NoneOfKeysPressed:'Callback w każdej klatce, gdy żaden z klawiszy String[] nie jest trzymany. Użyj do setRunning(false) po puszczeniu WASD.',
   TopDownCharacterController2D:'Ruch X/Y bez grawitacji, automatyczny flipX. walk(x,y), run(x,y), stop(). walkSpeed=120, runSpeed=240 px/s. isWalk()/isRunning() sprawdzają aktualny ruch; klawisze obsługuje komponent ucznia.',
