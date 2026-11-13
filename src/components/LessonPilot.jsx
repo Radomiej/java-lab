@@ -9,6 +9,7 @@ import CoordinateBoard from './CoordinateBoard.jsx';
 import ComponentToggleBoard from './ComponentToggleBoard.jsx';
 import KeyPressBoard from './KeyPressBoard.jsx';
 import LifecycleBoard from './LifecycleBoard.jsx';
+import NormalizeRaceBoard from './NormalizeRaceBoard.jsx';
 import SprintBoard from './SprintBoard.jsx';
 import StepTrial from './StepTrial.jsx';
 import { RowIcon } from './algoIcons.jsx';
@@ -47,6 +48,7 @@ function TheoryVisual({ learning }) {
   if (learning.board?.kind === 'canvas') return <CanvasDrawBoard {...learning.board} />;
   if (learning.board?.kind === 'lifecycle') return <LifecycleBoard {...learning.board} />;
   if (learning.board?.kind === 'sprint') return <SprintBoard {...learning.board} />;
+  if (learning.board?.kind === 'vector-race') return <NormalizeRaceBoard {...learning.board} />;
   if (learning.visual?.kind === 'array') {
     return <figure className="page-diagram pilot-array-visual">
       <figcaption>{learning.title}</figcaption>
@@ -54,6 +56,27 @@ function TheoryVisual({ learning }) {
     </figure>;
   }
   return <PageDiagram page={learning} />;
+}
+
+function PredictionQuiz({ question, options }) {
+  const [selected, setSelected] = useState(null);
+  const [checked, setChecked] = useState(false);
+  if (!options?.length) return null;
+  const chosen = selected != null ? options[selected] : null;
+  return <fieldset className="pilot-quiz">
+    <legend><GameDevTerms text={question || 'Szybkie pytanie'} /></legend>
+    <div className="pilot-quiz-options">
+      {options.map((option, index) => <label key={index} className={`pilot-quiz-option${checked && index === selected ? (option.correct ? ' is-correct' : ' is-wrong') : ''}${checked && option.correct ? ' shows-correct' : ''}`}>
+        <input type="radio" name="pilot-quiz" checked={selected === index} onChange={() => { setSelected(index); setChecked(false); }} />
+        <span><GameDevTerms text={option.label} /></span>
+      </label>)}
+    </div>
+    <button type="button" className="pilot-quiz-check" disabled={selected == null} onClick={() => setChecked(true)}>Sprawdź odpowiedź</button>
+    <p className="pilot-quiz-verdict" role="status" aria-live="polite">
+      {checked && chosen && (chosen.correct ? `Dobrze! ${chosen.why}` : `Niezupełnie. ${chosen.why}`)}
+    </p>
+    {checked && <p className="pilot-quiz-hint">Przejdź teraz próbę poniżej i porównaj z odpowiedzią.</p>}
+  </fieldset>;
 }
 
 function AnswerDetails({ answer }) {
@@ -117,6 +140,7 @@ export default function LessonPilot({
           <div className="pilot-prediction-code">
             <CodeExample label="Kod próby" code={learning.prediction.code} />
           </div>
+          <PredictionQuiz question={learning.prediction.quizQuestion} options={learning.prediction.options} />
           {learning.trace ? <>
             {learning.trial && <p><strong>Sprawdź.</strong> <GameDevTerms text={learning.trial} /></p>}
             <StepTrial trace={learning.trace} />

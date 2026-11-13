@@ -40,7 +40,7 @@ describe('Game Dev pilot notes', () => {
       expect(note.prediction?.context, `${id} prediction.context`).toBeTruthy();
       expect(note.prediction?.code, `${id} prediction.code`).toBeTruthy();
       if (note.board) {
-        expect(['chase', 'coordinates', 'components', 'keypress', 'canvas', 'lifecycle', 'sprint'], `${id} board.kind=${note.board.kind}`).toContain(note.board.kind);
+        expect(['chase', 'coordinates', 'components', 'keypress', 'canvas', 'lifecycle', 'sprint', 'vector-race'], `${id} board.kind=${note.board.kind}`).toContain(note.board.kind);
       }
     }
   });
