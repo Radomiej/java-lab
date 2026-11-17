@@ -18,7 +18,42 @@ public class TileMap extends Component {
     public String texture;
     public double tileSize;
     public int layer=-100,order=0;
+    private final java.util.HashMap<Long,String> cells=new java.util.HashMap<>();
+    private static long key(int column,int row){return (((long)column)<<32)^(row&0xffffffffL);}
     public TileMap(String texture, double tileSize) { this.texture = texture; this.tileSize = tileSize; }
+    /** Maluje pojedynczy kafelek inną teksturą. */
+    public TileMap setTile(int column,int row,String texture){cells.put(key(column,row),texture);return this;}
+    public TileMap setTile(int column,int row,Assets texture){return setTile(column,row,texture.key());}
+    /** Tekstura kafelka albo null, gdy komórka jest domyślna. */
+    public String getTile(int column,int row){return cells.get(key(column,row));}
+    /** Tekstura kafelka pod pozycją świata — np. do zmiany prędkości na terenie. */
+    public String tileAt(double x,double y){return getTile((int)Math.floor(x/tileSize),(int)Math.floor(y/tileSize));}
+    /** Wypełnia prostokąt kafelków warstwami z deterministycznego szumu; ten sam seed = ta sama mapa. */
+    public TileMap generate(int width,int height,long seed,String... layers){
+        if(layers==null||layers.length==0)throw new IllegalArgumentException("generate potrzebuje warstw");
+        for(int row=0;row<height;row++)for(int column=0;column<width;column++){
+            double n=noise(column/4.0,row/4.0,seed);
+            cells.put(key(column,row),layers[Math.min(layers.length-1,(int)(n*layers.length))]);
+        }
+        return this;
+    }
+    public TileMap generate(int width,int height,long seed,Assets... layers){
+        String[] keys=new String[layers.length];for(int i=0;i<layers.length;i++)keys[i]=layers[i].key();
+        return generate(width,height,seed,keys);
+    }
+    private static double lattice(int x,int y,long seed){
+        int h=(int)seed ^ x*374761393 ^ y*668265263;
+        h*=1274126177; h^=h>>>16;
+        return (h&0xffffffffL)/4294967296.0;
+    }
+    private static double smooth(double t){return t*t*(3-2*t);}
+    private static double noise(double x,double y,long seed){
+        int xi=(int)Math.floor(x),yi=(int)Math.floor(y);
+        double fx=smooth(x-xi),fy=smooth(y-yi);
+        double ab=lattice(xi,yi,seed)+(lattice(xi+1,yi,seed)-lattice(xi,yi,seed))*fx;
+        double cd=lattice(xi,yi+1,seed)+(lattice(xi+1,yi+1,seed)-lattice(xi,yi+1,seed))*fx;
+        return ab+(cd-ab)*fy;
+    }
     @Override public void onDrawBackground() {
         if (!Double.isFinite(tileSize) || tileSize < 8) throw new IllegalArgumentException("Rozmiar kafelka musi wynosic co najmniej 8");
         Vector2 view=getGame().getCameraView();int firstRow=(int)Math.floor(view.y/tileSize),firstColumn=(int)Math.floor(view.x/tileSize);
@@ -26,10 +61,36 @@ public class TileMap extends Component {
         for (int row=firstRow; row<=firstRow+rows; row++)
             for (int column=firstColumn; column<=firstColumn+columns; column++) {
                 int variant=(column*31+row*17+column*row*7)&3;
-                boolean grass=texture.equals("grass");
-                GameCanvas.drawSprite(texture,(column+0.5)*tileSize-view.x,(row+0.5)*tileSize-view.y,tileSize,tileSize,
+                String cell=getTile(column,row);
+                String tex=cell!=null?cell:texture;
+                boolean grass="grass".equals(tex);
+                GameCanvas.drawSprite(tex,(column+0.5)*tileSize-view.x,(row+0.5)*tileSize-view.y,tileSize+1,tileSize+1,
                     0,grass&&(variant&1)!=0?-1:1,grass&&(variant&2)!=0?-1:1);
             }
+    }
+}
+`,
+  'SpriteAnimator.java': `package engine;
+/** Cykluje sprite.texture po klatkach z podanym tempem. loop=false odtwarza raz i zatrzymuje na ostatniej klatce. */
+public class SpriteAnimator extends Component {
+    public String[] frames;
+    public double fps;
+    public boolean loop=true, playing;
+    public double elapsed;
+    public int frame;
+    public SpriteAnimator(String[] frames,double fps){this.frames=frames;this.fps=fps;this.playing=frames!=null&&frames.length>0;}
+    public SpriteAnimator(Assets[] assets,double fps){this(toKeys(assets),fps);}
+    private static String[] toKeys(Assets[] assets){String[] keys=new String[assets.length];for(int i=0;i<assets.length;i++)keys[i]=assets[i].key();return keys;}
+    public SpriteAnimator play(String[] frames,double fps){this.frames=frames;this.fps=fps;this.elapsed=0;this.frame=0;this.playing=true;return this;}
+    public SpriteAnimator play(){this.playing=true;return this;}
+    public SpriteAnimator stop(){this.playing=false;return this;}
+    @Override public void onUpdate(double delta){
+        if(!playing||frames==null||frames.length==0)return;
+        elapsed+=delta;
+        int total=frames.length,index=(int)(elapsed*fps);
+        frame=loop?index%total:Math.min(total-1,index);
+        if(!loop&&index>=total)playing=false;
+        Sprite sprite=getComponent(Sprite.class);if(sprite!=null)sprite.texture=frames[frame];
     }
 }
 `,

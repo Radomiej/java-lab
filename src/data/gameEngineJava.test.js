@@ -375,3 +375,77 @@ public class ColliderApiTests {
 }`;
   expect(runJava({...gameEngineRuntimeFiles,'ColliderApiTests.java':source},'ColliderApiTests')).toContain('PASS collider api');
 },45000);
+
+it('matches Unity lifecycle: destroy fires onDisable+onDestroy once, setActive/setEnabled toggle callbacks and gate onUpdate',()=>{
+ const source=`import engine.*;
+public class UnityLifecycleTest {
+ static StringBuilder calls=new StringBuilder();
+ public static class Probe extends Component {
+  public void onCreate(){calls.append("create|");}
+  public void onUpdate(double d){calls.append("update|");}
+  public void onEnable(){calls.append("enable|");}
+  public void onDisable(){calls.append("disable|");}
+  public void onDestroy(){calls.append("destroy|");}
+ }
+ public static class Scene extends Game { public void onCreate(){createObject("Probe").addComponent(new Probe());} }
+ static long count(String n){return calls.toString().split(java.util.regex.Pattern.quote(n),-1).length-1;}
+ public static void main(String[] a){
+  GameCanvas.setSize(640,360);
+  Scene game=new Scene();game.start();game.step(0);
+  if(count("create|")!=1)throw new AssertionError("onCreate!=1: "+calls);
+  calls.setLength(0);game.step(0.1);
+  if(count("update|")!=1)throw new AssertionError("onUpdate!=1");
+  GameObject obj=game.find("Probe");Probe p=obj.getComponent(Probe.class);
+  obj.setActive(false);
+  if(count("disable|")!=1)throw new AssertionError("setActive(false) bez onDisable: "+calls);
+  calls.setLength(0);game.step(0.1);
+  if(count("update|")!=0)throw new AssertionError("onUpdate leci gdy inactive");
+  obj.setActive(true);
+  if(count("enable|")!=1)throw new AssertionError("setActive(true) bez onEnable: "+calls);
+  calls.setLength(0);game.step(0.1);
+  if(count("update|")!=1)throw new AssertionError("brak wznowienia onUpdate");
+  calls.setLength(0);p.setEnabled(false);
+  if(count("disable|")!=1)throw new AssertionError("setEnabled(false) bez onDisable: "+calls);
+  game.step(0.1);if(count("update|")!=0)throw new AssertionError("onUpdate leci gdy disabled");
+  p.setEnabled(true);
+  if(count("enable|")!=1)throw new AssertionError("setEnabled(true) bez onEnable: "+calls);
+  calls.setLength(0);obj.destroy();game.step(0);
+  if(count("disable|")!=1||count("destroy|")!=1)throw new AssertionError("destroy: "+calls);
+  game.step(0.1);
+  if(count("destroy|")!=1)throw new AssertionError("onDestroy powtorzyl sie");
+  System.out.println("UNITY LIFECYCLE PASS");game.dispose();
+ }
+}`;
+ expect(runJava({...gameEngineRuntimeFiles,'UnityLifecycleTest.java':source},'UnityLifecycleTest')).toContain('UNITY LIFECYCLE PASS');
+},45000);
+
+it('supports TileMap grid/generate with deterministic seed and SpriteAnimator frame cycling',()=>{
+ const source=`import engine.*;
+public class TileAnimatorTest {
+ public static void main(String[] a){
+  GameCanvas.setSize(640,360);
+  Game game=new Game(){public void onCreate(){
+   GameObject ground=createObject("Ground");
+   TileMap map=ground.addComponent(new TileMap("grass",32));
+   map.setTile(2,3,"sand");
+   if(!"sand".equals(map.tileAt(80,112)))throw new AssertionError("tileAt");
+   if(map.tileAt(0,0)!=null)throw new AssertionError("empty cell");
+   map.generate(20,15,42,"grass","sand","stone");
+   String first=map.getTile(0,0);
+   map.generate(20,15,42,"grass","sand","stone");
+   if(!first.equals(map.getTile(0,0)))throw new AssertionError("seed not deterministic");
+   GameObject slime=createObject("Slime");
+   slime.addComponent(new Sprite("slime"));
+   slime.addComponent(new SpriteAnimator(new String[]{"slime","slime-blue","slime-red"},10));
+  }};
+  game.start();game.step(0);
+  game.step(0.11);
+  Sprite s=game.find("Slime").getComponent(Sprite.class);
+  if(!"slime-blue".equals(s.texture))throw new AssertionError("anim: "+s.texture);
+  game.step(0.1);if(!"slime-red".equals(s.texture))throw new AssertionError("anim: "+s.texture);
+  game.step(0.1);if(!"slime".equals(s.texture))throw new AssertionError("anim loop: "+s.texture);
+  System.out.println("TILEMAP ANIM PASS");game.dispose();
+ }
+}`;
+ expect(runJava({...gameEngineRuntimeFiles,'TileAnimatorTest.java':source},'TileAnimatorTest')).toContain('TILEMAP ANIM PASS');
+},45000);

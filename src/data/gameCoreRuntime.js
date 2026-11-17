@@ -84,8 +84,10 @@ public abstract class Component {
     boolean removed;
     boolean destroyed;
     public final void attach(GameObject owner) { gameObject = owner;transform=owner.transform; }
-    public void setEnabled(boolean value){if(enabled==value)return;enabled=value;if(!value&&this instanceof Button)((Button)this).blur();if(gameObject!=null)gameObject.game.spatialRevision++;}
+    public void setEnabled(boolean value){if(enabled==value)return;boolean wasEffective=enabled&&(gameObject==null||gameObject.active);enabled=value;if(!value&&this instanceof Button)((Button)this).blur();if(gameObject!=null)gameObject.game.spatialRevision++;boolean effective=enabled&&(gameObject==null||gameObject.active);if(created&&!destroyed&&effective!=wasEffective){if(effective)onEnable();else onDisable();}}
     public void onCreate() {}
+    public void onEnable() {}
+    public void onDisable() {}
     public void onLateUpdate(double delta) {}
     public void onUpdate(double delta) {}
     public void onDestroy() {}
@@ -373,7 +375,7 @@ public class GameObject {
     }
     GameObject(Game game, String name) { this.id=game.allocateObjectId();this.game = game; this.name = name; this.transform = new Transform(0, 0); }
     public GameObject setPosition(double x, double y) { if(!Double.isFinite(x)||!Double.isFinite(y))throw new IllegalArgumentException("Niepoprawna pozycja");if(game!=null&&(transform.x!=x||transform.y!=y))game.spatialRevision++;transform.x = x; transform.y = y; return this; }
-    public GameObject setActive(boolean value){if(active!=value){active=value;if(game!=null)game.spatialRevision++;if(!value)for(Button b:getComponents(Button.class))b.blur();}return this;}
+    public GameObject setActive(boolean value){if(active!=value){active=value;if(game!=null)game.spatialRevision++;for(Component c:components)if(c.created&&!c.destroyed&&c.enabled){if(value)c.onEnable();else c.onDisable();}if(!value)for(Button b:getComponents(Button.class))b.blur();}return this;}
 
     public <T extends Component> T addComponent(T component) {
         if (destroyed) throw new IllegalArgumentException("Obiekt jest usuniety");
@@ -441,6 +443,7 @@ public class GameObject {
     public void destroy() {
         if (destroyed) return;
         destroyed = true;
+        setActive(false);
         if(game!=null)game.spatialRevision++;
         if(game!=null){game.updateComponentIndex(this);for(String tag:getTags())game.updateTagIndex(this,tag,false);}
         if (game == null && !updating) cleanup();
