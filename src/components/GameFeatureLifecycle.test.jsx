@@ -1,5 +1,5 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import App from "../App.jsx";
 
 afterEach(() => {
@@ -9,6 +9,7 @@ afterEach(() => {
   delete globalThis.__JAVA_LAB_FEATURE_FLAGS__;
   localStorage.clear();
 });
+beforeEach(() => { vi.spyOn(window, "scrollTo").mockImplementation(() => {}); });
 
 it("stops forwarding runtime frames when Game Dev is disabled dynamically", async () => {
   localStorage.clear();
@@ -32,8 +33,8 @@ it("stops forwarding runtime frames when Game Dev is disabled dynamically", asyn
   vi.stubGlobal('Image',class{set src(value){queueMicrotask(()=>this.onload());}});
   render(<App />);
   fireEvent.click(screen.getByRole("tab", { name: /Game Dev w Javie/i }));
-  fireEvent.click(screen.getByRole("button", { name: "3. Zadanie" }));
   fireEvent.click(screen.getByRole("button", { name: /RUN/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Pokaż podgląd wyniku" }));
   await waitFor(() => expect(screen.getByText("Gra gotowa")).toBeInTheDocument());
   act(() => window.dispatchEvent(new CustomEvent("java-lab-game-render-error", { detail: "Brak tekstury: unknown" })));
   expect(screen.getByText(/Brak tekstury: unknown/)).toBeInTheDocument();

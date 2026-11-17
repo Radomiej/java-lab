@@ -2,3 +2,12 @@
 
 .java-course-submission{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:18px;border:1px solid #cadbd7;border-radius:12px;margin:20px 0}.java-course-submission button{padding:10px 16px;border-radius:8px;background:#164e55;color:white;border:0;font:inherit}.java-course-submission input,.java-lesson-quiz>label input{padding:9px;max-width:180px;border:1px solid #9aada9;border-radius:6px}
 .java-quiz-identity{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0}.java-quiz-identity label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:13px;background:none;padding:0;margin:0;white-space:normal;cursor:text}.java-quiz-identity input{padding:9px;max-width:220px;border:1px solid #9aada9;border-radius:6px;margin:0}
+.java-learning-step{min-width:0;margin:14px 0;padding:clamp(12px,1.7vw,20px);border:1px solid #cadbd7;border-radius:12px;background:#fff;box-shadow:0 3px 12px #102e4208;scroll-margin-top:18px}
+.java-learning-step-heading{display:flex;align-items:center;gap:10px;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid #e5eeeb}
+.java-learning-step-heading>span{display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;border-radius:8px;background:#e5f3f2;color:#075b62;font:800 12px/1 system-ui,sans-serif}
+.java-learning-step-heading>p{margin:0;color:#42616c;font-size:11px;font-weight:800;letter-spacing:.09em}
+.java-learning-step--practice .java-learning-step-heading>span{background:#fff2d8;color:#895e00}
+.java-learning-step--task .java-learning-step-heading>span{background:#e5edfb;color:#3b5d9c}
+.java-learning-step .lesson-overview{padding:0;border:0}
+.java-learning-step .java-lesson-quiz{margin:0}
+@media(max-width:600px){.java-learning-step{padding:12px}.java-learning-step-heading{margin-bottom:10px}.java-learning-step-heading>p{font-size:10px}}

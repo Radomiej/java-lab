@@ -1,11 +1,12 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { afterEach, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import App from '../App.jsx';
 import TaskPanel from './TaskPanel.jsx';
 import LessonOverview from './LessonOverview.jsx';
 import { gameDevLessons } from '../data/lessons/gameDevCourse.js';
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.restoreAllMocks(); localStorage.clear(); });
+beforeEach(() => { vi.spyOn(window, 'scrollTo').mockImplementation(() => {}); });
 
 test('RUN starts a compilable game even when exercise assertions fail, without awarding completion', async () => {
   localStorage.clear();
@@ -26,8 +27,8 @@ test('RUN starts a compilable game even when exercise assertions fail, without a
   vi.stubGlobal('Worker',WorkerFixture);
   render(<App />);
   fireEvent.click(screen.getByRole('tab',{name:/Game Dev w Javie/i}));
-  fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
   fireEvent.click(screen.getByRole('button',{name:/RUN/}));
+  fireEvent.click(screen.getByRole('button',{name:'Pokaż podgląd wyniku'}));
   await waitFor(()=>expect(screen.getByText('Gra gotowa')).toBeInTheDocument());
   expect(screen.getAllByText(/Marker.x: oczekiwano 80/).length).toBeGreaterThan(0);
   expect(screen.getByText('0/1')).toBeInTheDocument();

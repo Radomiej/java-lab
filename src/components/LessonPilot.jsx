@@ -93,9 +93,11 @@ export default function LessonPilot({
   lesson, activeTask, learning, completedTasks, onTaskChange, onNextLesson, editor, preview, feedback, submission,
 }) {
   const heading = useRef(null);
+  const [showPreview, setShowPreview] = useState(false);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [lesson.id]);
+  useEffect(() => setShowPreview(false), [activeTask.id]);
   const taskIndex = lesson.tasks.findIndex(task => task.id === activeTask.id);
   const nextTask = lesson.tasks[taskIndex + 1];
   const focusTask = () => {
@@ -187,7 +189,12 @@ export default function LessonPilot({
       </details>}
       <div className="pilot-workbench">
         {editor}
-        {preview}
+        {preview && <section className="pilot-output" aria-label="Wynik zadania">
+          <button type="button" className="java-learning-next pilot-output-toggle" aria-expanded={showPreview} aria-controls={`pilot-output-${lesson.id}`} onClick={() => setShowPreview(value => !value)}>
+            {showPreview ? 'Schowaj podgląd' : 'Pokaż podgląd wyniku'}
+          </button>
+          {showPreview && <div id={`pilot-output-${lesson.id}`} className="pilot-output-content">{preview}</div>}
+        </section>}
       </div>
       {feedback}
       {submission}

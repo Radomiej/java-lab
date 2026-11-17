@@ -1,24 +1,25 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "../App.jsx";
 
 afterEach(() => {cleanup(); vi.restoreAllMocks(); localStorage.clear(); window.history.replaceState(null,'','/');});
+beforeEach(() => {vi.spyOn(window,'scrollTo').mockImplementation(()=>{});});
 
 describe("Java Lab workspace", () => {
-  it('starts with learning and opens quiz before the task editor',()=>{
+  it('keeps theory, quiz and editor visible together on one lesson page',()=>{
     render(<App/>);
-    expect(screen.getByRole('button',{name:'1. Nauka'})).toHaveAttribute('aria-current','step');
-    expect(screen.queryByRole('textbox',{name:'Kod pliku Main.java'})).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button',{name:'2. Quiz'}));
-    const option=screen.getAllByRole('radio')[0];fireEvent.click(option);
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
+    expect(screen.getByRole('region',{name:'Teoria i przykład'})).toBeInTheDocument();
+    expect(screen.getByRole('region',{name:'Krótka próba'})).toBeInTheDocument();
     expect(screen.getByRole('textbox',{name:'Kod pliku Main.java'})).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button',{name:'2. Quiz'}));
-    expect(screen.getAllByRole('radio')[0]).toBeChecked();
+    const taskRegion = screen.getByRole('region',{name:'Zadanie do wykonania'});
+    expect(taskRegion).toContainElement(screen.getByRole('textbox',{name:'Kod pliku Main.java'}));
+    expect(within(taskRegion).getAllByRole('tab', { name: /Powitaj gracza|Komunikat misji|Trzy linie historii/ })).toHaveLength(3);
+    expect(screen.queryByRole('button',{name:'1. Nauka'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button',{name:'2. Quiz'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button',{name:'3. Zadanie'})).not.toBeInTheDocument();
   });
   it('offers solutions only for guided exercises, not independent tasks',()=>{
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
     expect(screen.getByRole('button',{name:'Pokaż rozwiązanie'})).toBeInTheDocument();
     fireEvent.click(screen.getByRole('tab',{name:/Komunikat misji/i}));
     expect(screen.queryByRole('button',{name:'Pokaż rozwiązanie'})).not.toBeInTheDocument();
@@ -28,7 +29,6 @@ describe("Java Lab workspace", () => {
   });
   it('offers formatting as an accessible icon without visible button text', () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
     const format = screen.getByRole('button', {name:'Formatuj kod'});
     expect(format.textContent).toBe('');
     expect(format).toHaveAttribute('title', 'Formatuj kod (Shift+Alt+F)');
@@ -38,7 +38,6 @@ describe("Java Lab workspace", () => {
     vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockReturnValue({setTransform(){},fillRect(){},fillText(){}});
     const confirm=vi.spyOn(window,'confirm').mockReturnValue(false);
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
     fireEvent.click(screen.getByRole('tab',{name:/Game Dev w Javie/i}));
     // Lekcje Game Dev używają układu pilota — edytor jest widoczny bez etapów.
     expect(screen.getByRole('textbox',{name:'Kod pliku GameMain.java'})).toBeInTheDocument();
@@ -56,7 +55,6 @@ describe("Java Lab workspace", () => {
   it('shows only the simple game entry, not engine sources or TeaVM bindings', () => {
     vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockReturnValue({setTransform(){},fillRect(){},fillText(){}});
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
     fireEvent.click(screen.getByRole('tab',{name:/Game Dev w Javie/i}));
     expect(screen.getByRole('tab',{name:/GameMain.java/})).toBeInTheDocument();
     expect(screen.queryByRole('tab',{name:/^J Main\.java$/})).not.toBeInTheDocument();
@@ -66,14 +64,12 @@ describe("Java Lab workspace", () => {
   });
   it('keeps one RUN and the console in the main area for ordinary Java', () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
     expect(screen.getAllByRole('button',{name:/^▶?\s*RUN$/})).toHaveLength(1);
     expect(document.querySelector('main .runtime-console')).toBeInTheDocument();
     expect(document.querySelector('.inspector-region')).not.toBeInTheDocument();
   });
   it('places actions above the code and attaches the console directly below it', () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
     const toolbar = screen.getByRole('toolbar',{name:'Akcje edytora'});
     const editor = screen.getByRole('textbox',{name:'Kod pliku Main.java'});
     const consolePanel = screen.getByRole('region',{name:'Konsola'});
@@ -85,11 +81,12 @@ describe("Java Lab workspace", () => {
   it('enlarges the existing game canvas as a modal and closes it with Escape', () => {
     vi.spyOn(HTMLCanvasElement.prototype,'getContext').mockReturnValue({setTransform(){},fillRect(){},fillText(){}});
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
     fireEvent.click(screen.getByRole('tab',{name:/Game Dev w Javie/i}));
-    // W pilocie podgląd gry jest w osi edytora — bez przycisku „Pokaż podgląd".
-    expect(screen.queryByRole('button',{name:'Pokaż podgląd'})).not.toBeInTheDocument();
+    // Wynik gry nie montuje się stale; uczeń otwiera go dopiero na żądanie.
+    expect(screen.queryByRole('button',{name:'Pełny ekran gry'})).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button',{name:'Pokaż podgląd wyniku'}));
     const canvas=document.querySelector('.game-canvas');
+    expect(canvas).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button',{name:'Pełny ekran gry'}));
     expect(screen.getByRole('dialog',{name:'Podgląd gry'})).toContainElement(canvas);
     fireEvent.keyDown(document,{key:'Escape'});
@@ -98,7 +95,6 @@ describe("Java Lab workspace", () => {
   });
   it("renders the first lesson and its primary actions", () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
 
     expect(screen.getAllByText("Java Lab").length).toBeGreaterThan(0);
     expect(screen.getByRole("heading", { name: "Pierwszy program Javy" })).toBeInTheDocument();
@@ -108,7 +104,6 @@ describe("Java Lab workspace", () => {
 
   it("hides hints after switching to an independent task", () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
 
     fireEvent.click(screen.getByRole("tab", { name: /Komunikat misji/i }));
 
@@ -116,9 +111,8 @@ describe("Java Lab workspace", () => {
     expect(screen.queryByText(/Podpowiedź:/i)).not.toBeInTheDocument();
   });
 
-  it("shows the pilot layout on algorithm lesson 402 and the stage nav on 413", () => {
+  it("shows the pilot layout for GameDev and the one-page lesson flow for 413", () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
     fireEvent.click(screen.getByRole('tab',{name:/Algorytmy/i}));
 
     fireEvent.click(screen.getByRole('button',{name:/Sortowanie bąbelkowe/i}));
@@ -130,14 +124,14 @@ describe("Java Lab workspace", () => {
     expect(screen.getByText('Krok 2 / 11')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button',{name:/Liczby pierwsze/i}));
-    expect(screen.getByRole('button',{name:'1. Nauka'})).toBeInTheDocument();
-    expect(screen.getByRole('button',{name:'2. Quiz'})).toBeInTheDocument();
-    expect(screen.getByRole('button',{name:'3. Zadanie'})).toBeInTheDocument();
+    expect(screen.getByRole('region',{name:'Teoria i przykład'})).toBeInTheDocument();
+    expect(screen.getByRole('region',{name:'Krótka próba'})).toBeInTheDocument();
+    expect(screen.getByRole('region',{name:'Zadanie do wykonania'})).toBeInTheDocument();
+    expect(screen.queryByRole('button',{name:'1. Nauka'})).not.toBeInTheDocument();
   });
 
   it("pokazuje ścieżkę 04 Game Dev i pozwala schować lewy panel", () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
 
     expect(screen.getByRole("tab", { name: /Game Dev w Javie/i })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Schowaj panel ścieżek/i }));
@@ -149,7 +143,6 @@ describe("Java Lab workspace", () => {
   it("ukrywa ścieżkę Game Dev, gdy flaga runtime jest wyłączona", () => {
     globalThis.__JAVA_LAB_FEATURE_FLAGS__ = { "game-dev.enabled": false };
     render(<App />);
-    fireEvent.click(screen.getByRole('button',{name:'3. Zadanie'}));
 
     expect(screen.queryByRole("tab", { name: /Game Dev w Javie/i })).not.toBeInTheDocument();
     delete globalThis.__JAVA_LAB_FEATURE_FLAGS__;
