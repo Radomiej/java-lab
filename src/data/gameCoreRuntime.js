@@ -279,6 +279,14 @@ public class Game {
     }
 }
 `,
+  "Screen.java": `package engine;
+/** Rozmiar logicznego viewportu w pikselach — to samo co Game.getViewportWidth/Height. */
+public final class Screen {
+    private Screen() {}
+    public static double width = 640;
+    public static double height = 480;
+}
+`,
   "GameCanvas.java": `package engine;
 
 public final class GameCanvas {
@@ -289,7 +297,7 @@ public final class GameCanvas {
     private static double height = 480;
     public static double getWidth() { return width; }
     public static double getHeight() { return height; }
-    public static void setSize(double nextWidth, double nextHeight) { width = nextWidth; height = nextHeight; }
+    public static void setSize(double nextWidth, double nextHeight) { width = nextWidth; height = nextHeight; Screen.width = nextWidth; Screen.height = nextHeight; }
 
     /** Komendy audio przeżywają clear(): są czyszczone dopiero przy odczycie ramki. */
     public static void emitAudio(String json) { audio.append("audio|").append(json.replace("|", "/").replace((char) 10, ' ')).append((char) 10); }

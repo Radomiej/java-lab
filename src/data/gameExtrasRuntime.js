@@ -259,14 +259,28 @@ public final class Tweens {
 }
 `,
   'Camera2D.java': `package engine;
-/** Kamera zmienia tylko renderowanie świata. HUD pozostaje nieruchomy. */
+/** Kamera jest obiektem: pozycja jej GameObjectu to środek widoku. HUD pozostaje nieruchomy. */
 public class Camera2D extends Component {
     public double offsetX, offsetY;
+    public boolean followX = true, followY = true;
     private double remaining,strength,time;
     private GameObject target;
     public void follow(GameObject target){if(target==null||target.destroyed||target.game!=getGame())throw new IllegalArgumentException("Cel kamery z innej sceny");this.target=target;}
     public void stopFollowing(){target=null;}
-    public Vector2 getView(){boolean live=target!=null&&target.active&&!target.destroyed;return new Vector2((live?target.transform.x-getGame().getViewportWidth()/2:0)+offsetX+(remaining>0?Math.sin(time*47)*strength:0),(live?target.transform.y-getGame().getViewportHeight()/2:0)+offsetY+(remaining>0?Math.cos(time*39)*strength:0));}
+    private GameObject liveTarget(){return target!=null&&target.active&&!target.destroyed?target:null;}
+    @Override public void onLateUpdate(double delta) {
+        GameObject live=liveTarget();
+        if(live==null)return;
+        if(followX)transform.x=live.transform.x;
+        if(followY)transform.y=live.transform.y;
+    }
+    public Vector2 getView(){
+        GameObject live=liveTarget();
+        double cx=(followX&&live!=null?live.transform.x:transform.x)-Screen.width/2+offsetX;
+        double cy=(followY&&live!=null?live.transform.y:transform.y)-Screen.height/2+offsetY;
+        if(remaining>0){cx+=Math.sin(time*47)*strength;cy+=Math.cos(time*39)*strength;}
+        return new Vector2(cx,cy);
+    }
     public Vector2 worldToScreen(Vector2 p){Vector2 v=getView();return new Vector2(p.x-v.x,p.y-v.y);}
     public Vector2 screenToWorld(Vector2 p){Vector2 v=getView();return new Vector2(p.x+v.x,p.y+v.y);}
     public void shake(double strength,double seconds) {

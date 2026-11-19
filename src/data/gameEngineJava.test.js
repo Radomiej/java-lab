@@ -449,3 +449,29 @@ public class TileAnimatorTest {
 }`;
  expect(runJava({...gameEngineRuntimeFiles,'TileAnimatorTest.java':source},'TileAnimatorTest')).toContain('TILEMAP ANIM PASS');
 },45000);
+
+it('exposes Screen dimensions that track the logical viewport',()=>{
+  const source=`import engine.*;
+public class ScreenTests {
+ static void check(boolean ok,String label){if(!ok)throw new IllegalArgumentException(label);}
+ public static void main(String[] args){
+  check(Screen.width==640&&Screen.height==480,"default 640x480");
+  Game g=new Game();g.start();
+  check(Screen.width==g.getViewportWidth()&&Screen.height==g.getViewportHeight(),"screen matches viewport");
+  GameCanvas.setSize(800,450);
+  check(Screen.width==800&&Screen.height==450,"setSize updates screen");
+  check(Screen.width==g.getViewportWidth()&&Screen.height==g.getViewportHeight(),"screen matches resized viewport");
+  GameCanvas.setSize(640,480);g.dispose();
+  Game cam=new Game();GameObject hero=cam.createObject("hero").setPosition(400,300);GameObject camObj=cam.createObject("cam").setPosition(400,180);
+  Camera2D c=camObj.addComponent(new Camera2D());c.follow(hero);c.followY=false;cam.start();
+  hero.transform.x=500;hero.transform.y=350;cam.step(0.1);
+  check(camObj.transform.x==500&&camObj.transform.y==180,"followX only");
+  c.shake(6,0.2);cam.step(0.05);
+  check(camObj.transform.x==500&&camObj.transform.y==180,"shake keeps transform");
+  c.stopShake();cam.step(0.05);
+  Vector2 w=c.screenToWorld(new Vector2(320,240));check(Math.abs(w.x-500)<1e-6&&Math.abs(w.y-180)<1e-6,"screenToWorld center");
+  cam.dispose();
+  System.out.println("PASS screen");
+ }}`;
+  expect(runJava({...gameEngineRuntimeFiles,'ScreenTests.java':source},'ScreenTests')).toContain('PASS screen');
+},45000);
